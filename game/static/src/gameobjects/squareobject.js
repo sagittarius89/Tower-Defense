@@ -1,0 +1,3 @@
+class SquareObject extends GameObject {
+
+}

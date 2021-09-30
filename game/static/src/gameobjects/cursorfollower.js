@@ -1,5 +1,6 @@
 class CursorFollower extends GameObject {
     #position;
+    #selection;
 
     constructor(startPos) {
         this.#position = startPos;
@@ -7,9 +8,13 @@ class CursorFollower extends GameObject {
     }
     /**
      * 
-     * @param {InputDevice} input 
+     * @param {MouseEvent} input 
      */
-    notify(input) {
+    notify(event) {
+
+    }
+
+    update(ctx, objects) {
 
     }
 }

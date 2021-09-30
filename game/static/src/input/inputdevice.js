@@ -1,13 +1,7 @@
 class InputDevice {
-    get isJump() { }
-    get isMoveRight() { }
-    get isMoveLeft() { }
-    get isMoveDown() { }
-    get isFire() { }
-
-    set jump(keycode) { }
-    set moveRight(keycode) { }
-    set moveLeft(keycode) { }
-    set moveDown(keycode) { }
-    set fire(keycode) { }
+    get mousePos() { console.log("not implemented yet"); }
+    get leftClick() { console.log("not implemented yet"); }
+    get rightClick() { console.log("not implemented yet"); }
+    get scrollUp() { console.log("not implemented yet"); }
+    get scrollDown() { console.log("not implemented yet"); }
 }

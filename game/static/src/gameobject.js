@@ -2,6 +2,9 @@ class GameObject {
     #id;
     #type;
     #properties;
+    #zIndex;
+    #alwaysOnTop;
+    #ready;
 
     constructor() {
         /**@member {String} */
@@ -12,10 +15,37 @@ class GameObject {
 
         /**@member {Map<String, Object>} */
         this.#properties = {};
+
+        /**@member {bool} */
+        this.#ready = false;
     }
 
+    /** @type {String} */
     get id() { return this.#id; }
+
+    /** @type {String} */
     get type() { return this.#type; }
+
+    /** @type {Number} */
+    get zIndex() { return this.#zIndex; }
+
+    /** @type {Boolean} */
+    get alwaysOnTop() { return this.#alwaysOnTop; }
+
+    /** @type {Boolean} */
+    get ready() { return this.#ready; }
+
+    set alwaysOnTop(value) {
+        this.#alwaysOnTop = value ? true : false;
+    }
+
+    set ready(value) {
+        this.#ready = value ? true : false;
+    }
+
+    set zIndex(value) {
+        var tmp = Number.parseInt(value);
+    }
 
     /**
      * @param {String} name 
