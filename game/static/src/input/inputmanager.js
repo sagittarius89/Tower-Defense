@@ -23,9 +23,13 @@ class InputManager extends GameObject {
     update(ctx, objects) {
         objects.foreach((obj) => {
             var player = obj.getProperty(InputManager.INPUT_LISTENER_PROPERTY);
+            var device = this.#devices[player];
 
-            if (player && this.#devices[player]) {
-                obj.notify(this.#devices[player]);
+            if (player && device) {
+                while (!device.isEmpty()) {
+                    var event = device.dequeue();
+                    obj.notify(event);
+                }
             }
         });
     }

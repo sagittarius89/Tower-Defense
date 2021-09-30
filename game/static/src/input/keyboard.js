@@ -1,4 +1,4 @@
-class Keyboard extends InputDevice {
+/*class Keyboard extends InputDevice {
     #keyLeft;
     #keyUp;
     #keyRight;
@@ -42,9 +42,6 @@ class Keyboard extends InputDevice {
     get isMoveDown() {
         return this.#keysState[this.#keyDown];
     }
-    get isFire() {
-        return this.#keysState[this.#keyFire];
-    }
 
     set jump(keycode) {
         this.#keyLeft = keycode;
@@ -61,4 +58,4 @@ class Keyboard extends InputDevice {
     set fire(keycode) {
         this.#keysState = keycode;
     }
-}
+}*/
