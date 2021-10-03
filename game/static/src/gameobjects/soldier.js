@@ -7,10 +7,12 @@ class Soldier extends RoundObject {
     #maxHp;
     #attackMode;
     #idle;
+    #shotFrequency;
+    #shotTimestamp;
 
 
     constructor(x, y) {
-        let tmpImg = ResourceManager.instance.getImageResource("solider_01_2");
+        let tmpImg = ResourceManager.instance.getImageResource("solider_01_3");
         super(tmpImg.width / 2, x, y);
 
         this.#image = tmpImg;
@@ -23,26 +25,57 @@ class Soldier extends RoundObject {
         this.#attackDistance = 110;
         this.#attackMode = false;
         this.#idle = false;
+        this.#shotTimestamp = new Date();
+        this.#shotFrequency = 1000;
     }
 
     update(ctx, objects) {
 
         this.draw(ctx);
         this.findClostestEnemy(objects);
-        this.checkCollisions(objects);
+
+        if (!this.#attackMode && !this.#idle)
+            this.checkCollisions(objects);
+
+        let now = new Date();
+        if (this.#attackMode &&
+            (now.getTime() - this.#shotTimestamp.getTime()
+                > this.#shotFrequency)
+        ) {
+
+            this.doShot(objects);
+
+            this.#shotTimestamp = new Date();
+        }
+
         this.move();
+    }
+
+    doShot(objects) {
+        let bullet = new Bullet(
+            this.x + (this.radius * Math.cos(this.#angle)),
+            this.y + (this.radius * Math.sin(this.#angle)),
+            new Vector2d(
+                Bullet.BULLET_VELOCITY * Math.cos(this.#angle),
+                Bullet.BULLET_VELOCITY * Math.sin(this.#angle)
+            ),
+            this
+        );
+
+        GameContext.engine.addObject(bullet);
     }
 
     checkCollisions(objects) {
         objects.foreach((obj) => {
-            if (obj != this && obj instanceof RoundObject) {
+            let player = obj.getProperty(Player.PLAYER_PROPERTY);
+            if (obj != this && player && obj instanceof RoundObject) {
                 let objPos = new Vector2d(obj.x, obj.y);
                 let myPos = new Vector2d(this.x, this.y);
 
                 var distance = myPos.getDistance(objPos);
 
                 if (distance <= this.radius + obj.radius) {
-                    this.#angle += (Math.random() > 0.5 ? -1 : 1) * Math.PI / 2;
+                    this.#angle += Math.PI / 2;
                 }
             }
         });
@@ -99,7 +132,7 @@ class Soldier extends RoundObject {
             ctx.stroke();
         }
 
-        ctx.rotate(this.#angle - (Math.PI / 2)); // rotate
+        ctx.rotate(this.#angle - Math.PI); // rotate
         ctx.drawImage(this.#image, -this.#image.width / 2, -this.#image.height / 2); // draw image offset so its center is at x,y
         ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
         ctx.restore();
@@ -111,7 +144,8 @@ class Soldier extends RoundObject {
 
         objects.foreach((obj) => {
 
-            if (obj.getProperty(Player.PLAYER_PROPERTY)
+            if (obj.getProperty(Player.PLAYER_PROPERTY) &&
+                obj.getProperty(Player.PLAYER_PROPERTY)
                 != this.getProperty(Player.PLAYER_PROPERTY)) {
 
 
@@ -151,6 +185,14 @@ class Soldier extends RoundObject {
             console.log("uuid: " + this.id + " clicked");
 
             Selection.instance.currentSelection = this;
+        }
+    }
+
+    lumbago(value) {
+        this.#hp -= value;
+
+        if (this.#hp < 0) {
+            GameContext.engine.objects.delete(this);
         }
     }
 }

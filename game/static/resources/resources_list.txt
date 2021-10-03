@@ -6,3 +6,5 @@ tower_01.png
 tower_01_2.png
 tower_02.png
 tower_02_2.png
+solider_01_3.png
+solider_01_4.png
