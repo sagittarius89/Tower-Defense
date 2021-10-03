@@ -5,6 +5,7 @@ class GameObject {
     #zIndex;
     #alwaysOnTop;
     #ready;
+    #selectable;
 
     constructor() {
         /**@member {String} */
@@ -18,6 +19,12 @@ class GameObject {
 
         /**@member {bool} */
         this.#ready = false;
+
+        /**@member {bool} */
+        this.#selectable = false;
+
+        /**@member {Number} */
+        this.#zIndex = 50;
     }
 
     /** @type {String} */
@@ -34,6 +41,13 @@ class GameObject {
 
     /** @type {Boolean} */
     get ready() { return this.#ready; }
+
+    /** @type {Boolean} */
+    get selectable() { return this.#selectable; }
+
+    set selectable(value) {
+        this.#selectable = value ? true : false;
+    }
 
     set alwaysOnTop(value) {
         this.#alwaysOnTop = value ? true : false;

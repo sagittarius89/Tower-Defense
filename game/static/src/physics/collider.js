@@ -30,6 +30,11 @@ class Collider {
         return result;
     }
 
+    static checkCollisionPointWithSquare(point, square) {
+        return point.x > square.topLeft.x && point.x < square.topRight.x &&
+            point.y > square.topLeft.y && point.y < square.bottomLeft.y;
+    }
+
     checkCollision(objA, colDataA, objB, colDataB) {
         let shapeA = colDataA[Collider.SHAPE_PROPERTY];
         let shapeB = colDataB[Collider.SHAPE_PROPERTY];

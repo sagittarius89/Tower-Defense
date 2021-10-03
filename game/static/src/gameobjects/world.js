@@ -1,14 +1,11 @@
 class World extends GameObject {
     #image
 
-    constructor(image) {
+    constructor() {
         super();
 
-        this.#image = new Image();
-        this.#image.src = image;
-        this.#image.onload = function () {
-            this.ready = true;
-        }
+        this.#image = ResourceManager.instance.getImageResource("bg_02");
+        this.zIndex = 0;
     }
 
     update(ctx, objects) {

@@ -60,8 +60,10 @@ class Vector2d {
     rotate(angle) {
         var ca = Math.cos(angle);
         var sa = Math.sin(angle);
-        this.x = this.x * ca + this.y * sa;
-        this.y = this.x * sa - this.y * ca;
+        this.#x = this.x * ca + this.y * sa;
+        this.#y = this.x * sa - this.y * ca;
+
+        return this;
     }
 
     getLength() {
