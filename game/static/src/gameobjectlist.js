@@ -25,6 +25,7 @@ class GameObjectList {
         }
 
         this.#list.push(object);
+        this.#list.sort(function (a, b) { return a.zIndex - b.zIndex });
 
         return true;
     }

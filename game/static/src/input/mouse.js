@@ -26,11 +26,12 @@ class Mouse extends InputDevice {
     #eventQueue;
 
     constructor() {
+        super();
         this.#eventQueue = new Queue();
 
         window.addEventListener('mousedown', e => {
-            x = e.offsetX;
-            y = e.offsetY;
+            let x = e.offsetX;
+            let y = e.offsetY;
 
             this.#eventQueue.enqueue(
                 new MouseEvent(MouseEventType.MOUSE_DOWN, x, y)
@@ -38,8 +39,8 @@ class Mouse extends InputDevice {
         });
 
         window.addEventListener('mousemove', e => {
-            x = e.offsetX;
-            y = e.offsetY;
+            let x = e.offsetX;
+            let y = e.offsetY;
 
             this.#eventQueue.enqueue(
                 new MouseEvent(MouseEventType.MOUSE_MOVE, x, y)
@@ -47,8 +48,8 @@ class Mouse extends InputDevice {
         });
 
         window.addEventListener('mouseup', e => {
-            x = e.offsetX;
-            y = e.offsetY;
+            let x = e.offsetX;
+            let y = e.offsetY;
 
             this.#eventQueue.enqueue(
                 new MouseEvent(MouseEventType.MOUSE_UP, x, y)

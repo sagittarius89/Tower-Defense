@@ -1,11 +1,16 @@
 class InputManager extends GameObject {
     #devices;
+    #mousePosX;
+    #mousePosY;
 
     constructor() {
         super();
 
         /** @member {Map<Player, InputDevice>} */
         this.#devices = {};
+
+        this.#mousePosX = 0;
+        this.#mousePosY = 0;
     }
 
     static get INPUT_LISTENER_PROPERTY() {
@@ -21,16 +26,25 @@ class InputManager extends GameObject {
     }
 
     update(ctx, objects) {
-        objects.foreach((obj) => {
-            var player = obj.getProperty(InputManager.INPUT_LISTENER_PROPERTY);
-            var device = this.#devices[player];
+        let device = this.#devices[GameContext.player1];
+        while (!device.eventQueue.isEmpty()) {
+            let event = device.eventQueue.dequeue();
 
-            if (player && device) {
-                while (!device.isEmpty()) {
-                    var event = device.dequeue();
+            if (event.type == MouseEventType.MOUSE_MOVE) {
+                this.#mousePosX = event.x;
+                this.#mousePosY = event.y;
+            }
+
+            objects.foreach((obj) => {
+                let player = obj.getProperty(InputManager.INPUT_LISTENER_PROPERTY);
+
+                if (player && device) {
                     obj.notify(event);
                 }
-            }
-        });
+            });
+        }
     }
+
+    get mousePosY() { return this.#mousePosY; }
+    get mousePosX() { return this.#mousePosX; }
 }
