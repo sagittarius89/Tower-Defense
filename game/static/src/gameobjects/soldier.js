@@ -29,13 +29,23 @@ class Soldier extends RoundObject {
         this.#shotFrequency = 1000;
     }
 
+    get angle() { return this.#angle; }
+    set angle(value) { this.#angle = value; }
+    get idle() { return this.#idle; }
+    set idle(value) { this.#idle = this.#idle; }
+    get pos() { return new Vector2d(this.x, this.y); }
+    set pos(value) {
+        this.x = value.x;
+        this.y = value.y;
+    }
+
     update(ctx, objects) {
 
-        this.draw(ctx);
-        this.findClostestEnemy(objects);
+        let enemy = this.findClostestEnemy(objects);
+        this.draw(ctx, enemy);
 
         if (!this.#attackMode && !this.#idle)
-            this.checkCollisions(objects);
+            this.checkCollisions(objects, enemy);
 
         let now = new Date();
         if (this.#attackMode &&
@@ -65,20 +75,52 @@ class Soldier extends RoundObject {
         GameContext.engine.addObject(bullet);
     }
 
-    checkCollisions(objects) {
-        objects.foreach((obj) => {
-            let player = obj.getProperty(Player.PLAYER_PROPERTY);
-            if (obj != this && player && obj instanceof RoundObject) {
-                let objPos = new Vector2d(obj.x, obj.y);
-                let myPos = new Vector2d(this.x, this.y);
+    checkCollisions(objects, clostestEnemy) {
 
-                var distance = myPos.getDistance(objPos);
+        if (!this.#idle && !this.#attackMode) {
+            let nextX = this.x + (this.#velocity * Math.cos(this.#angle)) * 3;
+            let nextY = this.y + (this.#velocity * Math.sin(this.#angle)) * 3;
 
-                if (distance <= this.radius + obj.radius) {
-                    this.#angle += Math.PI / 2;
+            objects.foreach((obj) => {
+                let player = obj.getProperty(Player.PLAYER_PROPERTY);
+                if (obj != this && player && obj instanceof RoundObject) {
+
+                    let objPos = new Vector2d(obj.x, obj.y);
+                    let myPos = new Vector2d(nextX, nextY);
+
+                    var distance = myPos.getDistance(objPos);
+
+                    if (distance <= this.radius + obj.radius) {
+
+                        Collider.resolveIntersectionBallBall(this, obj);
+
+                        let angle1 = this.#angle + Math.PI / 2;
+                        let angle2 = this.#angle - Math.PI / 2;
+
+                        let v1 = new Vector2d(
+                            nextX + (this.#velocity * Math.cos(angle1)),
+                            nextY + (this.#velocity * Math.sin(angle1))
+                        );
+
+                        let v2 = new Vector2d(
+                            nextX + (this.#velocity * Math.cos(angle2)),
+                            nextY + (this.#velocity * Math.sin(angle2))
+                        );
+
+                        let d1, d2 = 0;
+
+                        if (clostestEnemy) {
+                            d1 = v1.getDistance(clostestEnemy.pos);
+                            d2 = v2.getDistance(clostestEnemy.pos);
+                        }
+                        if (d1 < d2)
+                            this.#angle = angle1;
+                        else
+                            this.#angle = angle2;
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     resolveCollision() {
@@ -92,7 +134,7 @@ class Soldier extends RoundObject {
         }
     }
 
-    draw(ctx) {
+    draw(ctx, clostestEnemy) {
         ctx.setTransform(1, 0, 0, 1, this.x, this.y); // set position of image center
 
         /*let gradient = ctx.createRadialGradient(
@@ -136,6 +178,16 @@ class Soldier extends RoundObject {
         ctx.drawImage(this.#image, -this.#image.width / 2, -this.#image.height / 2); // draw image offset so its center is at x,y
         ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
         ctx.restore();
+
+        if (clostestEnemy) {
+            let randomColor = Math.floor(Math.random() * 16777215).toString(16);
+
+            ctx.strokeStyle = '#' + randomColor;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(clostestEnemy.x, clostestEnemy.y);
+            ctx.stroke();
+        }
     }
 
     findClostestEnemy(objects) {
@@ -169,11 +221,15 @@ class Soldier extends RoundObject {
 
             if (this.#attackDistance > distance) {
                 this.#attackMode = true;
+            } else {
+                this.#attackMode = false;
             }
 
         } else {
             this.#idle = true;
         }
+
+        return closestObj;
     }
 
     notify(inputEvent) {
