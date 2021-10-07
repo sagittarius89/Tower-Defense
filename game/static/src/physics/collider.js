@@ -70,9 +70,9 @@ class Collider {
         }
     }
 
-    resolveIntersectionBallBall(ball1, ball2) {
-        var ball1Pos = ball1.position;
-        var ball2Pos = ball2.position;
+    static resolveIntersectionBallBall(ball1, ball2) {
+        var ball1Pos = ball1.pos;
+        var ball2Pos = ball2.pos;
 
         var n = ball1Pos.substract(ball2Pos);
 
@@ -85,8 +85,8 @@ class Collider {
         ball1Pos = ball1Pos.add(n = n.multiplyByFloat(0.5));
         ball2Pos = ball2Pos.substract(n = n.multiplyByFloat(0.5));
 
-        ball1.position = ball1Pos;
-        ball2.position = ball2Pos;
+        ball1.pos = ball1Pos;
+        ball2.pos = ball2Pos;
     }
 
     processCircleShapeCollision(objA, isStaticA, objB, isStaticB) {
