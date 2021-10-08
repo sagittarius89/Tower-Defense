@@ -4,6 +4,10 @@ class GameEngine {
     #collider;
     #camera;
 
+    #fps;
+    #lastLoop;
+    #counter;
+
     /** @param {CanvasRenderingContext2D} ctx */
     constructor(ctx) {
         /** @member {CanvasRenderingContext2D} */
@@ -15,9 +19,14 @@ class GameEngine {
         this.#camera = new Camera(new Vector2d(0, 0));
 
         this.addObject(this.#camera);
+
+        this.#lastLoop = new Date();
+        this.#counter = 0;
+        this.#fps = 0;
     }
 
     get ctx() { return this.#ctx; }
+    get fps() { return (1000 / this.#fps * 60).toFixed(1); }
 
     /**
      * 
@@ -43,18 +52,42 @@ class GameEngine {
     start() {
         this.continue = true;
 
-        setTimeout(this.update, 20, this.#ctx, this.#objects, this.#collider, this.#camera, this);
+        window.requestAnimationFrame(function () {
+            this.update(this.#ctx, this.#objects, this.#collider, this.#camera, this);
+        }.bind(this));
     }
 
     update(ctx, objects, collider, camera, instance) {
         ctx.clearRect(0, 0, instance.WIDTH, instance.HEIGHT);
 
         objects.foreach((obj) => {
+            if (obj.x && obj.y
+                && (obj.x > GameContext.engine.background.width ||
+                    obj.y > GameContext.engine.background.height ||
+                    obj.x < 0 || obj.y < 0)
+            ) {
+                objects.delete(obj);
+                return;
+            }
+
             obj.update(ctx, objects, collider, camera);
         });
 
+        this.#counter++;
+
+        if (this.#counter == 60) {
+            let thisLoop = new Date();
+            let thisFrameTime = thisLoop.getTime() - this.#lastLoop.getTime();
+            this.#fps = thisFrameTime;
+            this.#lastLoop = new Date();
+
+            this.#counter = 0;
+        }
+
         if (instance.continue)
-            setTimeout(instance.update, Physics.framerate, ctx, objects, collider, camera, instance);
+            window.requestAnimationFrame(function () {
+                this.update(this.#ctx, this.#objects, this.#collider, this.#camera, this);
+            }.bind(this));
     }
 
     stop() {

@@ -4,11 +4,14 @@ class World extends GameObject {
     constructor() {
         super();
 
-        this.#image = ResourceManager.instance.getImageResource("bg_02");
+        this.#image = ResourceManager.instance.getImageResource("bg_03");
         this.zIndex = 0;
     }
 
     update(ctx, objects) {
         ctx.drawImage(this.#image, 0, 0);
     }
+
+    get width() { return this.#image.width; }
+    get height() { return this.#image.height; }
 }

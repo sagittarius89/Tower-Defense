@@ -3,30 +3,43 @@ class Soldier extends RoundObject {
     #velocity;
     #attackDistance;
     #angle;
-    #hp;
-    #maxHp;
     #attackMode;
     #idle;
     #shotFrequency;
     #shotTimestamp;
+    #imgWidth;
+    #imgHeight;
+    #currFrame;
+    #kills;
+    #bulletImage;
 
-
-    constructor(x, y) {
-        let tmpImg = ResourceManager.instance.getImageResource("solider_01_3");
+    constructor(x, y, dronImage, bulletImage) {
+        let tmpImg = ResourceManager.instance.getImageResource(dronImage);
         super(tmpImg.width / 2, x, y);
 
         this.#image = tmpImg;
-        this.zIndex = 20;
-        this.selectable = true;
         this.#angle = 0;
-        this.#hp = 60;
-        this.#maxHp = 60;
-        this.#velocity = 0.7;
+        //this.#velocity = 0.7;
+
+        this.#velocity = 3.0;
         this.#attackDistance = 110;
         this.#attackMode = false;
         this.#idle = false;
         this.#shotTimestamp = new Date();
         this.#shotFrequency = 1000;
+        this.#imgWidth = tmpImg.width;
+        this.#imgHeight = tmpImg.height;
+        this.#currFrame = 0;
+        this.#kills = 0;
+        this.#bulletImage = bulletImage;
+
+        this.name = "Drone";
+        this.zIndex = 20;
+        this.selectable = true;
+        this.hp = 60;
+        this.maxHp = 60;
+
+
     }
 
     get angle() { return this.#angle; }
@@ -38,6 +51,9 @@ class Soldier extends RoundObject {
         this.x = value.x;
         this.y = value.y;
     }
+
+    get kills() { return this.#kills; }
+    set kills(value) { this.#kills = Number.parseInt(value); }
 
     update(ctx, objects) {
 
@@ -69,7 +85,8 @@ class Soldier extends RoundObject {
                 Bullet.BULLET_VELOCITY * Math.cos(this.#angle),
                 Bullet.BULLET_VELOCITY * Math.sin(this.#angle)
             ),
-            this
+            this,
+            this.#bulletImage
         );
 
         GameContext.engine.addObject(bullet);
@@ -109,7 +126,7 @@ class Soldier extends RoundObject {
 
                         let d1, d2 = 0;
 
-                        if (clostestEnemy) {
+                        if (clostestEnemy && clostestEnemy.pos) {
                             d1 = v1.getDistance(clostestEnemy.pos);
                             d2 = v2.getDistance(clostestEnemy.pos);
                         }
@@ -137,27 +154,6 @@ class Soldier extends RoundObject {
     draw(ctx, clostestEnemy) {
         ctx.setTransform(1, 0, 0, 1, this.x, this.y); // set position of image center
 
-        /*let gradient = ctx.createRadialGradient(
-            this.radius / 2, this.radius / 2,
-            0, this.radius / 2,
-            this.radius / 2, this.radius * 2);
-
-        gradient.addColorStop(0, 'black');
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-        ctx.fillStyle = gradient;
-
-        ctx.ellipse(
-            this.radius / 2,
-            this.radius / 2,
-            this.radius * 2,
-            this.radius,
-            0,
-            0,
-            2 * Math.PI);
-
-        ctx.fill();*/
-
         if (this == Selection.instance.currentSelection) {
             ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
             ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
@@ -175,11 +171,22 @@ class Soldier extends RoundObject {
         }
 
         ctx.rotate(this.#angle - Math.PI); // rotate
-        ctx.drawImage(this.#image, -this.#image.width / 2, -this.#image.height / 2); // draw image offset so its center is at x,y
+
+        ctx.drawImage(
+            this.#image.frames ? this.#image.frames[this.#currFrame++].image : this.#image,
+            -this.#imgWidth / 2,
+            -this.#imgHeight / 2,
+            this.#imgWidth,
+            this.#imgHeight
+        ); // draw image offset so its center is at x,y
+
+        if (this.#image.frames && this.#currFrame >= this.#image.frames.length)
+            this.#currFrame = 0;
+
         ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
         ctx.restore();
 
-        if (clostestEnemy) {
+        if (clostestEnemy && GameContext.debug) {
             let randomColor = Math.floor(Math.random() * 16777215).toString(16);
 
             ctx.strokeStyle = '#' + randomColor;
@@ -188,6 +195,13 @@ class Soldier extends RoundObject {
             ctx.lineTo(clostestEnemy.x, clostestEnemy.y);
             ctx.stroke();
         }
+
+        drawHpStripe(ctx, this.maxHp, this.hp,
+            this.x - this.radius,
+            this.y - (this.radius * 1, 25),
+            this.radius * 2, 5);
+
+
     }
 
     findClostestEnemy(objects) {
@@ -245,10 +259,28 @@ class Soldier extends RoundObject {
     }
 
     lumbago(value) {
-        this.#hp -= value;
+        this.hp -= value;
 
-        if (this.#hp < 0) {
-            GameContext.engine.objects.delete(this);
+        if (this.hp <= 0) {
+            this.#image = ResourceManager.instance.getImageResource("bang");
+            this.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
+                null);
+            this.addProperty(Player.PLAYER_PROPERTY,
+                null);
+
+            if (Selection.instance.currentSelection == this) {
+                Selection.instance.currentSelection = null;
+            }
+
+            setTimeout(function () {
+                GameContext.engine.objects.delete(this);
+
+
+            }.bind(this), 1000);
+
+            return true;
         }
+
+        return false;
     }
 }

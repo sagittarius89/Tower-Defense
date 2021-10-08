@@ -11,3 +11,6 @@ class Player {
 
     get name() { return this.#name }
 }
+
+Player.player1 = new Player("Player 1");
+Player.player2 = new Player("Player 2");
