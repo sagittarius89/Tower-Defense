@@ -4,19 +4,20 @@ var GameContext = (async function () {
         await sleep(100);
     }
 
+    GameContext.debug = false;
     GameContext.canvas = document.getElementById("canvas");
     GameContext.canvas.width = document.body.clientWidth - 15;
     GameContext.canvas.height = document.body.clientHeight - 15;
 
     GameContext.engine = new GameEngine(GameContext.canvas.getContext("2d"));
     GameContext.inputManager = new InputManager();
-    GameContext.player1 = new Player("Player 1");
+    GameContext.player1 = Player.player1;
 
     GameContext.mouseInput = new Mouse();
     GameContext.inputManager.attachPlayer(GameContext.player1, GameContext.mouseInput);
     GameContext.engine.addObject(GameContext.inputManager);
 
-    GameContext.player2 = new Player("Player 2");
+    GameContext.player2 = Player.player2;
 
     //roof
     //GameContext.engine.addObject(new Surface(new Vector2d(0, 0), GameContext.engine.WIDTH, Orientation.HORIZONTAL));
@@ -30,11 +31,16 @@ var GameContext = (async function () {
     //right wall
     //GameContext.engine.addObject(new Surface(new Vector2d(GameContext.engine.WIDTH - 10, 0), GameContext.engine.HEIGHT, Orientation.VERTICAL));
 
-    GameContext.engine.addObject(new World());
+    GameContext.engine.background = new World();
+    GameContext.engine.addObject(GameContext.engine.background);
 
-    let buildingA = new CommandCenterBuilding("tower_02",
-        new Vector2d(60, 320),
-        new Vector2d(410, 420)
+    let buildingA = new CommandCenterBuilding(
+        new Vector2d(67, 425),
+        new Vector2d(73, 440),
+        "tower_violet_01",
+        "towerlight_violet_01",
+        "solider_violet_01",
+        "bullet_violet_01"
     );
 
     buildingA.addProperty(InputManager.INPUT_LISTENER_PROPERTY, GameContext.player1);
@@ -42,9 +48,13 @@ var GameContext = (async function () {
     GameContext.engine.addObject(buildingA);
     buildingA.produceNewSoldier();
 
-    let buildingB = new CommandCenterBuilding("tower_01",
-        new Vector2d(1100, 290),
-        new Vector2d(1080, 400)
+    let buildingB = new CommandCenterBuilding(
+        new Vector2d(1356, 435),
+        new Vector2d(1292, 460),
+        "tower_orange_01",
+        "towerlight_orange_01",
+        "solider_oragne_01",
+        "bullet_orange_01"
     );
     buildingB.addProperty(InputManager.INPUT_LISTENER_PROPERTY, GameContext.player2);
     buildingB.addProperty(Player.PLAYER_PROPERTY, GameContext.player2);
@@ -59,6 +69,9 @@ var GameContext = (async function () {
     //GameContext.engine.camera.attachToObject(GameContext.playerBall);
 
     GameContext.engine.addObject(GameContext.inputManager);
+
+    GameContext.hud = new Hud(GameContext.canvas.getContext("2d"));
+    GameContext.engine.addObject(GameContext.hud);
 
     GameContext.engine.start();
 }());

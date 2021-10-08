@@ -18,4 +18,9 @@ class SquareObject extends GameObject {
     get y() { return this.#y; }
     set x(value) { this.#x = value; }
     set y(value) { this.#y = value; }
+
+    toSquare() {
+        return new Square(this.x, this.y, this.width, this.height);
+    }
+
 }

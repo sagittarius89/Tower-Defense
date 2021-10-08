@@ -3,22 +3,37 @@ class CommandCenterBuilding extends Building {
     #spawnPoint;
     #spawnFrequency;
     #soldierLimit;
-    #hp;
-    #maxHp;
+    #dronImage;
+    #bulletImage;
 
-    constructor(image, pos, spawnPoint) {
-        super(image, pos.x, pos.y);
-        this.selectable = true;
+    constructor(pos, spawnPoint, image, imageSelected, dronImage, bulletImage) {
+        super(image, imageSelected, pos.x, pos.y);
+
         this.#productionTimestamp = new Date();
         this.#spawnFrequency = 3 * 1000;
         this.#spawnPoint = spawnPoint;
         this.#soldierLimit = 15;
-        this.#hp = 1000;
-        this.#maxHp = 1000;
+        this.#dronImage = dronImage;
+        this.#bulletImage = bulletImage;
+
+        this.selectable = true;
+        this.hp = 1000;
+        this.maxHp = 1000;
+        this.name = "Command Center";
+        this.zIndex = 30;
+
+        let actionsList = [];
+
+        actionsList.push(new Button(
+            "build tower", null, 420, 750, 50, 50, "turret_violet_01", true
+        ))
+
+        this.addProperty(Building.ACTIONS_PROPERY, actionsList);
     }
 
     produceNewSoldier() {
-        let soldier = new Soldier(this.#spawnPoint.x, this.#spawnPoint.y);
+        let soldier = new Soldier(this.#spawnPoint.x, this.#spawnPoint.y,
+            this.#dronImage, this.#bulletImage);
         soldier.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
             this.getProperty(InputManager.INPUT_LISTENER_PROPERTY));
         soldier.addProperty(Player.PLAYER_PROPERTY,
@@ -51,5 +66,9 @@ class CommandCenterBuilding extends Building {
             this.#productionTimestamp = new Date();
         }
 
+        drawHpStripe(ctx, this.maxHp, this.hp,
+            this.x,
+            this.y - (this.width * 1, 25),
+            this.width, 5);
     }
 }

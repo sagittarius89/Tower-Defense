@@ -1,11 +1,14 @@
 class GameObject {
     #id;
     #type;
+    #name;
     #properties;
     #zIndex;
     #alwaysOnTop;
     #ready;
     #selectable;
+    #hp;
+    #maxHp;
 
     constructor() {
         /**@member {String} */
@@ -25,6 +28,15 @@ class GameObject {
 
         /**@member {Number} */
         this.#zIndex = 50;
+
+        /**@member {String} */
+        this.#name = this.#id;
+
+        /**@member {Number} */
+        this.#hp = 0;
+
+        /**@member {Number} */
+        this.#maxHp = 0;
     }
 
     /** @type {String} */
@@ -45,6 +57,9 @@ class GameObject {
     /** @type {Boolean} */
     get selectable() { return this.#selectable; }
 
+    /** @type {String} */
+    get name() { return this.#name; }
+
     set selectable(value) {
         this.#selectable = value ? true : false;
     }
@@ -59,6 +74,23 @@ class GameObject {
 
     set zIndex(value) {
         var tmp = Number.parseInt(value);
+        this.#zIndex = tmp;
+    }
+
+    set name(value) {
+        this.#name = value;
+    }
+
+    get hp() { return this.#hp; }
+
+    get maxHp() { return this.#maxHp; }
+
+    set hp(value) {
+        this.#hp = Number.parseInt(value);
+    }
+
+    set maxHp(value) {
+        this.#maxHp = Number.parseInt(value);
     }
 
     /**

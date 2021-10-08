@@ -7,7 +7,10 @@ class Selection {
 
     get currentSelection() { return this.#selectedObj; }
     set currentSelection(value) {
-        if (value instanceof GameObject)
+        if (value == null) {
+            this.#selectedObj = null;
+        }
+        else if (value instanceof GameObject)
             this.#selectedObj = value;
         else {
             this.#selectedObj = null;

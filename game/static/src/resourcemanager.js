@@ -34,16 +34,44 @@ class ResourceManager {
 
                 switch (ext) {
                     case "png":
-                        this.loadPngFile(fullFileName, fileName);
+                        this.#images[fileName] = null;
+                        break;
+                    case "gif":
                         this.#images[fileName] = null;
                         break;
                     case "wav":
-                        this.loadWavFile(fullFileName, fileName);
                         this.#audio[fileName] = null;
                         break;
                     case "txt":
-                        this.loadTextFile(fullFileName, fileName);
                         this.#text[fileName] = null;
+                        break;
+                    default:
+                        console.log("ResourceManager: Not suppoted extension");
+                }
+            } catch (e) {
+                console.log("ResourceManager: Invalid file name: " + fullFileName);
+            }
+        }
+
+
+        for (var i = 0; i < arr.length; ++i) {
+            try {
+                var fullFileName = arr[i];
+                var fileName = fullFileName.split(".")[0];
+                var ext = fullFileName.split(".")[1];
+
+                switch (ext) {
+                    case "png":
+                        this.loadPngFile(fullFileName, fileName);
+                        break;
+                    case "gif":
+                        this.loadGifFile(fullFileName, fileName);
+                        break;
+                    case "wav":
+                        this.loadWavFile(fullFileName, fileName);
+                        break;
+                    case "txt":
+                        this.loadTextFile(fullFileName, fileName);
                         break;
                     default:
                         console.log("ResourceManager: Not suppoted extension");
@@ -65,6 +93,13 @@ class ResourceManager {
         }.bind(this);
 
         img.src = "resources/images/" + fullFileName;
+    }
+
+    loadGifFile(fullFileName, fileName) {
+        var img = GIF();
+
+        img.load("resources/images/" + fullFileName);
+        this.addImage(fileName, img);
     }
 
     addImage(fileName, img) {
