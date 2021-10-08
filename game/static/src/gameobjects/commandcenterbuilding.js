@@ -1,3 +1,63 @@
+class CreateTower extends GameAction {
+    #towerImage;
+    #towerImageName;
+    #towerImageSelected;
+    #bulletImage;
+    #player;
+
+    constructor(callback, towerImage, towerImageSelected, bulletImage, player) {
+        super(callback);
+
+        this.#towerImage = ResourceManager.instance.getImageResource(towerImage);
+        this.#towerImageName = towerImage;
+        this.#towerImageSelected = towerImageSelected;
+        this.#bulletImage = bulletImage;
+        this.#player = player;
+    }
+
+    update(ctx, objects) {
+        ctx.globalAlpha = 0.3;
+
+        ctx.setTransform(1, 0, 0, 1,
+            GameContext.inputManager.mousePosX,
+            GameContext.inputManager.mousePosY);
+
+        ctx.drawImage(
+            this.#towerImage,
+            -this.#towerImage.width / 2,
+            -this.#towerImage.height / 2);
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.restore();
+        ctx.globalAlpha = 1;
+    }
+
+    mouseUp() {
+        super.stop();
+
+        let tower = new Tower(
+            new Vector2d(GameContext.inputManager.mousePosX,
+                GameContext.inputManager.mousePosY),
+            new Vector2d(GameContext.inputManager.mousePosX,
+                GameContext.inputManager.mousePosY),
+            this.#towerImageName,
+            this.#towerImageSelected,
+            this.#bulletImage
+        );
+
+        tower.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
+            this.#player);
+
+        tower.addProperty(Player.PLAYER_PROPERTY,
+            this.#player);
+
+        GameContext.engine.addObject(tower);
+
+        this.callback();
+    }
+}
+
+
 class CommandCenterBuilding extends Building {
     #productionTimestamp;
     #spawnPoint;
@@ -6,9 +66,14 @@ class CommandCenterBuilding extends Building {
     #dronImage;
     #bulletImage;
 
-    constructor(pos, spawnPoint, image, imageSelected, dronImage, bulletImage) {
+    constructor(pos, spawnPoint, player,
+        image, imageSelected,
+        dronImage, bulletImage,
+        towerImage, towerImageSelected) {
+
         super(image, imageSelected, pos.x, pos.y);
 
+        this.addProperty(Player.PLAYER_PROPERTY, player);
         this.#productionTimestamp = new Date();
         this.#spawnFrequency = 3 * 1000;
         this.#spawnPoint = spawnPoint;
@@ -24,9 +89,13 @@ class CommandCenterBuilding extends Building {
 
         let actionsList = [];
 
-        actionsList.push(new Button(
-            "build tower", null, 420, 750, 50, 50, "turret_violet_01", true
-        ))
+        let towerAction = new Button(
+            "build tower", CreateTower,
+            [towerImage, towerImageSelected, bulletImage, this.getProperty(Player.PLAYER_PROPERTY)],
+            420, 750, 50, 50, "turret_violet_01", 25, true
+        );
+
+        actionsList.push(towerAction);
 
         this.addProperty(Building.ACTIONS_PROPERY, actionsList);
     }
@@ -65,10 +134,5 @@ class CommandCenterBuilding extends Building {
             this.produceNewSoldier();
             this.#productionTimestamp = new Date();
         }
-
-        drawHpStripe(ctx, this.maxHp, this.hp,
-            this.x,
-            this.y - (this.width * 1, 25),
-            this.width, 5);
     }
 }

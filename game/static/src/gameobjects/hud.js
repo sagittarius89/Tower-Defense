@@ -1,5 +1,18 @@
 class Hud extends GameObject {
     #grd;
+    #currentAction;
+
+    get currentAction() { return this.#currentAction };
+    set currentAction(value) {
+        if (value instanceof GameAction) {
+            if (this.#currentAction)
+                this.#currentAction.stop();
+
+            this.#currentAction = value;
+        } else if (value == null) {
+            this.#currentAction = null;
+        }
+    }
 
     constructor(ctx) {
         super();
@@ -74,7 +87,6 @@ class Hud extends GameObject {
             let actionsList = sel.getProperty(Building.ACTIONS_PROPERY);
             if (actionsList) {
                 actionsList.forEach(element => {
-
                     ctx.globalAlpha = 1;
                     element.draw(ctx);
                     ctx.globalAlpha = 0.5;
@@ -82,11 +94,27 @@ class Hud extends GameObject {
             }
         }
 
-
-
-
         ctx.globalAlpha = 1;
+    }
 
+    notify(inputEvent) {
+        if (inputEvent.type == MouseEventType.MOUSE_DOWN) {
+            let sel = Selection.instance.currentSelection;
+            if (sel) {
+                let actionsList = sel.getProperty(Building.ACTIONS_PROPERY);
+                if (actionsList) {
+                    actionsList.forEach(element => {
+                        if (element.notify) {
+                            element.notify(inputEvent);
+                        }
+                    });
+                }
+            }
+        } else if (inputEvent.type == MouseEventType.MOUSE_UP) {
+            if (this.currentAction) {
+                this.currentAction.mouseUp();
+            }
+        }
     }
 
 }

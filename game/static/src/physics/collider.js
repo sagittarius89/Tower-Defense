@@ -79,7 +79,10 @@ class Collider {
         // How much the distance between centers is less than the radii's sum.
         var offset = (ball1.radius + ball2.radius) - (n.getLength());
         n = n.normalize();
-        n = n.multiplyByFloat(offset);
+        if (n)
+            n = n.multiplyByFloat(offset);
+        else
+            return;
 
         // Bring back the two ball according to their mass.
         ball1Pos = ball1Pos.add(n = n.multiplyByFloat(0.5));

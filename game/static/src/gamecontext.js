@@ -37,27 +37,31 @@ var GameContext = (async function () {
     let buildingA = new CommandCenterBuilding(
         new Vector2d(67, 425),
         new Vector2d(73, 440),
+        GameContext.player1,
         "tower_violet_01",
         "towerlight_violet_01",
         "solider_violet_01",
-        "bullet_violet_01"
+        "bullet_violet_01",
+        "turret_violet_01",
+        "turretlight_violet_01"
     );
 
     buildingA.addProperty(InputManager.INPUT_LISTENER_PROPERTY, GameContext.player1);
-    buildingA.addProperty(Player.PLAYER_PROPERTY, GameContext.player1);
     GameContext.engine.addObject(buildingA);
     buildingA.produceNewSoldier();
 
     let buildingB = new CommandCenterBuilding(
         new Vector2d(1356, 435),
         new Vector2d(1292, 460),
+        GameContext.player2,
         "tower_orange_01",
         "towerlight_orange_01",
         "solider_oragne_01",
-        "bullet_orange_01"
+        "bullet_orange_01",
+        "turret_orange_01",
+        "turretlight_orange_01"
     );
     buildingB.addProperty(InputManager.INPUT_LISTENER_PROPERTY, GameContext.player2);
-    buildingB.addProperty(Player.PLAYER_PROPERTY, GameContext.player2);
 
     GameContext.engine.addObject(buildingB);
     buildingB.produceNewSoldier();
@@ -71,6 +75,7 @@ var GameContext = (async function () {
     GameContext.engine.addObject(GameContext.inputManager);
 
     GameContext.hud = new Hud(GameContext.canvas.getContext("2d"));
+    GameContext.hud.addProperty(InputManager.INPUT_LISTENER_PROPERTY, GameContext.player1);
     GameContext.engine.addObject(GameContext.hud);
 
     GameContext.engine.start();

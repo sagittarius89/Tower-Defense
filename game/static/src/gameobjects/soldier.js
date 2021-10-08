@@ -250,7 +250,9 @@ class Soldier extends RoundObject {
         if (inputEvent.type == MouseEventType.MOUSE_DOWN &&
             Collider.checkCollisionPointWithSquare(
                 new Vector2d(inputEvent.x, inputEvent.y),
-                new Square(this.x, this.y, this.radius * 2, this.radius * 2))
+                new Square(this.x - this.radius,
+                    this.y - this.radius,
+                    this.radius * 2, this.radius * 2))
         ) {
             console.log("uuid: " + this.id + " clicked");
 

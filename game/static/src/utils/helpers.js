@@ -2,6 +2,15 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function mesaureStrokedText(ctx, text, textSize = 29) {
+    ctx.font = `${textSize}px Menlo, monospace`;
+    ctx.fillStyle = 'white';
+    ctx.lineWidth = 1;
+
+    return ctx.measureText(text).width;
+}
+
+
 function drawStrokedText(ctx, text, x, y, textSize = 29) {
     ctx.font = `${textSize}px Menlo, monospace`;
     ctx.fillStyle = 'white';

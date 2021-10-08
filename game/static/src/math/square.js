@@ -11,18 +11,25 @@ class Square {
     get y() { return this.#position.y; }
     get width() { return this.#dimension.x; }
     get height() { return this.#dimension.y; }
-    get topLeft() { return new Vector2d(this.#position.x, this.#position.y); }
+    get topLeft() {
+        return new Vector2d(
+            this.#position.x - this.#dimension.x / 2,
+            this.#position.y - this.#dimension.y / 2);
+    }
     get topRight() {
-        return new Vector2d(this.#position.x + this.#dimension.x,
-            this.#position.y);
+        return new Vector2d(
+            this.#position.x + this.#dimension.x / 2,
+            this.#position.y - this.#dimension.y / 2);
     }
     get bottomLeft() {
-        return new Vector2d(this.#position.x,
-            this.#position.y + this.#dimension.y);
+        return new Vector2d(
+            this.#position.x - this.#dimension.x / 2,
+            this.#position.y + this.#dimension.y / 2);
     }
 
     get bottomRight() {
-        return new Vector2d(this.#position.x + this.#dimension.x,
-            this.#position.y + this.#dimension.y);
+        return new Vector2d(
+            this.#position.x + this.#dimension.x / 2,
+            this.#position.y + this.#dimension.y / 2);
     }
 }

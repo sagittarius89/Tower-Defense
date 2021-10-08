@@ -8,6 +8,8 @@ towerlight_orange_01.png
 towerlight_violet_01.png
 turret_orange_01.png
 turret_violet_01.png
+turretlight_orange_01.png
+turretlight_violet_01.png
 bullet_orange_01.png
 bullet_violet_01.png
 bang.gif

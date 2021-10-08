@@ -57,6 +57,45 @@ class GameEngine {
         }.bind(this));
     }
 
+    endGame(ctx, hasPlayer1Objects, hasPlayer2Objects, instance) {
+
+        setTimeout(function () {
+            instance.continue = false;
+            let text = '';
+            if (hasPlayer1Objects && !hasPlayer2Objects) {
+                text = `${GameContext.player1.name} wins`;
+            } else if (!hasPlayer1Objects && hasPlayer2Objects) {
+                text = `${GameContext.player2.name} wins`;
+            } else {
+                text = `Draw!`;
+            }
+
+            drawStrokedText(ctx, text, this.background.width / 2, this.background.height / 2, 40);
+        }.bind(this), 1000);
+    }
+
+    checkWin(ctx, objects, instance) {
+        let hasPlayer1Objects = false;
+        let hasPlayer2Objects = false;
+
+        objects.foreach(element => {
+            if (element instanceof Building || element instanceof Soldier) {
+                let player = element.getProperty(Player.PLAYER_PROPERTY);
+                if (player) {
+                    if (player == GameContext.player1) {
+                        hasPlayer1Objects = true;
+                    } else if (player == GameContext.player2) {
+                        hasPlayer2Objects = true;
+                    }
+                }
+            }
+        });
+
+        if (!hasPlayer1Objects || !hasPlayer2Objects) {
+            this.endGame(ctx, hasPlayer1Objects, hasPlayer2Objects, instance);
+        }
+    }
+
     update(ctx, objects, collider, camera, instance) {
         ctx.clearRect(0, 0, instance.WIDTH, instance.HEIGHT);
 
@@ -72,6 +111,8 @@ class GameEngine {
 
             obj.update(ctx, objects, collider, camera);
         });
+
+        this.checkWin(ctx, objects, instance);
 
         this.#counter++;
 

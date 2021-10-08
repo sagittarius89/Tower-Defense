@@ -24,21 +24,45 @@ class Building extends SquareObject {
 
         let centerX = this.width / 2;
         let centerY = this.height / 2;
+        let width = this.width;
+        let height = this.height;
+        let image = this.#image;
 
         if (this == Selection.instance.currentSelection) {
+            image = this.#imageSelected;
+        }
+
+        if (image.frames) {
+            image = image.frames[this.#currFrame++].image;
+
+            let scale = this.height / image.height;
+
+            width = image.width;
+            height = image.height;
+
             ctx.drawImage(
-                this.#imageSelected.frames ? this.#imageSelected.frames[this.#currFrame++].image : this.#imageSelected,
-                -this.width / 2,
-                -this.height / 2);
+                image,
+                -(width * scale) / 2,
+                -(height * scale) / 2,
+                width * scale,
+                height * scale);
+
         } else {
+
             ctx.drawImage(
-                this.#image.frames ? this.#image.frames[this.#currFrame++].image : this.#image,
-                -this.width / 2,
-                -this.height / 2);
+                image,
+                -width / 2,
+                -height / 2);
         }
 
         if (this.#image.frames && this.#currFrame >= this.#image.frames.length)
             this.#currFrame = 0;
+
+
+
+        drawHpStripe(ctx, this.maxHp, this.hp,
+            -this.width * 0.4, -this.height * 0.4,
+            this.width, 5);
 
 
         ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
@@ -49,7 +73,11 @@ class Building extends SquareObject {
         if (inputEvent.type == MouseEventType.MOUSE_DOWN &&
             Collider.checkCollisionPointWithSquare(
                 new Vector2d(inputEvent.x, inputEvent.y),
-                new Square(this.x, this.y, this.width, this.height))
+                new Square(
+                    this.x,
+                    this.y,
+                    this.width,
+                    this.height))
         ) {
             console.log("uuid: " + this.id + " clicked");
 
