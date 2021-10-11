@@ -1,43 +1,23 @@
-var GameContext = (async function () {
+var createGameContext = (async function (player1, player2) {
+    this.debug = false;
 
-    while (!ResourceManager.instance.isReady()) {
-        await sleep(100);
-    }
+    this.engine = new GameEngine(this.canvas.getContext("2d"));
+    this.inputManager = new InputManager();
+    this.player1 = player1;
 
-    GameContext.debug = false;
-    GameContext.canvas = document.getElementById("canvas");
-    GameContext.canvas.width = document.body.clientWidth - 15;
-    GameContext.canvas.height = document.body.clientHeight - 15;
+    this.mouseInput = new Mouse();
+    this.inputManager.attachPlayer(this.player1, this.mouseInput);
+    this.engine.addObject(this.inputManager);
 
-    GameContext.engine = new GameEngine(GameContext.canvas.getContext("2d"));
-    GameContext.inputManager = new InputManager();
-    GameContext.player1 = Player.player1;
+    this.player2 = player2;
 
-    GameContext.mouseInput = new Mouse();
-    GameContext.inputManager.attachPlayer(GameContext.player1, GameContext.mouseInput);
-    GameContext.engine.addObject(GameContext.inputManager);
-
-    GameContext.player2 = Player.player2;
-
-    //roof
-    //GameContext.engine.addObject(new Surface(new Vector2d(0, 0), GameContext.engine.WIDTH, Orientation.HORIZONTAL));
-
-    //floor
-    //GameContext.engine.addObject(new Surface(new Vector2d(0, GameContext.engine.HEIGHT), GameContext.engine.WIDTH, Orientation.HORIZONTAL));
-
-    //left wall
-    //GameContext.engine.addObject(new Surface(new Vector2d(0, 0), GameContext.engine.HEIGHT, Orientation.VERTICAL));
-
-    //right wall
-    //GameContext.engine.addObject(new Surface(new Vector2d(GameContext.engine.WIDTH - 10, 0), GameContext.engine.HEIGHT, Orientation.VERTICAL));
-
-    GameContext.engine.background = new World();
-    GameContext.engine.addObject(GameContext.engine.background);
+    this.engine.background = new World();
+    this.engine.addObject(this.engine.background);
 
     let buildingA = new CommandCenterBuilding(
         new Vector2d(67, 425),
         new Vector2d(73, 440),
-        GameContext.player1,
+        this.player1,
         "tower_violet_01",
         "towerlight_violet_01",
         "solider_violet_01",
@@ -46,14 +26,14 @@ var GameContext = (async function () {
         "turretlight_violet_01"
     );
 
-    buildingA.addProperty(InputManager.INPUT_LISTENER_PROPERTY, GameContext.player1);
-    GameContext.engine.addObject(buildingA);
+    buildingA.addProperty(InputManager.INPUT_LISTENER_PROPERTY, this.player1);
+    this.engine.addObject(buildingA);
     buildingA.produceNewSoldier();
 
     let buildingB = new CommandCenterBuilding(
         new Vector2d(1356, 435),
         new Vector2d(1292, 460),
-        GameContext.player2,
+        this.player2,
         "tower_orange_01",
         "towerlight_orange_01",
         "solider_oragne_01",
@@ -61,22 +41,16 @@ var GameContext = (async function () {
         "turret_orange_01",
         "turretlight_orange_01"
     );
-    buildingB.addProperty(InputManager.INPUT_LISTENER_PROPERTY, GameContext.player2);
+    buildingB.addProperty(InputManager.INPUT_LISTENER_PROPERTY, this.player2);
 
-    GameContext.engine.addObject(buildingB);
+    this.engine.addObject(buildingB);
     buildingB.produceNewSoldier();
 
+    this.engine.addObject(this.inputManager);
 
-    //GameContext.playerBall = null;
-    //GameContext.engine.addObject(GameContext.playerBall = new PlayerBall(GameContext.canvas.width / 2, GameContext.canvas.height / 2, "red", GameContext.player));
+    this.hud = new Hud(this.canvas.getContext("2d"));
+    this.hud.addProperty(InputManager.INPUT_LISTENER_PROPERTY, this.player1);
+    this.engine.addObject(this.hud);
 
-    //GameContext.engine.camera.attachToObject(GameContext.playerBall);
-
-    GameContext.engine.addObject(GameContext.inputManager);
-
-    GameContext.hud = new Hud(GameContext.canvas.getContext("2d"));
-    GameContext.hud.addProperty(InputManager.INPUT_LISTENER_PROPERTY, GameContext.player1);
-    GameContext.engine.addObject(GameContext.hud);
-
-    GameContext.engine.start();
-}());
+    this.engine.setWaitingForPlayersState();
+});

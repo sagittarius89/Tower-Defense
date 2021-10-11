@@ -15,6 +15,10 @@ class Vector2d {
 
     get y() { return this.#y; }
 
+    clone() {
+        return new Vector2d(this.#x, this.#y);
+    }
+
     /** @param {Vector2d} vector - vector2d */
     add(vector) {
         return new Vector2d(this.x + vector.x, this.y + vector.y);
@@ -90,5 +94,18 @@ class Vector2d {
         scalefactor = 1.0 / length;
 
         return new Vector2d(this.x * scalefactor, this.y * scalefactor);
+    }
+
+    toDTO() {
+        let dto = {};
+
+        dto.x = this.x;
+        dto.y = this.y;
+
+        return dto;
+    }
+
+    static fromDTO(dto) {
+        return new Vector2d(dto.x, dto.y);
     }
 }

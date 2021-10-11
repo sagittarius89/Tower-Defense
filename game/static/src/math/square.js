@@ -32,4 +32,9 @@ class Square {
             this.#position.x + this.#dimension.x / 2,
             this.#position.y + this.#dimension.y / 2);
     }
+
+    set x(value) { this.#position.x = Number.parseFloat(value); }
+    set y(value) { this.#position.y = Number.parseFloat(value); }
+    set width(value) { this.#position.width = Number.parseFloat(value); }
+    set height(value) { this.#position.height = Number.parseFloat(value); }
 }

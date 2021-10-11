@@ -285,4 +285,46 @@ class Soldier extends RoundObject {
 
         return false;
     }
+
+    toDTO() {
+        let dto = super.toDTO();
+
+        dto.image = geImagetName(this.#image);
+        dto.velocity = this.#velocity;
+        dto.attackDistance = this.#attackDistance;
+        dto.angle = this.#angle;
+        dto.attackMode = this.#attackMode;
+        dto.idle = this.#idle;
+        dto.shotFrequency = this.#shotFrequency;
+        dto.shotTimestamp = this.#shotTimestamp;
+        dto.imgWidth = this.#imgWidth;
+        dto.imgHeight = this.#imgHeight;
+        dto.currFrame = 0;
+        dto.kills = this.#kills;
+        dto.bulletImage = geImagetName(this.#bulletImage);
+        return dto;
+    }
+
+    static fromDTO(dto) {
+        let obj = new Soldier(dto.x, dto.y, dto.dronImage, dto.bulletImage)
+        super.fromDTO(dto, obj);
+
+        obj.#velocity = dto.velocity;
+        obj.#attackDistance = dto.attackDistance;
+        obj.#angle = dto.angle;
+        obj.#attackMode = dto.attackMode;
+        obj.#idle = dto.idle;
+        obj.#shotFrequency = dto.shotFrequency;
+        obj.#shotTimestamp = dto.shotTimestamp;
+        obj.#imgWidth = dto.imgWidth;
+        obj.#imgHeight = dto.imgHeight;
+        obj.#kills = dto.kills;
+
+        return obj;
+    }
+
+    sync(dto) {
+        super.sync(dto);
+
+    }
 }

@@ -1,14 +1,15 @@
+const { Player } = require("../../../shared/player");
+
 class GameObject {
     #id;
     #type;
     #name;
     #properties;
     #zIndex;
-    #alwaysOnTop;
-    #ready;
     #selectable;
     #hp;
     #maxHp;
+    #owner;
 
     constructor() {
         /**@member {String} */
@@ -19,9 +20,6 @@ class GameObject {
 
         /**@member {Map<String, Object>} */
         this.#properties = {};
-
-        /**@member {bool} */
-        this.#ready = false;
 
         /**@member {bool} */
         this.#selectable = false;
@@ -37,6 +35,9 @@ class GameObject {
 
         /**@member {Number} */
         this.#maxHp = 0;
+
+        /**@member {Player} */
+        this.#owner = null;
     }
 
     /** @type {String} */
@@ -49,9 +50,6 @@ class GameObject {
     get zIndex() { return this.#zIndex; }
 
     /** @type {Boolean} */
-    get alwaysOnTop() { return this.#alwaysOnTop; }
-
-    /** @type {Boolean} */
     get ready() { return this.#ready; }
 
     /** @type {Boolean} */
@@ -60,16 +58,17 @@ class GameObject {
     /** @type {String} */
     get name() { return this.#name; }
 
+    /** @type {Number} */
+    get hp() { return this.#hp; }
+
+    /** @type {Number} */
+    get maxHp() { return this.#maxHp; }
+
+    /** @type {Player} */
+    get player() { return this.#owner; }
+
     set selectable(value) {
         this.#selectable = value ? true : false;
-    }
-
-    set alwaysOnTop(value) {
-        this.#alwaysOnTop = value ? true : false;
-    }
-
-    set ready(value) {
-        this.#ready = value ? true : false;
     }
 
     set zIndex(value) {
@@ -81,16 +80,17 @@ class GameObject {
         this.#name = value;
     }
 
-    get hp() { return this.#hp; }
-
-    get maxHp() { return this.#maxHp; }
-
     set hp(value) {
         this.#hp = Number.parseInt(value);
     }
 
     set maxHp(value) {
         this.#maxHp = Number.parseInt(value);
+    }
+
+    set owner(value) {
+        if (value instanceof Player)
+            this.#owner = value;
     }
 
     /**
@@ -121,19 +121,44 @@ class GameObject {
      *  @param {CanvasRenderingContext2D} ctx
      *  @param {GameObjectList} objects
      */
-    update(ctx, objects, collider) {
-        var colDataA = this.getProperty(Collider.OBJECT_PROPERTY);
+    update(ctx, objects) {
 
-        if (colDataA) {
-            objects.foreach((objB) => {
-                if (this != objB) {
-                    var colDataB = objB.getProperty(Collider.OBJECT_PROPERTY);
+    }
 
-                    if (colDataB) {
-                        collider.checkCollision(this, colDataA, objB, colDataB);
-                    }
-                }
-            });
-        }
+    logic(objetcs) {
+
+    }
+
+    toDTO() {
+        let dto = {};
+
+        dto.id = this.#id;
+        dto.type = this.#type;
+        dto.name = this.#name;
+        dto.properties = this.#properties;
+        dto.zIndex = this.#zIndex;
+        dto.selectable = this.#selectable;
+        dto.hp = this.#hp;
+        dto.maxHp = this.#maxHp;
+        dto.owner = this.#owner;
+    }
+
+    static fromDTO(dto, obj = new GameObject()) {
+        obj.id = dto.id;
+        obj.type = dto.type;
+        obj.name = dto.name;
+        obj.properties = dto.properties;
+        obj.zIndex = dto.zIndex;
+        obj.selectable = dto.selectable;
+        obj.hp = dto.hp;
+        obj.maxHp = dto.maxHp;
+        obj.owner = dto.owner;
+    }
+
+    sync(dto) {
+        this.#zIndex = dto.zIndex;
+        this.#selectable = dto.selectable;
+        this.#hp = dto.hp;
+        this.#maxHp = dto.maxHp;
     }
 }

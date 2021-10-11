@@ -135,4 +135,29 @@ class CommandCenterBuilding extends Building {
             this.#productionTimestamp = new Date();
         }
     }
+
+    toDTO() {
+        let dto = super.toDTO();
+
+        dto.#productionTimestamp = this.productionTimestamp;
+        dto.#spawnPoint = Vector2d.toDTO(this.spawnPoint);
+        dto.#spawnFrequency = this.spawnFrequency;
+        dto.#soldierLimit = this.soldierLimit;
+
+        return dto;
+    }
+
+    static fromDTO(dto) {
+
+        return null;
+    }
+
+    sync(dto) {
+        super.sync(dto);
+
+        this.#productionTimestamp = dto.productionTimestamp;
+        this.#spawnPoint = Vector2d.fromDTO(dto.spawnPoint);
+        this.#spawnFrequency = dto.spawnFrequency;
+        this.#soldierLimit = dto.soldierLimit;
+    }
 }

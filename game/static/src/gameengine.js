@@ -1,7 +1,6 @@
 class GameEngine {
     #ctx;
     #objects;
-    #collider;
     #camera;
 
     #fps;
@@ -15,7 +14,6 @@ class GameEngine {
 
         /** @member {GameObjectList} */
         this.#objects = new GameObjectList();
-        this.#collider = new Collider();
         this.#camera = new Camera(new Vector2d(0, 0));
 
         this.addObject(this.#camera);
@@ -47,14 +45,6 @@ class GameEngine {
         this.#camera = camera;
 
         addObject(this.#camera);
-    }
-
-    start() {
-        this.continue = true;
-
-        window.requestAnimationFrame(function () {
-            this.update(this.#ctx, this.#objects, this.#collider, this.#camera, this);
-        }.bind(this));
     }
 
     endGame(ctx, hasPlayer1Objects, hasPlayer2Objects, instance) {
@@ -112,6 +102,10 @@ class GameEngine {
             obj.update(ctx, objects, collider, camera);
         });
 
+        objects.foreach((obj) => {
+            obj.logic(ctx, objects, collider, camera);
+        });
+
         this.checkWin(ctx, objects, instance);
 
         this.#counter++;
@@ -129,6 +123,20 @@ class GameEngine {
             window.requestAnimationFrame(function () {
                 this.update(this.#ctx, this.#objects, this.#collider, this.#camera, this);
             }.bind(this));
+    }
+
+    updateSingleFrame() {
+        window.requestAnimationFrame(function () {
+            this.update(this.#ctx, this.#objects, this.#collider, this.#camera, this);
+        }.bind(this));
+    }
+
+    start() {
+        this.continue = true;
+
+        window.requestAnimationFrame(function () {
+            this.update(this.#ctx, this.#objects, this.#collider, this.#camera, this);
+        }.bind(this));
     }
 
     stop() {

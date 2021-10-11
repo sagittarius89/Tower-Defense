@@ -40,3 +40,16 @@ function drawHpStripe(ctx, maxHp, cHp, x, y, width, height, showText = false) {
     if (showText)
         drawStrokedText(ctx, `${cHp}\\${maxHp}`, x, y - 5, 18);
 }
+
+
+function geImagetName(image) {
+    let filename = '';
+    if (image instanceof Image) {
+        let fullPath = image.src;
+        filename = fullPath.replace(/^.*[\\\/]/, '').split(".")[0];
+    } else if (image instanceof String) {
+        return image;
+    }
+
+    return filename;
+}

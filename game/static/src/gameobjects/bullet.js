@@ -10,27 +10,24 @@ class Bullet extends RoundObject {
 
     constructor(x, y, vector, parent, image) {
         super(5, x, y);
-        let tmpImg = ResourceManager.instance.getImageResource(image);
+
+        if (image) {
+            let tmpImg = ResourceManager.instance.getImageResource(image);
+
+            this.#image = tmpImg;
+            this.#imgWidth = tmpImg.width;
+            this.#imgHeight = tmpImg.height;
+        }
 
         this.#vector = vector;
         this.selectable = false;
         this.#parent = parent;
         this.zIndex = 50;
-        this.#image = tmpImg;
         this.#currFrame = 0;
-        this.#imgWidth = tmpImg.width;
-        this.#imgHeight = tmpImg.height;
     }
-
-
 
     update(ctx, objects) {
         ctx.setTransform(1, 0, 0, 1, this.x, this.y);
-
-        //ctx.beginPath();
-        //ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        //ctx.fill();
-
 
         let angle = Math.atan2(
             this.#vector.y, this.#vector.x
@@ -51,7 +48,10 @@ class Bullet extends RoundObject {
 
         ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
         ctx.restore();
+    }
 
+
+    logic(objetcs) {
         this.x += this.#vector.x;
         this.y += this.#vector.y;
 
@@ -94,5 +94,48 @@ class Bullet extends RoundObject {
                 }
             }
         });
+    }
+
+    toDTO() {
+        let dto = super.toDTO();
+
+        dto.#vector = this.#vector.toDTO();
+        dto.#parent = this.#parent.id;
+        dto.#image = geImagetName(this.#image);
+        dto.#currFrame = this.#currFrame;
+        dto.#imgWidth = this.#imgWidth;
+        dto.#imgHeight = this.#imgHeight;
+
+        return dto;
+    }
+
+    static fromDTO(dto, objects,
+        loadResources = true,
+        obj = new Bullet()) {
+
+        super.fromDTO(dto, obj);
+
+        obj.#vector = Vector2d.fromDTO(dto.vector);
+        obj.#parent = objects.byId(parent);
+
+        if (loadResources) {
+            obj.#image = ResourceManager.instance.getImageResource(dto.image);
+        }
+        else {
+            obj.#image = dto.image;
+        }
+
+        obj.#imgWidth = dto.imgWidth;
+        obj.#imgHeight = dto.imgHeight;
+
+        obj.#currFrame = 0;
+
+        return obj;
+    }
+
+    sync(dto) {
+        super.sync(dto);
+
+        obj.#vector = Vector2d.fromDTO(dto.vector);
     }
 }

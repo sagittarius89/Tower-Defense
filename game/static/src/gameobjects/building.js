@@ -14,6 +14,7 @@ class Building extends SquareObject {
         this.#image = tmpImg;
         this.#imageSelected = tmpImgSel;
         this.#currFrame = 0;
+        this.#bang = false;
 
         this.zIndex = 10;
         this.selectable = true;
@@ -89,8 +90,10 @@ class Building extends SquareObject {
         this.hp -= value;
 
         if (this.hp <= 0) {
+
             this.#image = ResourceManager.instance.getImageResource("bang");
             this.imageSelected = this.#image;
+
             this.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
                 null);
             this.addProperty(Player.PLAYER_PROPERTY,
@@ -102,13 +105,27 @@ class Building extends SquareObject {
 
             setTimeout(function () {
                 GameContext.engine.objects.delete(this);
-
-
             }.bind(this), 1000);
 
             return true;
         }
 
         return false;
+    }
+
+    toDTO() {
+        let dto = super.toDTO();
+
+        return dto;
+    }
+
+    static fromDTO(dto, obj = new Building()) {
+        super.fromDTO(dto, obj);
+
+        return obj;
+    }
+
+    sync(dto) {
+        super.sync(dto)
     }
 }
