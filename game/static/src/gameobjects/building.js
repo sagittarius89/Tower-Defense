@@ -11,13 +11,14 @@ class Building extends SquareObject {
 
         super(tmpImg.width, tmpImg.height, x, y);
 
-        this.#image = tmpImg;
-        this.#imageSelected = tmpImgSel;
+        this.#image = name;
+        this.#imageSelected = nameSelected;
         this.#currFrame = 0;
         this.#bang = false;
 
         this.zIndex = 10;
         this.selectable = true;
+        this.syncable = true;
     }
 
     update(ctx, objects) {
@@ -27,10 +28,10 @@ class Building extends SquareObject {
         let centerY = this.height / 2;
         let width = this.width;
         let height = this.height;
-        let image = this.#image;
+        let image = ResourceManager.instance.getImageResource(this.#image);
 
         if (this == Selection.instance.currentSelection) {
-            image = this.#imageSelected;
+            image = ResourceManager.instance.getImageResource(this.#imageSelected);
         }
 
         if (image.frames) {
@@ -56,7 +57,7 @@ class Building extends SquareObject {
                 -height / 2);
         }
 
-        if (this.#image.frames && this.#currFrame >= this.#image.frames.length)
+        if (image.frames && this.#currFrame >= image.frames.length)
             this.#currFrame = 0;
 
 
@@ -91,8 +92,8 @@ class Building extends SquareObject {
 
         if (this.hp <= 0) {
 
-            this.#image = ResourceManager.instance.getImageResource("bang");
-            this.imageSelected = this.#image;
+            this.#image = "bang";
+            this.#imageSelected = this.#image;
 
             this.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
                 null);
@@ -119,7 +120,12 @@ class Building extends SquareObject {
         return dto;
     }
 
-    static fromDTO(dto, obj = new Building()) {
+    static fromDTO(dto, obj = new Building(
+        dto.image,
+        dto.imageSelected,
+        dto.x,
+        dto.y)) {
+
         super.fromDTO(dto, obj);
 
         return obj;

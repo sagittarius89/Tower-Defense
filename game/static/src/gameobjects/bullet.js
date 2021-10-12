@@ -11,22 +11,22 @@ class Bullet extends RoundObject {
     constructor(x, y, vector, parent, image) {
         super(5, x, y);
 
-        if (image) {
-            let tmpImg = ResourceManager.instance.getImageResource(image);
+        let tmpImg = ResourceManager.instance.getImageResource(image);
 
-            this.#image = tmpImg;
-            this.#imgWidth = tmpImg.width;
-            this.#imgHeight = tmpImg.height;
-        }
-
+        this.#image = image;
+        this.#imgWidth = tmpImg.width;
+        this.#imgHeight = tmpImg.height;
         this.#vector = vector;
         this.selectable = false;
+        this.syncable = true;
         this.#parent = parent;
         this.zIndex = 50;
         this.#currFrame = 0;
     }
 
     update(ctx, objects) {
+        let image = ResourceManager.instance.getImageResource(this.#image);
+
         ctx.setTransform(1, 0, 0, 1, this.x, this.y);
 
         let angle = Math.atan2(
@@ -36,14 +36,14 @@ class Bullet extends RoundObject {
         ctx.rotate(angle - (0.0 * Math.PI));
 
         ctx.drawImage(
-            this.#image.frames ? this.#image.frames[this.#currFrame++].image : this.#image,
+            image.frames ? image.frames[this.#currFrame++].image : image,
             -this.#imgWidth / 2,
             -this.#imgHeight / 2,
             this.#imgWidth,
             this.#imgHeight
         );
 
-        if (this.#image.frames && this.#currFrame >= this.#image.frames.length)
+        if (image.frames && this.#currFrame >= image.frames.length)
             this.#currFrame = 0;
 
         ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
@@ -101,33 +101,22 @@ class Bullet extends RoundObject {
 
         dto.#vector = this.#vector.toDTO();
         dto.#parent = this.#parent.id;
-        dto.#image = geImagetName(this.#image);
-        dto.#currFrame = this.#currFrame;
+        dto.#image = this.#image;
         dto.#imgWidth = this.#imgWidth;
         dto.#imgHeight = this.#imgHeight;
 
         return dto;
     }
 
-    static fromDTO(dto, objects,
-        loadResources = true,
-        obj = new Bullet()) {
+    static fromDTO(dto, obj = new Bullet()) {
 
         super.fromDTO(dto, obj);
 
         obj.#vector = Vector2d.fromDTO(dto.vector);
-        obj.#parent = objects.byId(parent);
-
-        if (loadResources) {
-            obj.#image = ResourceManager.instance.getImageResource(dto.image);
-        }
-        else {
-            obj.#image = dto.image;
-        }
-
+        obj.#parent = GameContext.engine.objects.byId(parent);
+        obj.#image = dto.image;
         obj.#imgWidth = dto.imgWidth;
         obj.#imgHeight = dto.imgHeight;
-
         obj.#currFrame = 0;
 
         return obj;
@@ -137,5 +126,6 @@ class Bullet extends RoundObject {
         super.sync(dto);
 
         obj.#vector = Vector2d.fromDTO(dto.vector);
+        obj.#image = dto.image;
     }
 }

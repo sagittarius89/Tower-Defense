@@ -7,6 +7,7 @@ class GameObject {
     #properties;
     #zIndex;
     #selectable;
+    #syncable;
     #hp;
     #maxHp;
     #owner;
@@ -23,6 +24,9 @@ class GameObject {
 
         /**@member {bool} */
         this.#selectable = false;
+
+        /**@member {bool} */
+        this.#syncable = false;
 
         /**@member {Number} */
         this.#zIndex = 50;
@@ -67,6 +71,9 @@ class GameObject {
     /** @type {Player} */
     get player() { return this.#owner; }
 
+    /** @type {Boolean} */
+    get syncable() { return this.#syncable; }
+
     set selectable(value) {
         this.#selectable = value ? true : false;
     }
@@ -91,6 +98,10 @@ class GameObject {
     set owner(value) {
         if (value instanceof Player)
             this.#owner = value;
+    }
+
+    set syncable(value) {
+        this.#syncable = new Boolean(value);
     }
 
     /**
@@ -141,6 +152,7 @@ class GameObject {
         dto.hp = this.#hp;
         dto.maxHp = this.#maxHp;
         dto.owner = this.#owner;
+        dto.syncable = this.#syncable;
     }
 
     static fromDTO(dto, obj = new GameObject()) {
@@ -153,6 +165,7 @@ class GameObject {
         obj.hp = dto.hp;
         obj.maxHp = dto.maxHp;
         obj.owner = dto.owner;
+        obj.syncable = dto.#syncable;
     }
 
     sync(dto) {

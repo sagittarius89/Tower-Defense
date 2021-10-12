@@ -13,7 +13,7 @@ class Soldier extends RoundObject {
     #kills;
     #bulletImage;
 
-    constructor(x, y, dronImage, bulletImage) {
+    constructor(x, y, dronImage, bulletImage, owner) {
         let tmpImg = ResourceManager.instance.getImageResource(dronImage);
         super(tmpImg.width / 2, x, y);
 
@@ -33,6 +33,7 @@ class Soldier extends RoundObject {
         this.#kills = 0;
         this.#bulletImage = bulletImage;
 
+        this.owner = owner;
         this.name = "Drone";
         this.zIndex = 20;
         this.selectable = true;
@@ -302,6 +303,7 @@ class Soldier extends RoundObject {
         dto.currFrame = 0;
         dto.kills = this.#kills;
         dto.bulletImage = geImagetName(this.#bulletImage);
+
         return dto;
     }
 
