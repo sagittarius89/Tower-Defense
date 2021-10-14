@@ -23,6 +23,8 @@ class Hud extends GameObject {
         this.#grd.addColorStop(1, "rgba(0,0,0,1)");
         this.#grd.addColorStop(0, 'rgba(0,0,0,0)');
 
+        this.syncable = false;
+
     }
 
     drawSection(ctx, name, x, y, width, height) {

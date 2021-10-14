@@ -20,9 +20,8 @@ class RoundObject extends GameObject {
     toDTO() {
         let dto = super.toDTO();
 
-        dto.x = this.x;
-        dto.y = this.y;
-        dto.radius = this.radius;
+        dto.pos = this.#pos.toDTO();
+        dto.radius = this.#radius;
 
         return dto;
     }
@@ -30,9 +29,8 @@ class RoundObject extends GameObject {
     static fromDTO(dto, obj = new RoundObject(0, 0, 0)) {
         super.fromDTO(dto, obj);
 
-        obj.x = dto.x;
-        obj.y = dto.y;
-        obj.radius = dto.radius;
+        obj.#pos = Vector2d.fromDTO(dto.pos);
+        obj.#radius = dto.radius;
 
         return obj;
     }

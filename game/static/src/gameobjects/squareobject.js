@@ -35,13 +35,13 @@ class SquareObject extends GameObject {
         return dto;
     }
 
-    static fromDTO(dto, obj = new SquareObject(0, 0, 0, 0)) {
+    static fromDTO(dto, obj = new SquareObject(
+        dto.width,
+        dto.height,
+        dto.x,
+        dto.y
+    )) {
         super.fromDTO(dto, obj);
-
-        obj.x = dto.x;
-        obj.y = dto.y;
-        obj.width = dto.width;
-        obj.height = dto.height;
 
         return obj;
     }

@@ -150,6 +150,7 @@ class CommandCenterBuilding extends Building {
         dto.soldierLimit = this.#soldierLimit;
         dto.dronImage = this.#dronImage;
         dto.bulletImage = this.#bulletImage;
+
         return dto;
     }
 
