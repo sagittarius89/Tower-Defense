@@ -1,3 +1,5 @@
+const { MessageType } = require("../../../shared/protocol");
+
 class Network {
     #client;
     #player1Data;
@@ -52,6 +54,12 @@ class Network {
                     } else if (msg.number == 2) {
                         this.#player2Data = Player.fromDTO(msg.player);
                     }
+                    break;
+                case MessageType.START_GAME:
+
+                    break;
+                case MessageType.SYNC_OBJECTS:
+                    break;
             }
         }
     };

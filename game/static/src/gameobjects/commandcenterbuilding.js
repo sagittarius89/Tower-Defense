@@ -184,3 +184,9 @@ class CommandCenterBuilding extends Building {
         this.#bulletImage = dto.bulletImage;
     }
 }
+
+try {
+    module.exports = {
+        CommandCenterBuilding
+    }
+} catch (e) { }

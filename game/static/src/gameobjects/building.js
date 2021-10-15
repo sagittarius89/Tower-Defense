@@ -135,3 +135,9 @@ class Building extends SquareObject {
         super.sync(dto)
     }
 }
+
+try {
+    module.exports = {
+        Building
+    }
+} catch (e) { }

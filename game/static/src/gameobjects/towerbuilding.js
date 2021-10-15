@@ -1,12 +1,9 @@
 class Tower extends Building {
-    #productionTimestamp;
     #spawnPoint;
-    #spawnFrequency;
     #attackDistance;
     #attackMode;
     #shotFrequency;
     #shotTimestamp;
-    #idle;
     #bulletImage;
     #angle;
     #kills;
@@ -93,9 +90,11 @@ class Tower extends Building {
     }
 
     update(ctx, objects) {
-        Building.prototype.update.call(this, ctx, objects);
+        super.update(ctx, objects);
+    }
 
-        let enemy = this.findClostestEnemy(objects);
+    logick(objects) {
+        this.findClostestEnemy(objects);
 
         let now = new Date();
         if (this.#attackMode &&
@@ -107,7 +106,44 @@ class Tower extends Building {
 
             this.#shotTimestamp = new Date();
         }
+    }
 
+    toDTO() {
+        let dto = super.toDTO();
 
     }
+
+    static fromDTO(dto, obj = new Tower(
+        Vector2d.fromDTO(dto.pos),
+        Vector2d.fromDTO(dto.spawnPoint),
+        dto.image,
+        dto.imageSelected,
+        dto.bulletImage)
+    ) {
+        super.fromDTO(dto, obj);
+
+        obj.#attackDistance = dto.attackDistance;
+        obj.#attackMode = dto.attackMode;
+        obj.#shotFrequency = dto.shotFrequency;
+        obj.#shotTimestamp = dto.shotTimestamp;
+        obj.#angle = dto.angle;
+        obj.#kills = dto.kills;
+    }
+
+    sync(dto) {
+        super.sync(dto);
+
+        this.#attackDistance = dto.attackDistance;
+        this.#attackMode = dto.attackMode;
+        this.#shotFrequency = dto.shotFrequency;
+        this.#shotTimestamp = dto.shotTimestamp;
+        this.#angle = dto.angle;
+        this.#kills = dto.kills;
+    }
 }
+
+try {
+    module.exports = {
+        Tower
+    }
+} catch (e) { }

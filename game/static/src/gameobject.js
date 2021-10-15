@@ -175,3 +175,9 @@ class GameObject {
         this.#maxHp = dto.maxHp;
     }
 }
+
+try {
+    module.exports = {
+        GameObject
+    }
+} catch (e) { }

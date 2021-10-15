@@ -82,3 +82,9 @@ class GameObjectList {
         return null;
     }
 }
+
+try {
+    module.exports = {
+        GameObjectList
+    }
+} catch (e) { }

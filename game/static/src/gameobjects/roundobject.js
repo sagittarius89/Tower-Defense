@@ -43,3 +43,9 @@ class RoundObject extends GameObject {
         this.radius = dto.radius;
     }
 }
+
+try {
+    module.exports = {
+        RoundObject
+    }
+} catch (e) { }

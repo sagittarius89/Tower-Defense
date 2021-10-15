@@ -159,7 +159,7 @@ class Soldier extends RoundObject {
     draw(ctx, clostestEnemy) {
         ctx.setTransform(1, 0, 0, 1, this.x, this.y); // set position of image center
 
-        let image = this.#image
+        let image = ResourceManager.instance.getImageResource(this.#image);
 
         if (this == Selection.instance.currentSelection) {
             ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
@@ -179,15 +179,19 @@ class Soldier extends RoundObject {
 
         ctx.rotate(this.#angle - Math.PI); // rotate
 
-        ctx.drawImage(
-            this.#image.frames ? this.#image.frames[this.#currFrame++].image : this.#image,
-            -this.#imgWidth / 2,
-            -this.#imgHeight / 2,
-            this.#imgWidth,
-            this.#imgHeight
-        );
+        if (image.frames) {
+            image = image.frames[this.#currFrame++].image;
 
-        if (this.#image.frames && this.#currFrame >= this.#image.frames.length)
+            ctx.drawImage(
+                image,
+                -this.#imgWidth / 2,
+                -this.#imgHeight / 2,
+                this.#imgWidth,
+                this.#imgHeight
+            );
+        }
+
+        if (image.frames && this.#currFrame >= image.frames.length)
             this.#currFrame = 0;
 
         ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
@@ -195,7 +199,7 @@ class Soldier extends RoundObject {
 
         /*if (clostestEnemy && GameContext.debug) {
             let randomColor = Math.floor(Math.random() * 16777215).toString(16);
-
+ 
             ctx.strokeStyle = '#' + randomColor;
             ctx.beginPath();
             ctx.moveTo(this.x, this.y);
@@ -207,8 +211,6 @@ class Soldier extends RoundObject {
             this.x - this.radius,
             this.y - (this.radius * 1, 25),
             this.radius * 2, 5);
-
-
     }
 
     findClostestEnemy(objects) {
@@ -337,3 +339,9 @@ class Soldier extends RoundObject {
 
     }
 }
+
+try {
+    module.exports = {
+        Soldier
+    }
+} catch (e) { }

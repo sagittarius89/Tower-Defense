@@ -109,3 +109,9 @@ class Vector2d {
         return new Vector2d(dto.x, dto.y);
     }
 }
+
+try {
+    module.exports = {
+        Vector2d
+    }
+} catch (e) { }

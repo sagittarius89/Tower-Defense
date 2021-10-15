@@ -129,3 +129,9 @@ class Bullet extends RoundObject {
         obj.#image = dto.image;
     }
 }
+
+try {
+    module.exports = {
+        Bullet
+    }
+} catch (e) { }

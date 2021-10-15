@@ -35,3 +35,9 @@ class Queue {
         return this.#items.length == 0;
     }
 }
+
+try {
+    module.exports = {
+        Queue
+    }
+} catch (e) { }

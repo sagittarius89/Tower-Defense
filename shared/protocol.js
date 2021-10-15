@@ -2,7 +2,10 @@ const MessageType = {
     EHLO: "ehlo",
     ERROR: 'error',
     REGISTER_PLAYER: "register_player",
-    PLAYER_REGISTERED: "player_registered"
+    PLAYER_REGISTERED: "player_registered",
+    SYNC_OBJECTS: "sync_objects",
+    START_GAME: "start_game",
+    CLIENT_READY: "client_ready"
 }
 
 class Message {
@@ -58,6 +61,28 @@ class Message {
         msg.set('self', self);
 
         return msg;
+    }
+
+    static startGame(objectList) {
+        let msg = new Message(MessageType.START_GAME);
+
+        msg.set('obj_list', objectList);
+
+        return msg;
+    }
+
+    static clientReady() {
+        let msg = new Message(MessageType.CLIENT_READY);
+
+        return msg;
+    }
+
+    static objectsSync(objectList) {
+        let msg = new Message(MessageType.SYNC_OBJECTS);
+
+        msg.set('obj_list', objectList);
+
+        return objectList;
     }
 
     static error(text) {

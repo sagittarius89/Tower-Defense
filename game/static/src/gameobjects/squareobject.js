@@ -55,3 +55,9 @@ class SquareObject extends GameObject {
         this.height = dto.height;
     }
 }
+
+try {
+    module.exports = {
+        SquareObject
+    }
+} catch (e) { }

@@ -1,12 +1,14 @@
 const MessageType = require('../shared/protocol').MessageType;
 const Message = require('../shared/protocol').Message;
 const Player = require('../shared/player').Player;
+const GameContext = require('./servercontext').GameContext;
 
 class GameServer {
     #player1;
     #player2;
     #p1Conn;
     #p2Conn;
+    #gameContext;
 
     constructor() {
         this.countDownNumber = 3;
@@ -80,10 +82,35 @@ class GameServer {
     }
 
     countDown() {
+        //@todo
+    }
 
+
+    sync() {
+        let objectList = [];
+        this.#gameContext.engine.objects.foreach(element => {
+            objectList.push(element.toDTO());
+        });
+
+        let msg = Message.objectsSync(objectList);
+
+        this.broadcast(msg);
+
+        setTimeout(function () {
+            this.sync();
+        }.bind(this), 50);
     }
 
     startGame() {
+        this.countDown();
+        this.#gameContext = new GameContext(this.#player1, this.#player2);
+
+        let objectList = [];
+        this.#gameContext.engine.objects.foreach(element => {
+            objectList.push(element.toDTO());
+        });
+
+        let msg = Message.startGame(objectList);
 
     }
 

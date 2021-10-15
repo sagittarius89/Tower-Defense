@@ -124,3 +124,10 @@ class Collider {
         }
     }
 }
+
+try {
+    module.exports = {
+        Collider,
+        ColliderShape
+    }
+} catch (e) { }

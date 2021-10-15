@@ -38,3 +38,9 @@ class Square {
     set width(value) { this.#position.width = Number.parseFloat(value); }
     set height(value) { this.#position.height = Number.parseFloat(value); }
 }
+
+try {
+    module.exports = {
+        Square
+    }
+} catch (e) { }
