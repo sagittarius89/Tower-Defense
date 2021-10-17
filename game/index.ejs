@@ -27,7 +27,6 @@
 <script src="src/gameobjects/roundobject.js"></script>
 <script src="src/gameobjects/button.js"></script>
 <script src="src/gameobjects/hud.js"></script>
-<script src="src/gameobjects/selectable.js"></script>
 <script src="src/gameobjects/soldier.js"></script>
 <script src="src/gameobjects/building.js"></script>
 <script src="src/gameobjects/bullet.js"></script>
@@ -51,17 +50,18 @@
 
     async function renderBg() {
         while (!ResourceManager.instance.isReady()) {
-            await sleep(100);
-
-            let background = ResourceManager.instance.getImageResource('bg_03');
-            let ctx = canvas.getContext("2d");
-            this.canvas.width = background.width;
-            this.canvas.height = background.height;
-
-            ctx.drawImage(background, 0, 0);
-            drawStrokedText(ctx, "Waiting for players...",
-                background.width / 2, background.height / 2, 40);
+            console.log('Resource manager not ready');
+            await sleep(500);
         }
+
+        let background = ResourceManager.instance.getImageResource('bg_03');
+        let ctx = canvas.getContext("2d");
+        this.canvas.width = background.width;
+        this.canvas.height = background.height;
+
+        ctx.drawImage(background, 0, 0);
+        drawStrokedText(ctx, "Waiting for players...",
+            background.width / 2, background.height / 2, 40);
     }
 
     renderBg();

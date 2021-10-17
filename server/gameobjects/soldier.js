@@ -1,4 +1,12 @@
-class Soldier extends RoundObject {
+const RoundObject = require('./roundobject');
+const ResourceManager = require('../resourcemanager').ResourceManager;
+const Player = require('../../shared/player.js').Player;
+const Vector2d = require('../../game/static/src/math/vector').Vector2d;
+const Bullet = require('./bullet');
+const Collider = require('../../game/static/src/physics/collider').Collider;
+const ColliderShape = require('../../game/static/src/physics/collider').ColliderShape;
+
+module.exports = class Soldier extends RoundObject {
     #image;
     #velocity;
     #attackDistance;
@@ -57,7 +65,6 @@ class Soldier extends RoundObject {
     set kills(value) { this.#kills = Number.parseInt(value); }
 
     update(ctx, objects) {
-        let enemy = this.findClostestEnemy(objects);
 
         this.draw(ctx, enemy);
     }
@@ -75,9 +82,9 @@ class Soldier extends RoundObject {
                 > this.#shotFrequency)
         ) {
 
-            //this.doShot(objects);
+            this.doShot(objects);
 
-            //this.#shotTimestamp = new Date().getTime();
+            this.#shotTimestamp = new Date().getTime();
         }
 
 
@@ -92,11 +99,11 @@ class Soldier extends RoundObject {
                 Bullet.BULLET_VELOCITY * Math.cos(this.#angle),
                 Bullet.BULLET_VELOCITY * Math.sin(this.#angle)
             ),
-            this.id,
+            this,
             this.#bulletImage
         );
 
-        GameContext.engine.addObject(bullet);
+        objects.push(bullet);
     }
 
     checkCollisions(objects, clostestEnemy) {
@@ -182,33 +189,32 @@ class Soldier extends RoundObject {
         ctx.rotate(this.#angle - Math.PI); // rotate
 
         if (image.frames) {
-
-            if (this.#currFrame >= image.frames.length)
-                this.#currFrame = 0;
             image = image.frames[this.#currFrame++].image;
+
+            ctx.drawImage(
+                image,
+                -this.#imgWidth / 2,
+                -this.#imgHeight / 2,
+                this.#imgWidth,
+                this.#imgHeight
+            );
         }
 
-        ctx.drawImage(
-            image,
-            -this.#imgWidth / 2,
-            -this.#imgHeight / 2,
-            this.#imgWidth,
-            this.#imgHeight
-        );
-
+        if (image.frames && this.#currFrame >= image.frames.length)
+            this.#currFrame = 0;
 
         ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
         ctx.restore();
 
-        if (clostestEnemy && GameContext.debug) {
+        /*if (clostestEnemy && GameContext.debug) {
             let randomColor = Math.floor(Math.random() * 16777215).toString(16);
-
+ 
             ctx.strokeStyle = '#' + randomColor;
             ctx.beginPath();
             ctx.moveTo(this.x, this.y);
             ctx.lineTo(clostestEnemy.x, clostestEnemy.y);
             ctx.stroke();
-        }
+        }*/
 
         drawHpStripe(ctx, this.maxHp, this.hp,
             this.x - this.radius,
@@ -220,7 +226,7 @@ class Soldier extends RoundObject {
         let distance = Number.MAX_VALUE;
         let closestObj = null;
 
-        objects.foreach(((obj) => {
+        objects.foreach((obj) => {
 
             if (obj.owner && obj.owner.name != this.owner.name) {
                 let calculatedD = obj.pos.getDistance(this.pos);
@@ -230,7 +236,7 @@ class Soldier extends RoundObject {
                     closestObj = obj;
                 }
             }
-        }).bind(this));
+        });
 
         if (closestObj != null) {
 
@@ -260,21 +266,15 @@ class Soldier extends RoundObject {
         }
     }
 
-    lumbago(value) {
+    lumbago(value, objects) {
         this.hp -= value;
 
         if (this.hp <= 0) {
             this.#image = "bang";
-            this.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
-                null);
             this.owner = null;
 
-            if (Selection.instance.currentSelection == this) {
-                Selection.instance.currentSelection = null;
-            }
-
             setTimeout(function () {
-                GameContext.engine.objects.delete(this);
+                objects.delete(this);
             }.bind(this), 1000);
 
             return true;
@@ -299,8 +299,8 @@ class Soldier extends RoundObject {
         dto.currFrame = 0;
         dto.kills = this.#kills;
         dto.bulletImage = this.#bulletImage;
-
         dto.type = this.constructor.name;
+
         return dto;
     }
 
@@ -320,6 +320,8 @@ class Soldier extends RoundObject {
         obj.#idle = dto.idle;
         obj.#shotFrequency = dto.shotFrequency;
         obj.#shotTimestamp = dto.shotTimestamp;
+        obj.#imgWidth = dto.imgWidth;
+        obj.#imgHeight = dto.imgHeight;
         obj.#kills = dto.kills;
 
         return obj;
@@ -335,6 +337,8 @@ class Soldier extends RoundObject {
         this.#idle = dto.idle;
         this.#shotFrequency = dto.shotFrequency;
         this.#shotTimestamp = dto.shotTimestamp;
+        this.#imgWidth = dto.imgWidth;
+        this.#imgHeight = dto.imgHeight;
         this.#kills = dto.kills;
 
     }

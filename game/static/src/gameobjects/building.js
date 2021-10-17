@@ -14,7 +14,6 @@ class Building extends SquareObject {
         this.#image = name;
         this.#imageSelected = nameSelected;
         this.#currFrame = 0;
-        this.#bang = false;
 
         this.zIndex = 10;
         this.selectable = true;
@@ -35,6 +34,9 @@ class Building extends SquareObject {
         }
 
         if (image.frames) {
+            if (image.frames && this.#currFrame >= image.frames.length)
+                this.#currFrame = 0;
+
             image = image.frames[this.#currFrame++].image;
 
             let scale = this.height / image.height;
@@ -57,8 +59,7 @@ class Building extends SquareObject {
                 -height / 2);
         }
 
-        if (image.frames && this.#currFrame >= image.frames.length)
-            this.#currFrame = 0;
+
 
 
 
@@ -117,6 +118,7 @@ class Building extends SquareObject {
     toDTO() {
         let dto = super.toDTO();
 
+        dto.type = this.constructor.name;
         return dto;
     }
 
@@ -135,9 +137,3 @@ class Building extends SquareObject {
         super.sync(dto)
     }
 }
-
-try {
-    module.exports = {
-        Building
-    }
-} catch (e) { }

@@ -1,4 +1,7 @@
-class Tower extends Building {
+const Building = require('./building');
+const Vector2d = require('../../game/static/src/math/vector').Vector2d;
+
+module.exports = class Tower extends Building {
     #spawnPoint;
     #attackDistance;
     #attackMode;
@@ -27,7 +30,6 @@ class Tower extends Building {
         this.maxHp = 250;
         this.name = "Impulse Tower";
         this.zIndex = 70;
-        this.syncable = true;
     }
 
     doShot(objects) {
@@ -53,6 +55,8 @@ class Tower extends Building {
         objects.foreach((obj) => {
 
             if (obj.owner && obj.owner.name != this.owner.name) {
+
+
                 let enemyPos = new Vector2d(obj.x, obj.y);
                 let myPos = new Vector2d(this.x, this.y);
 
@@ -88,7 +92,7 @@ class Tower extends Building {
         super.update(ctx, objects);
     }
 
-    logic(objects) {
+    logick(objects) {
         this.findClostestEnemy(objects);
 
         let now = new Date();
@@ -106,6 +110,7 @@ class Tower extends Building {
     toDTO() {
         let dto = super.toDTO();
 
+        dto.type = this.constructor.name;
         dto.attackDistance = this.attackDistance;
         dto.attackMode = this.attackMode;
         dto.shotFrequency = this.shotFrequency;
@@ -115,7 +120,8 @@ class Tower extends Building {
         dto.spawnPoint = this.#spawnPoint.toDTO();
 
         dto.type = this.constructor.name;
-        return dto;
+
+        return this;
     }
 
     static fromDTO(dto, obj = new Tower(

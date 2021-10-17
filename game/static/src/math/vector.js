@@ -12,8 +12,9 @@ class Vector2d {
     }
 
     get x() { return this.#x; }
-
+    set x(value) { this.#x = value; }
     get y() { return this.#y; }
+    set y(value) { this.#y = value; }
 
     clone() {
         return new Vector2d(this.#x, this.#y);
@@ -114,4 +115,6 @@ try {
     module.exports = {
         Vector2d
     }
-} catch (e) { }
+} catch (e) {
+    console.log(e);
+}

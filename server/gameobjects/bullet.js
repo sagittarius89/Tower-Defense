@@ -1,4 +1,13 @@
-class Bullet extends RoundObject {
+const RoundObject = require('./roundobject');
+const ResourceManager = require('../resourcemanager').ResourceManager;
+const Vector2d = require('../../game/static/src/math/vector').Vector2d;
+//const Soldier = require('./soldier');
+const Building = require('./building');
+const SquareObject = require('./squareobject');
+const Collider = require('../../game/static/src/physics/collider').Collider;
+const ColliderShape = require('../../game/static/src/physics/collider').ColliderShape;
+
+module.exports = class Bullet extends RoundObject {
     #vector;
     #parent;
     #image;
@@ -24,33 +33,6 @@ class Bullet extends RoundObject {
         this.#currFrame = 0;
     }
 
-    update(ctx, objects) {
-        let image = ResourceManager.instance.getImageResource(this.#image);
-
-        ctx.setTransform(1, 0, 0, 1, this.x, this.y);
-
-        let angle = Math.atan2(
-            this.#vector.y, this.#vector.x
-        );
-
-        ctx.rotate(angle - (0.0 * Math.PI));
-
-        ctx.drawImage(
-            image.frames ? image.frames[this.#currFrame++].image : image,
-            -this.#imgWidth / 2,
-            -this.#imgHeight / 2,
-            this.#imgWidth,
-            this.#imgHeight
-        );
-
-        if (image.frames && this.#currFrame >= image.frames.length)
-            this.#currFrame = 0;
-
-        ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
-        ctx.restore();
-    }
-
-
     logic(objects) {
         this.x += this.#vector.x;
         this.y += this.#vector.y;
@@ -61,7 +43,7 @@ class Bullet extends RoundObject {
     checkCollisions(objects) {
         objects.foreach(obj => {
             if (obj.id != this.#parent &&
-                (obj instanceof Soldier || obj instanceof Building)) {
+                (obj.constructor.name == 'Soldier' || obj instanceof Building)) {
 
                 let player = obj.owner;
 
@@ -74,19 +56,18 @@ class Bullet extends RoundObject {
                         var distance = myPos.getDistance(objPos);
 
                         if (distance <= this.radius + obj.radius) {
-                            if (obj.lumbago(10)) {
+                            if (obj.lumbago(10, objects)) {
                                 let parent = objects.byId(this.#parent);
                                 if (parent)
                                     parent.kills++;
                             }
-
                             objects.delete(this);
                         }
                     } else if (obj instanceof SquareObject) {
                         let myPos = new Vector2d(this.x, this.y);
 
                         if (Collider.checkCollisionPointWithSquare(myPos, obj.toSquare())) {
-                            if (obj.lumbago(10)) {
+                            if (obj.lumbago(10, objects)) {
                                 let parent = objects.byId(this.#parent);
                                 if (parent)
                                     parent.kills++;
@@ -109,17 +90,19 @@ class Bullet extends RoundObject {
         dto.imgWidth = this.#imgWidth;
         dto.imgHeight = this.#imgHeight;
 
+        dto.type = 'bullet';
+
         dto.type = this.constructor.name;
+
         return dto;
     }
 
-    static fromDTO(dto, obj = new Bullet(dto.x, dto.y,
-        Vector2d.fromDTO(dto.vector), dto.parent, dto.image)) {
+    static fromDTO(dto, obj = new Bullet()) {
 
         super.fromDTO(dto, obj);
 
         obj.#vector = Vector2d.fromDTO(dto.vector);
-        obj.#parent = GameContext.engine.objects.byId(parent);
+        obj.#parent = dto.parent;
         obj.#image = dto.image;
         obj.#imgWidth = dto.imgWidth;
         obj.#imgHeight = dto.imgHeight;

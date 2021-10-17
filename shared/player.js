@@ -5,15 +5,15 @@ class Player {
 
     static PLAYER_PROPERTY = "PLAYER_PROPERTY"
 
-    constructor(name, self) {
+    constructor(name) {
         this.#name = name;
         this.#score = 0;
-        this.#self = self;
     }
 
     get name() { return this.#name; }
     get score() { return this.#score; }
     set score(value) { this.#score = Number.parseInt(value); }
+    set self(value) { this.#self = Boolean(value); }
     get self() { return this.#self; }
 
     toDTO() {
@@ -31,7 +31,11 @@ class Player {
     static fromDTO(dto, self) {
         let p = new Player(dto.name);
         p.score = dto.score;
-        p.self = slef;
+        p.self = dto.self;
+
+        if (self) {
+            p.self = true;
+        }
 
         return p;
     }

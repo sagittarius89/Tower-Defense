@@ -88,6 +88,7 @@ class ResourceManager {
 
     loadPngFile(fullFileName, fileName) {
         var img = new Image();
+
         img.onload = function () {
             this.addImage(fileName, img);
         }.bind(this);

@@ -1,19 +1,20 @@
-const GameEngine = require('serverengine').GameEngine;
-const World = require('../game/static/src/gameobjects/world').World;
-const CommandCenterBuilding = require('../game/static/src/gameobjects/commandcenterbuilding').CommandCenterBuilding;
+const GameEngine = require('./serverengine');
+const World = require('./gameobjects/world');
+const CommandCenterBuilding = require('./gameobjects/commandcenterbuilding');
+const Vector2d = require('../game/static/src/math/vector').Vector2d;
 
-
-class GameContext {
+module.exports = class GameContext {
     constructor(player1, player2) {
         this.debug = false;
 
-        this.engine = new GameEngine(this.canvas.getContext("2d"));
+        this.engine = new GameEngine(player1, player2);
 
         this.player1 = player1;
         this.player2 = player2;
 
         this.engine.background = new World('bg_03');
         this.engine.addObject(this.engine.background);
+
 
         let buildingA = new CommandCenterBuilding(
             new Vector2d(67, 425),
@@ -28,7 +29,7 @@ class GameContext {
         );
 
         this.engine.addObject(buildingA);
-        buildingA.produceNewSoldier();
+        buildingA.produceNewSoldier(this.engine.objects);
 
         let buildingB = new CommandCenterBuilding(
             new Vector2d(1356, 435),
@@ -43,10 +44,6 @@ class GameContext {
         );
 
         this.engine.addObject(buildingB);
-        buildingB.produceNewSoldier();
+        buildingB.produceNewSoldier(this.engine.objects);
     }
-}
-
-module.exports = {
-    GameContext
 }

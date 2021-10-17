@@ -22,7 +22,6 @@ app.listen(port);
 let webSocketServer = require('websocket').server;
 
 var httpServer = http.createServer(function (request, response) {
-    console.log((new Date()) + ' Received request for ' + request.url);
     response.writeHead(404);
     response.end();
 });
@@ -62,8 +61,6 @@ wsServer.on('request', function (request) {
 
     connection.on('message', function (message) {
         if (message.type === 'utf8') {
-            console.log('Received Message: ' + message.utf8Data);
-
             let pMsg = Message.parse(message.utf8Data);
 
             server.processMsg(pMsg, connection);

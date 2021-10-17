@@ -1,3 +1,5 @@
+const Player = require("../shared/player").Player;
+
 function UUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -5,7 +7,7 @@ function UUID() {
     });
 }
 
-class GameObject {
+module.exports = class GameObject {
     #id;
     #type;
     #name;
@@ -107,7 +109,7 @@ class GameObject {
     }
 
     set syncable(value) {
-        this.#syncable = new Boolean(value);
+        this.#syncable = Boolean(value);
     }
 
     /**
@@ -159,6 +161,9 @@ class GameObject {
         dto.owner = this.#owner ? this.#owner.toDTO() : null;
         dto.syncable = this.#syncable;
 
+
+        dto.type = this.constructor.name;
+
         return dto;
     }
 
@@ -172,8 +177,6 @@ class GameObject {
         obj.#maxHp = dto.maxHp;
         obj.#owner = dto.owner ? Player.fromDTO(dto.owner) : null;
         obj.#syncable = dto.syncable;
-
-        return obj;
     }
 
     sync(dto) {
@@ -183,9 +186,3 @@ class GameObject {
         this.#maxHp = dto.maxHp;
     }
 }
-
-try {
-    module.exports = {
-        GameObject
-    }
-} catch (e) { }

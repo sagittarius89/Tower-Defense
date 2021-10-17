@@ -4,8 +4,11 @@ const MessageType = {
     REGISTER_PLAYER: "register_player",
     PLAYER_REGISTERED: "player_registered",
     SYNC_OBJECTS: "sync_objects",
+    INIT_GAME: "init_game",
     START_GAME: "start_game",
-    CLIENT_READY: "client_ready"
+    CLIENT_READY: "client_ready",
+    PLAYER_IDX: 'player_idx',
+    SYNC_PACK: 'sync_pack'
 }
 
 class Message {
@@ -53,21 +56,31 @@ class Message {
         return msg;
     }
 
-    static playerRegistered(number, player, self) {
+    static playerRegistered(players) {
         let msg = new Message(MessageType.PLAYER_REGISTERED);
-
-        msg.set('number', number);
-        msg.set('player', player);
-        msg.set('self', self);
+        msg.set('players', players);
 
         return msg;
     }
 
-    static startGame(objectList) {
-        let msg = new Message(MessageType.START_GAME);
+    static playerIndex(number) {
+        let msg = new Message(MessageType.PLAYER_IDX);
+
+        msg.set('player_idx', number);
+
+        return msg;
+    }
+
+    static initGame(objectList) {
+        let msg = new Message(MessageType.INIT_GAME);
 
         msg.set('obj_list', objectList);
 
+        return msg;
+    }
+
+    static startGame() {
+        let msg = new Message(MessageType.START_GAME);
         return msg;
     }
 
@@ -77,12 +90,20 @@ class Message {
         return msg;
     }
 
+    static syncPack(objectList) {
+        let msg = new Message(MessageType.SYNC_PACK);
+
+        msg.set('obj_list', objectList);
+
+        return msg;
+    }
+
     static objectsSync(objectList) {
         let msg = new Message(MessageType.SYNC_OBJECTS);
 
         msg.set('obj_list', objectList);
 
-        return objectList;
+        return msg;
     }
 
     static error(text) {
