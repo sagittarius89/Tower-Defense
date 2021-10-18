@@ -5,8 +5,6 @@ class Soldier extends RoundObject {
     #angle;
     #attackMode;
     #idle;
-    #shotFrequency;
-    #shotTimestamp;
     #imgWidth;
     #imgHeight;
     #currFrame;
@@ -24,8 +22,6 @@ class Soldier extends RoundObject {
         this.#attackDistance = 110;
         this.#attackMode = false;
         this.#idle = false;
-        this.#shotTimestamp = new Date().getTime();
-        this.#shotFrequency = 1000;
         this.#imgWidth = tmpImg.width;
         this.#imgHeight = tmpImg.height;
         this.#currFrame = 0;
@@ -69,34 +65,20 @@ class Soldier extends RoundObject {
         if (!this.#attackMode && !this.#idle)
             this.checkCollisions(objects, enemy);
 
-        let now = new Date();
-        if (this.#attackMode &&
-            (now.getTime() - this.#shotTimestamp
-                > this.#shotFrequency)
-        ) {
+        if (this.hp <= 0) {
+            this.#image = "bang";
+            this.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
+                null);
 
-            //this.doShot(objects);
+            if (Selection.instance.currentSelection == this) {
+                Selection.instance.currentSelection = null;
+            }
 
-            //this.#shotTimestamp = new Date().getTime();
+            return true;
         }
 
 
         this.move();
-    }
-
-    doShot(objects) {
-        let bullet = new Bullet(
-            this.x + (this.radius * Math.cos(this.#angle)),
-            this.y + (this.radius * Math.sin(this.#angle)),
-            new Vector2d(
-                Bullet.BULLET_VELOCITY * Math.cos(this.#angle),
-                Bullet.BULLET_VELOCITY * Math.sin(this.#angle)
-            ),
-            this.id,
-            this.#bulletImage
-        );
-
-        GameContext.engine.addObject(bullet);
     }
 
     checkCollisions(objects, clostestEnemy) {
@@ -260,45 +242,20 @@ class Soldier extends RoundObject {
         }
     }
 
-    lumbago(value) {
-        this.hp -= value;
-
-        if (this.hp <= 0) {
-            this.#image = "bang";
-            this.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
-                null);
-            this.owner = null;
-
-            if (Selection.instance.currentSelection == this) {
-                Selection.instance.currentSelection = null;
-            }
-
-            setTimeout(function () {
-                GameContext.engine.objects.delete(this);
-            }.bind(this), 1000);
-
-            return true;
-        }
-
-        return false;
-    }
-
     toDTO() {
         let dto = super.toDTO();
 
         dto.image = this.#image;
+        dto.bulletImage = this.#bulletImage;
         dto.velocity = this.#velocity;
         dto.attackDistance = this.#attackDistance;
         dto.angle = this.#angle;
         dto.attackMode = this.#attackMode;
         dto.idle = this.#idle;
-        dto.shotFrequency = this.#shotFrequency;
-        dto.shotTimestamp = this.#shotTimestamp;
         dto.imgWidth = this.#imgWidth;
         dto.imgHeight = this.#imgHeight;
         dto.currFrame = 0;
         dto.kills = this.#kills;
-        dto.bulletImage = this.#bulletImage;
 
         dto.type = this.constructor.name;
         return dto;
@@ -318,9 +275,9 @@ class Soldier extends RoundObject {
         obj.#angle = dto.angle;
         obj.#attackMode = dto.attackMode;
         obj.#idle = dto.idle;
-        obj.#shotFrequency = dto.shotFrequency;
-        obj.#shotTimestamp = dto.shotTimestamp;
         obj.#kills = dto.kills;
+        obj.#image = dto.image;
+        obj.#bulletImage = dto.bulletImage;
 
         return obj;
     }
@@ -333,9 +290,9 @@ class Soldier extends RoundObject {
         this.#angle = dto.angle;
         this.#attackMode = dto.attackMode;
         this.#idle = dto.idle;
-        this.#shotFrequency = dto.shotFrequency;
-        this.#shotTimestamp = dto.shotTimestamp;
         this.#kills = dto.kills;
+        this.#image = dto.image;
+        this.#bulletImage = dto.bulletImage;
 
     }
 }
