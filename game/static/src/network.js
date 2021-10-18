@@ -34,6 +34,17 @@ class Network {
     processSync(dtoList) {
         let objList = GameContext.engine.objects;
 
+        objList.foreach((obj => {
+
+            if (obj.syncable) {
+                if (!dtoList.find(dto => dto.id == obj.id)) {
+
+                    objList.delete(obj);
+                }
+            }
+
+        }).bind(this));
+
         dtoList.forEach(dto => {
             let obj = objList.byId(dto.id);
 

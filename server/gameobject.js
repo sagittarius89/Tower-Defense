@@ -182,7 +182,7 @@ module.exports = class GameObject {
     sync(dto) {
         this.#zIndex = dto.zIndex;
         this.#selectable = dto.selectable;
-        this.#hp = dto.hp;
+        //this.#hp = dto.hp;
         this.#maxHp = dto.maxHp;
     }
 }

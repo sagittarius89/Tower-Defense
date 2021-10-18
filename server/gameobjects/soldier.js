@@ -165,63 +165,6 @@ module.exports = class Soldier extends RoundObject {
         }
     }
 
-    draw(ctx, clostestEnemy) {
-        ctx.setTransform(1, 0, 0, 1, this.x, this.y); // set position of image center
-
-        let image = ResourceManager.instance.getImageResource(this.#image);
-
-        if (this == Selection.instance.currentSelection) {
-            ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
-            ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
-            ctx.beginPath();
-            ctx.ellipse(
-                this.radius / 2,
-                this.radius / 2,
-                this.radius * 1.5,
-                this.radius,
-                0,
-                0,
-                2 * Math.PI);
-            ctx.fill();
-            ctx.stroke();
-        }
-
-        ctx.rotate(this.#angle - Math.PI); // rotate
-
-        if (image.frames) {
-            image = image.frames[this.#currFrame++].image;
-
-            ctx.drawImage(
-                image,
-                -this.#imgWidth / 2,
-                -this.#imgHeight / 2,
-                this.#imgWidth,
-                this.#imgHeight
-            );
-        }
-
-        if (image.frames && this.#currFrame >= image.frames.length)
-            this.#currFrame = 0;
-
-        ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
-        ctx.restore();
-
-        /*if (clostestEnemy && GameContext.debug) {
-            let randomColor = Math.floor(Math.random() * 16777215).toString(16);
- 
-            ctx.strokeStyle = '#' + randomColor;
-            ctx.beginPath();
-            ctx.moveTo(this.x, this.y);
-            ctx.lineTo(clostestEnemy.x, clostestEnemy.y);
-            ctx.stroke();
-        }*/
-
-        drawHpStripe(ctx, this.maxHp, this.hp,
-            this.x - this.radius,
-            this.y - (this.radius * 1, 25),
-            this.radius * 2, 5);
-    }
-
     findClostestEnemy(objects) {
         let distance = Number.MAX_VALUE;
         let closestObj = null;
@@ -329,17 +272,6 @@ module.exports = class Soldier extends RoundObject {
 
     sync(dto) {
         super.sync(dto);
-
-        this.#velocity = dto.velocity;
-        this.#attackDistance = dto.attackDistance;
-        this.#angle = dto.angle;
-        this.#attackMode = dto.attackMode;
-        this.#idle = dto.idle;
-        this.#shotFrequency = dto.shotFrequency;
-        this.#shotTimestamp = dto.shotTimestamp;
-        this.#imgWidth = dto.imgWidth;
-        this.#imgHeight = dto.imgHeight;
-        this.#kills = dto.kills;
 
     }
 }

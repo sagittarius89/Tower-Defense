@@ -49,18 +49,8 @@ module.exports = class GameEngine {
                 obj.sync(dto);
             } else if (!obj) {
                 switch (dto.type) {
-                    case 'Soldier': {
-                        let obj = Soldier.fromDTO(dto);
-                        this.addObject(obj);
-                        break;
-                    }
                     case 'Tower': {
                         let obj = Tower.fromDTO(dto);
-                        this.addObject(obj);
-                        break;
-                    }
-                    case 'Bullet': {
-                        let obj = Bullet.fromDTO(dto);
                         this.addObject(obj);
                         break;
                     }

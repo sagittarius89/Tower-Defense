@@ -73,7 +73,7 @@ class Bullet extends RoundObject {
 
                         var distance = myPos.getDistance(objPos);
 
-                        if (distance <= this.radius + obj.radius) {
+                        /*if (distance <= this.radius + obj.radius) {
                             if (obj.lumbago(10)) {
                                 let parent = objects.byId(this.#parent);
                                 if (parent)
@@ -81,9 +81,9 @@ class Bullet extends RoundObject {
                             }
 
                             objects.delete(this);
-                        }
+                        }*/
                     } else if (obj instanceof SquareObject) {
-                        let myPos = new Vector2d(this.x, this.y);
+                        /*let myPos = new Vector2d(this.x, this.y);
 
                         if (Collider.checkCollisionPointWithSquare(myPos, obj.toSquare())) {
                             if (obj.lumbago(10)) {
@@ -93,7 +93,7 @@ class Bullet extends RoundObject {
                             }
 
                             objects.delete(this);
-                        }
+                        }*/
                     }
                 }
             }

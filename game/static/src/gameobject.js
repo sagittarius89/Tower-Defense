@@ -107,7 +107,7 @@ class GameObject {
     }
 
     set syncable(value) {
-        this.#syncable = new Boolean(value);
+        this.#syncable = Boolean(value);
     }
 
     /**
