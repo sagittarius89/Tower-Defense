@@ -92,7 +92,7 @@ module.exports = class Tower extends Building {
         super.update(ctx, objects);
     }
 
-    logick(objects) {
+    logic(objects) {
         this.findClostestEnemy(objects);
 
         let now = new Date();
@@ -118,10 +118,9 @@ module.exports = class Tower extends Building {
         dto.angle = this.angle;
         dto.kills = this.kills;
         dto.spawnPoint = this.#spawnPoint.toDTO();
-
         dto.type = this.constructor.name;
 
-        return this;
+        return dto;
     }
 
     static fromDTO(dto, obj = new Tower(

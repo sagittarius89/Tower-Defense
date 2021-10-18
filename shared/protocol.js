@@ -8,7 +8,8 @@ const MessageType = {
     START_GAME: "start_game",
     CLIENT_READY: "client_ready",
     PLAYER_IDX: 'player_idx',
-    SYNC_PACK: 'sync_pack'
+    SYNC_PACK: 'sync_pack',
+    ADD_BUILDING: 'add_building'
 }
 
 class Message {
@@ -102,6 +103,14 @@ class Message {
         let msg = new Message(MessageType.SYNC_OBJECTS);
 
         msg.set('obj_list', objectList);
+
+        return msg;
+    }
+
+    static addBuilding(dto) {
+        let msg = new Message(MessageType.ADD_BUILDING);
+
+        msg.set('obj', dto)
 
         return msg;
     }

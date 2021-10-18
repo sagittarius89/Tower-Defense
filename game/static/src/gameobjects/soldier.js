@@ -18,7 +18,7 @@ class Soldier extends RoundObject {
         this.#image = dronImage;
         this.#angle = 0;
 
-        this.#velocity = 3.0;
+        this.#velocity = 4.0;
         this.#attackDistance = 110;
         this.#attackMode = false;
         this.#idle = false;
@@ -32,8 +32,8 @@ class Soldier extends RoundObject {
         this.name = "Drone";
         this.zIndex = 20;
         this.selectable = true;
-        this.hp = 60;
-        this.maxHp = 60;
+        this.hp = 30;
+        this.maxHp = 30;
         this.syncable = true;
 
 

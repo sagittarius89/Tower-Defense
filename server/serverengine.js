@@ -50,8 +50,8 @@ module.exports = class GameEngine {
             } else if (!obj) {
                 switch (dto.type) {
                     case 'Tower': {
-                        let obj = Tower.fromDTO(dto);
-                        this.addObject(obj);
+                        //let obj = Tower.fromDTO(dto);
+                        //this.addObject(obj);
                         break;
                     }
                 }

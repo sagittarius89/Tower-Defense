@@ -4,14 +4,16 @@ class CreateTower extends GameAction {
     #towerImageSelected;
     #bulletImage;
     #player;
+    #pushFunc;
 
-    constructor(callback, towerImage, towerImageSelected, bulletImage, player) {
+    constructor(callback, towerImage, towerImageSelected, bulletImage, player, pushFunc) {
         super(callback);
 
         this.#towerImage = towerImage;
         this.#towerImageSelected = towerImageSelected;
         this.#bulletImage = bulletImage;
         this.#player = player;
+        this.#pushFunc = pushFunc;
     }
 
     update(ctx, objects) {
@@ -51,7 +53,7 @@ class CreateTower extends GameAction {
 
         tower.owner = this.#player;
 
-        GameContext.engine.addObject(tower);
+        this.#pushFunc(tower);
 
         this.callback();
     }
@@ -97,7 +99,10 @@ class CommandCenterBuilding extends Building {
         if (player.self) {
             let towerAction = new Button(
                 "build tower", CreateTower,
-                [towerImage, towerImageSelected, bulletImage, this.owner],
+                [towerImage, towerImageSelected, bulletImage, this.owner, function (obj) {
+                    let dto = obj.toDTO();
+                    Network.instance.addBuilding(dto);
+                }],
                 420, 750, 50, 50, "turret_violet_01", 25, true
             );
             actionsList.push(towerAction);

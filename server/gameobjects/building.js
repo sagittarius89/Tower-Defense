@@ -22,25 +22,17 @@ module.exports = class Building extends SquareObject {
         this.syncable = true;
     }
 
-    lumbago(value) {
+    lumbago(value, objects) {
         this.hp -= value;
 
         if (this.hp <= 0) {
 
             this.#image = "bang";
             this.#imageSelected = this.#image;
-
-            this.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
-                null);
-            this.addProperty(Player.PLAYER_PROPERTY,
-                null);
-
-            if (Selection.instance.currentSelection == this) {
-                Selection.instance.currentSelection = null;
-            }
+            this.owner = null;
 
             setTimeout(function () {
-                GameContext.engine.objects.delete(this);
+                objects.delete(this);
             }.bind(this), 1000);
 
             return true;
@@ -72,6 +64,6 @@ module.exports = class Building extends SquareObject {
     }
 
     sync(dto) {
-        super.sync(dto)
+        super.sync(dto);
     }
 }

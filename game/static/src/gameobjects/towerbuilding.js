@@ -30,21 +30,6 @@ class Tower extends Building {
         this.syncable = true;
     }
 
-    doShot(objects) {
-        let bullet = new Bullet(
-            this.#spawnPoint.x,
-            this.#spawnPoint.y,
-            new Vector2d(
-                Bullet.BULLET_VELOCITY * Math.cos(this.#angle),
-                Bullet.BULLET_VELOCITY * Math.sin(this.#angle)
-            ),
-            this,
-            this.#bulletImage
-        );
-
-        GameContext.engine.addObject(bullet);
-    }
-
 
     findClostestEnemy(objects) {
         let distance = Number.MAX_VALUE;
@@ -89,18 +74,7 @@ class Tower extends Building {
     }
 
     logic(objects) {
-        this.findClostestEnemy(objects);
 
-        let now = new Date();
-        if (this.#attackMode &&
-            (now.getTime() - this.#shotTimestamp
-                > this.#shotFrequency)
-        ) {
-
-            this.doShot(objects);
-
-            this.#shotTimestamp = new Date().getTime();
-        }
     }
 
     toDTO() {

@@ -56,7 +56,7 @@ module.exports = class Bullet extends RoundObject {
                         var distance = myPos.getDistance(objPos);
 
                         if (distance <= this.radius + obj.radius) {
-                            if (obj.lumbago(10, objects)) {
+                            if (obj.lumbago(20, objects)) {
                                 let parent = objects.byId(this.#parent);
                                 if (parent)
                                     parent.kills++;
@@ -67,7 +67,7 @@ module.exports = class Bullet extends RoundObject {
                         let myPos = new Vector2d(this.x, this.y);
 
                         if (Collider.checkCollisionPointWithSquare(myPos, obj.toSquare())) {
-                            if (obj.lumbago(10, objects)) {
+                            if (obj.lumbago(20, objects)) {
                                 let parent = objects.byId(this.#parent);
                                 if (parent)
                                     parent.kills++;

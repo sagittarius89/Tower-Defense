@@ -6,7 +6,7 @@ class Network {
     #gameContext;
 
     constructor() {
-        this.#client = new WebSocket('ws://localhost:8081/', 'echo-protocol');
+        this.#client = new WebSocket('ws://192.168.0.199:8081/', 'echo-protocol');
 
         this.#client.addEventListener('error', this.onError.bind(this));
 
@@ -73,6 +73,12 @@ class Network {
         if (GameContext.engine.continue) {
             setTimeout(this.sync.bind(this), 100);
         }
+    }
+
+    addBuilding(dto) {
+        let msg = Message.addBuilding(dto);
+
+        this.send(msg);
     }
 
     enrichOwner(dto) {

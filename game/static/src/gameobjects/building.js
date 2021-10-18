@@ -105,10 +105,6 @@ class Building extends SquareObject {
                 Selection.instance.currentSelection = null;
             }
 
-            setTimeout(function () {
-                GameContext.engine.objects.delete(this);
-            }.bind(this), 1000);
-
             return true;
         }
 
@@ -117,6 +113,9 @@ class Building extends SquareObject {
 
     toDTO() {
         let dto = super.toDTO();
+
+        dto.image = this.#image;
+        dto.imageSelected = this.#imageSelected;
 
         dto.type = this.constructor.name;
         return dto;
@@ -134,6 +133,9 @@ class Building extends SquareObject {
     }
 
     sync(dto) {
-        super.sync(dto)
+        super.sync(dto);
+
+        this.#image = dto.image;
+        this.#imageSelected = dto.imageSelected;
     }
 }

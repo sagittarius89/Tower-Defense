@@ -2,6 +2,7 @@ const MessageType = require('../shared/protocol').MessageType;
 const Message = require('../shared/protocol').Message;
 const Player = require('../shared/player').Player;
 const GameContext = require('./servercontext');
+const Tower = require('./gameobjects/towerbuilding');
 
 class GameServer {
     #player1;
@@ -29,9 +30,26 @@ class GameServer {
             case MessageType.SYNC_PACK:
                 this.processSync(msg);
                 break;
+            case MessageType.ADD_BUILDING:
+                this.processAddBuilding(msg);
+                break;
             default:
                 this.send(connection, Message.error('uknow message type'));
         }
+    }
+
+    processAddBuilding(msg) {
+        let dto = msg.get('obj');
+        let obj = null;
+        switch (dto.type) {
+            case Tower.name: {
+                obj = Tower.fromDTO(dto);
+                break;
+            }
+        }
+
+        if (obj)
+            this.#gameContext.engine.objects.push(obj);
     }
 
     processSync(msg) {
