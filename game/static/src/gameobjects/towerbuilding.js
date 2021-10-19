@@ -16,17 +16,17 @@ class Tower extends Building {
 
         this.#spawnPoint = spawnPoint;
         this.#bulletImage = bulletImage;
-        this.#attackDistance = 400;
+        this.#attackDistance = 600;
         this.#attackMode = false;
         this.idle = false;
         this.#shotTimestamp = new Date().getTime();
-        this.#shotFrequency = 1000;
+        this.#shotFrequency = 700;
 
         this.selectable = true;
         this.hp = 250;
         this.maxHp = 250;
         this.name = "Impulse Tower";
-        this.zIndex = 70;
+        this.zIndex = 20;
         this.syncable = true;
     }
 
@@ -80,12 +80,13 @@ class Tower extends Building {
     toDTO() {
         let dto = super.toDTO();
 
-        dto.attackDistance = this.attackDistance;
-        dto.attackMode = this.attackMode;
-        dto.shotFrequency = this.shotFrequency;
-        dto.shotTimestamp = this.shotTimestamp;
-        dto.angle = this.angle;
-        dto.kills = this.kills;
+        dto.attackDistance = this.#attackDistance;
+        dto.attackMode = this.#attackMode;
+        dto.shotFrequency = this.#shotFrequency;
+        dto.shotTimestamp = this.#shotTimestamp;
+        dto.angle = this.#angle;
+        dto.kills = this.#kills;
+        dto.bulletImage = this.#bulletImage;
         dto.spawnPoint = this.#spawnPoint.toDTO();
 
         dto.type = this.constructor.name;
@@ -116,8 +117,6 @@ class Tower extends Building {
 
         this.#attackDistance = dto.attackDistance;
         this.#attackMode = dto.attackMode;
-        this.#shotFrequency = dto.shotFrequency;
-        this.#shotTimestamp = dto.shotTimestamp;
         this.#angle = dto.angle;
         this.#kills = dto.kills;
     }

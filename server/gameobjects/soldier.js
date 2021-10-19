@@ -29,7 +29,7 @@ module.exports = class Soldier extends RoundObject {
         this.#angle = 0;
 
         this.#velocity = 4.0;
-        this.#attackDistance = 110;
+        this.#attackDistance = 310;
         this.#attackMode = false;
         this.#idle = false;
         this.#shotTimestamp = new Date().getTime();
@@ -242,13 +242,8 @@ module.exports = class Soldier extends RoundObject {
 
         super.fromDTO(dto, obj);
 
-        obj.#velocity = dto.velocity;
-        obj.#attackDistance = dto.attackDistance;
         obj.#angle = dto.angle;
         obj.#attackMode = dto.attackMode;
-        obj.#idle = dto.idle;
-        obj.#shotFrequency = dto.shotFrequency;
-        obj.#shotTimestamp = dto.shotTimestamp;
         obj.#imgWidth = dto.imgWidth;
         obj.#imgHeight = dto.imgHeight;
         obj.#kills = dto.kills;

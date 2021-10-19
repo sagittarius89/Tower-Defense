@@ -21,7 +21,7 @@ module.exports = class CommandCenterBuilding extends Building {
         super(image, imageSelected, pos.x, pos.y);
 
         this.#productionTimestamp = new Date().getTime();
-        this.#spawnFrequency = 3 * 1000;
+        this.#spawnFrequency = 2000;
         this.#spawnPoint = spawnPoint;
         this.#soldierLimit = 15;
         this.#dronImage = dronImage;
@@ -111,9 +111,7 @@ module.exports = class CommandCenterBuilding extends Building {
     sync(dto) {
         super.sync(dto);
 
-        this.#productionTimestamp = dto.productionTimestamp;
         this.#spawnPoint = Vector2d.fromDTO(dto.spawnPoint);
-        this.#spawnFrequency = dto.spawnFrequency;
         this.#soldierLimit = dto.soldierLimit;
         this.#dronImage = dto.dronImage;
         this.#bulletImage = dto.bulletImage;

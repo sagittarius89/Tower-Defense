@@ -15,7 +15,7 @@ module.exports = class Bullet extends RoundObject {
     #imgWidth;
     #imgHeight;
 
-    static BULLET_VELOCITY = 3;
+    static BULLET_VELOCITY = 6;
 
     constructor(x, y, vector, parent, image) {
         super(5, x, y);
@@ -28,7 +28,7 @@ module.exports = class Bullet extends RoundObject {
         this.#vector = vector;
         this.selectable = false;
         this.syncable = true;
-        this.#parent = parent;
+        this.#parent = parent.id;
         this.zIndex = 50;
         this.#currFrame = 0;
     }
@@ -61,6 +61,7 @@ module.exports = class Bullet extends RoundObject {
                                 if (parent)
                                     parent.kills++;
                             }
+
                             objects.delete(this);
                         }
                     } else if (obj instanceof SquareObject) {

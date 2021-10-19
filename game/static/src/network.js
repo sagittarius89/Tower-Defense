@@ -33,7 +33,6 @@ class Network {
 
     processSync(dtoList) {
         let objList = GameContext.engine.objects;
-
         objList.foreach((obj => {
 
             if (obj.syncable) {
@@ -71,7 +70,7 @@ class Network {
         this.send(Message.syncPack(dtoList));
 
         if (GameContext.engine.continue) {
-            setTimeout(this.sync.bind(this), 100);
+            setTimeout(this.sync.bind(this), 120);
         }
     }
 

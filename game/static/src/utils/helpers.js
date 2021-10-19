@@ -26,6 +26,9 @@ function drawStrokedText(ctx, text, x, y, textSize = 29) {
 
 function drawHpStripe(ctx, maxHp, cHp, x, y, width, height, showText = false) {
 
+    if (cHp < 0)
+        cHp = 0
+
     ctx.fillStyle = '#FF8989';
     ctx.fillRect(x, y, width, height);
 

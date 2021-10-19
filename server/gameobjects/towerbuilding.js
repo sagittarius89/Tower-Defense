@@ -1,6 +1,6 @@
 const Building = require('./building');
 const Vector2d = require('../../game/static/src/math/vector').Vector2d;
-
+const Bullet = require('./bullet');
 module.exports = class Tower extends Building {
     #spawnPoint;
     #attackDistance;
@@ -19,7 +19,7 @@ module.exports = class Tower extends Building {
 
         this.#spawnPoint = spawnPoint;
         this.#bulletImage = bulletImage;
-        this.#attackDistance = 400;
+        this.#attackDistance = 600;
         this.#attackMode = false;
         this.idle = false;
         this.#shotTimestamp = new Date().getTime();
@@ -44,7 +44,7 @@ module.exports = class Tower extends Building {
             this.#bulletImage
         );
 
-        GameContext.engine.addObject(bullet);
+        objects.push(bullet);
     }
 
 
@@ -111,14 +111,13 @@ module.exports = class Tower extends Building {
         let dto = super.toDTO();
 
         dto.type = this.constructor.name;
-        dto.attackDistance = this.attackDistance;
-        dto.attackMode = this.attackMode;
-        dto.shotFrequency = this.shotFrequency;
-        dto.shotTimestamp = this.shotTimestamp;
-        dto.angle = this.angle;
-        dto.kills = this.kills;
+        dto.attackDistance = this.#attackDistance;
+        dto.attackMode = this.#attackMode;
+        dto.shotFrequency = this.#shotFrequency;
+        dto.shotTimestamp = this.#shotTimestamp;
+        dto.angle = this.#angle;
+        dto.kills = this.#kills;
         dto.spawnPoint = this.#spawnPoint.toDTO();
-        dto.type = this.constructor.name;
 
         return dto;
     }
@@ -132,11 +131,14 @@ module.exports = class Tower extends Building {
     ) {
         super.fromDTO(dto, obj);
 
-        obj.#attackDistance = dto.attackDistance;
         obj.#attackMode = dto.attackMode;
+        obj.#angle = dto.angle;
+        obj.#kills = dto.kills;
         obj.#shotFrequency = dto.shotFrequency;
         obj.#shotTimestamp = dto.shotTimestamp;
-        obj.#angle = dto.angle;
+        obj.#spawnPoint = Vector2d.fromDTO(dto.spawnPoint);
+        obj.#attackDistance = dto.attackDistance;
+        obj.#attackMode = dto.attackMode;
         obj.#kills = dto.kills;
 
         return obj;
@@ -145,10 +147,6 @@ module.exports = class Tower extends Building {
     sync(dto) {
         super.sync(dto);
 
-        this.#attackDistance = dto.attackDistance;
-        this.#attackMode = dto.attackMode;
-        this.#shotFrequency = dto.shotFrequency;
-        this.#shotTimestamp = dto.shotTimestamp;
         this.#angle = dto.angle;
         this.#kills = dto.kills;
     }

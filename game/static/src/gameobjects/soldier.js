@@ -19,7 +19,7 @@ class Soldier extends RoundObject {
         this.#angle = 0;
 
         this.#velocity = 4.0;
-        this.#attackDistance = 110;
+        this.#attackDistance = 310;
         this.#attackMode = false;
         this.#idle = false;
         this.#imgWidth = tmpImg.width;
@@ -245,17 +245,12 @@ class Soldier extends RoundObject {
     toDTO() {
         let dto = super.toDTO();
 
-        dto.image = this.#image;
-        dto.bulletImage = this.#bulletImage;
         dto.velocity = this.#velocity;
-        dto.attackDistance = this.#attackDistance;
         dto.angle = this.#angle;
         dto.attackMode = this.#attackMode;
         dto.idle = this.#idle;
         dto.imgWidth = this.#imgWidth;
         dto.imgHeight = this.#imgHeight;
-        dto.currFrame = 0;
-        dto.kills = this.#kills;
 
         dto.type = this.constructor.name;
         return dto;

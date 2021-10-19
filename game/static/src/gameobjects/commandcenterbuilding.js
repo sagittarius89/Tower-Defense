@@ -103,7 +103,7 @@ class CommandCenterBuilding extends Building {
                     let dto = obj.toDTO();
                     Network.instance.addBuilding(dto);
                 }],
-                420, 750, 50, 50, "turret_violet_01", 25, true
+                420, 750, 50, 50, "turret_violet_01", 7, true
             );
             actionsList.push(towerAction);
         }

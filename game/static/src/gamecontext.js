@@ -8,7 +8,7 @@ var createGameContext = (async function (
 
 
     GameContext = this;
-    this.debug = true;
+    this.debug = false;
     this.engine = new GameEngine(this.canvas.getContext("2d"));
     this.inputManager = new InputManager();
     this.player1 = player1;
