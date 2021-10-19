@@ -6,8 +6,6 @@ class Bullet extends RoundObject {
     #imgWidth;
     #imgHeight;
 
-    static BULLET_VELOCITY = 0.5;
-
     constructor(x, y, vector, parent, image) {
         super(5, x, y);
 

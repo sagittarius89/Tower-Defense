@@ -70,7 +70,7 @@ class Network {
         this.send(Message.syncPack(dtoList));
 
         if (GameContext.engine.continue) {
-            setTimeout(this.sync.bind(this), 120);
+            setTimeout(this.sync.bind(this), CONSTS.SYNC_TIMEOUT);
         }
     }
 

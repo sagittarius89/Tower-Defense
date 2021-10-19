@@ -16,15 +16,15 @@ class Tower extends Building {
 
         this.#spawnPoint = spawnPoint;
         this.#bulletImage = bulletImage;
-        this.#attackDistance = 600;
+        this.#attackDistance = CONSTS.TOWER_ATTACK_DISTANCE;
+        this.hp = CONSTS.TOWER_HP;
+        this.maxHp = CONSTS.TOWER_HP;
+        this.#shotFrequency = CONSTS.TOWER_SHOT_FREQUENCY;
         this.#attackMode = false;
         this.idle = false;
         this.#shotTimestamp = new Date().getTime();
-        this.#shotFrequency = 700;
 
         this.selectable = true;
-        this.hp = 250;
-        this.maxHp = 250;
         this.name = "Impulse Tower";
         this.zIndex = 20;
         this.syncable = true;

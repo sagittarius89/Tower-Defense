@@ -78,9 +78,11 @@ class CommandCenterBuilding extends Building {
         super(image, imageSelected, pos.x, pos.y);
 
         this.#productionTimestamp = new Date().getTime();
-        this.#spawnFrequency = 3 * 1000;
+        this.#spawnFrequency = CONSTS.COMMAND_CENTER_SPAWN_FREQUENCY;
+        this.#soldierLimit = CONSTS.COMMAND_CENTER_SOLDIER_LIMIT;
+        this.hp = CONSTS.COMMAND_CENTER_HP;
+        this.maxHp = CONSTS.COMMAND_CENTER_HP;
         this.#spawnPoint = spawnPoint;
-        this.#soldierLimit = 15;
         this.#dronImage = dronImage;
         this.#bulletImage = bulletImage;
         this.#towerImage = towerImage;
@@ -89,8 +91,6 @@ class CommandCenterBuilding extends Building {
         this.owner = player;
         this.selectable = true;
         this.syncable = true;
-        this.hp = 1000;
-        this.maxHp = 1000;
         this.name = "Command Center";
         this.zIndex = 30;
 
@@ -103,7 +103,7 @@ class CommandCenterBuilding extends Building {
                     let dto = obj.toDTO();
                     Network.instance.addBuilding(dto);
                 }],
-                420, 750, 50, 50, "turret_violet_01", 7, true
+                420, 750, 50, 50, "turret_violet_01", CONSTS.TOWER_COOLDOWN, true
             );
             actionsList.push(towerAction);
         }

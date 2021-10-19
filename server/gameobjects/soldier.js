@@ -5,6 +5,7 @@ const Vector2d = require('../../game/static/src/math/vector').Vector2d;
 const Bullet = require('./bullet');
 const Collider = require('../../game/static/src/physics/collider').Collider;
 const ColliderShape = require('../../game/static/src/physics/collider').ColliderShape;
+const CONSTS = require('../../shared/consts').CONSTS;
 
 module.exports = class Soldier extends RoundObject {
     #image;
@@ -28,12 +29,15 @@ module.exports = class Soldier extends RoundObject {
         this.#image = dronImage;
         this.#angle = 0;
 
-        this.#velocity = 4.0;
-        this.#attackDistance = 310;
+        this.#velocity = CONSTS.SOLDIER_VELOCITY;
+        this.#attackDistance = CONSTS.SOLDIER_ATTACK_DISTANCE;
+        this.hp = CONSTS.SOLDIER_HP;
+        this.maxHp = CONSTS.SOLDIER_HP;
+        this.#shotFrequency = CONSTS.SOLDIER_SHOT_FREQUENCY;
         this.#attackMode = false;
         this.#idle = false;
         this.#shotTimestamp = new Date().getTime();
-        this.#shotFrequency = 1000;
+        ;
         this.#imgWidth = tmpImg.width;
         this.#imgHeight = tmpImg.height;
         this.#currFrame = 0;
@@ -44,11 +48,7 @@ module.exports = class Soldier extends RoundObject {
         this.name = "Drone";
         this.zIndex = 20;
         this.selectable = true;
-        this.hp = 30;
-        this.maxHp = 30;
         this.syncable = true;
-
-
     }
 
     get angle() { return this.#angle; }
@@ -96,8 +96,8 @@ module.exports = class Soldier extends RoundObject {
             this.x + (this.radius * Math.cos(this.#angle)),
             this.y + (this.radius * Math.sin(this.#angle)),
             new Vector2d(
-                Bullet.BULLET_VELOCITY * Math.cos(this.#angle),
-                Bullet.BULLET_VELOCITY * Math.sin(this.#angle)
+                CONSTS.BULLET_VELOCITY * Math.cos(this.#angle),
+                CONSTS.BULLET_VELOCITY * Math.sin(this.#angle)
             ),
             this,
             this.#bulletImage

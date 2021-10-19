@@ -2,6 +2,7 @@ const Building = require('./building');
 const Player = require("../../shared/player");
 const Soldier = require("./soldier");
 const Vector2d = require('../../game/static/src/math/vector').Vector2d;
+const CONSTS = require('../../shared/consts').CONSTS;
 
 module.exports = class CommandCenterBuilding extends Building {
     #productionTimestamp;
@@ -21,9 +22,11 @@ module.exports = class CommandCenterBuilding extends Building {
         super(image, imageSelected, pos.x, pos.y);
 
         this.#productionTimestamp = new Date().getTime();
-        this.#spawnFrequency = 2000;
+        this.#spawnFrequency = CONSTS.COMMAND_CENTER_SPAWN_FREQUENCY;
+        this.#soldierLimit = CONSTS.COMMAND_CENTER_SOLDIER_LIMIT;
+        this.hp = CONSTS.COMMAND_CENTER_HP;
+        this.maxHp = CONSTS.COMMAND_CENTER_HP;
         this.#spawnPoint = spawnPoint;
-        this.#soldierLimit = 15;
         this.#dronImage = dronImage;
         this.#bulletImage = bulletImage;
         this.#towerImage = towerImage;
@@ -33,8 +36,6 @@ module.exports = class CommandCenterBuilding extends Building {
         this.owner = player;
         this.selectable = true;
         this.syncable = true;
-        this.hp = 1000;
-        this.maxHp = 1000;
         this.name = "Command Center";
         this.zIndex = 30;
     }

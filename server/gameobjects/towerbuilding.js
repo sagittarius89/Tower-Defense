@@ -1,6 +1,8 @@
 const Building = require('./building');
 const Vector2d = require('../../game/static/src/math/vector').Vector2d;
 const Bullet = require('./bullet');
+const CONSTS = require('../../shared/consts').CONSTS;
+
 module.exports = class Tower extends Building {
     #spawnPoint;
     #attackDistance;
@@ -19,15 +21,15 @@ module.exports = class Tower extends Building {
 
         this.#spawnPoint = spawnPoint;
         this.#bulletImage = bulletImage;
-        this.#attackDistance = 600;
+        this.#attackDistance = CONSTS.TOWER_ATTACK_DISTANCE;
+        this.hp = CONSTS.TOWER_HP;
+        this.maxHp = CONSTS.TOWER_HP;
+        this.#shotFrequency = CONSTS.TOWER_SHOT_FREQUENCY;
         this.#attackMode = false;
         this.idle = false;
         this.#shotTimestamp = new Date().getTime();
-        this.#shotFrequency = 1000;
 
         this.selectable = true;
-        this.hp = 250;
-        this.maxHp = 250;
         this.name = "Impulse Tower";
         this.zIndex = 70;
     }
@@ -37,8 +39,8 @@ module.exports = class Tower extends Building {
             this.#spawnPoint.x,
             this.#spawnPoint.y,
             new Vector2d(
-                Bullet.BULLET_VELOCITY * Math.cos(this.#angle),
-                Bullet.BULLET_VELOCITY * Math.sin(this.#angle)
+                CONSTS.BULLET_VELOCITY * Math.cos(this.#angle),
+                CONSTS.BULLET_VELOCITY * Math.sin(this.#angle)
             ),
             this,
             this.#bulletImage

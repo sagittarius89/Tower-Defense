@@ -3,6 +3,7 @@ const Bullet = require('./gameobjects/bullet');
 const Soldier = require('./gameobjects/soldier');
 const Building = require('./gameobjects/building');
 const Tower = require('./gameobjects/towerbuilding');
+const CONSTS = require('../shared/consts').CONSTS;
 
 module.exports = class GameEngine {
     #objects;
@@ -102,7 +103,7 @@ module.exports = class GameEngine {
         if (this.continue)
             setTimeout(function () {
                 this.update(this.#objects);
-            }.bind(this), 17);
+            }.bind(this), CONSTS.FRAME_RATE);
     }
 
     start() {
