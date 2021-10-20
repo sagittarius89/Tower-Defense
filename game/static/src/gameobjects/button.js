@@ -25,6 +25,9 @@ class Button extends SquareObject {
         this.#cooldown = cooldown;
         this.#lastUse = (new Date().getTime()) - (cooldown * 1000)
         this.#locked = false;
+
+        this.selectable = false;
+        this.syncable = false;
     }
 
     draw(ctx) {

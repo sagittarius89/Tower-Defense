@@ -1,4 +1,6 @@
-class RoundObject extends GameObject {
+const GameObject = require('../gameobject');
+const Vector2d = require('../../game/static/src/math/vector').Vector2d;
+module.exports = class RoundObject extends GameObject {
     #pos;
     #radius;
 
@@ -22,6 +24,7 @@ class RoundObject extends GameObject {
 
         dto.pos = this.#pos.toDTO();
         dto.radius = this.#radius;
+        dto.type = this.constructor.name;
 
         return dto;
     }

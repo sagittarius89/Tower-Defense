@@ -1,7 +1,6 @@
 class GameEngine {
     #ctx;
     #objects;
-    #collider;
     #camera;
 
     #fps;
@@ -15,7 +14,6 @@ class GameEngine {
 
         /** @member {GameObjectList} */
         this.#objects = new GameObjectList();
-        this.#collider = new Collider();
         this.#camera = new Camera(new Vector2d(0, 0));
 
         this.addObject(this.#camera);
@@ -36,6 +34,30 @@ class GameEngine {
         this.#objects.push(object);
     }
 
+    addFromDTO(dto) {
+        switch (dto.type) {
+            case 'Soldier': {
+                let obj = Soldier.fromDTO(dto);
+                obj.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
+                    obj.owner);
+                this.addObject(obj);
+                break;
+            }
+            case 'Tower': {
+                let obj = Tower.fromDTO(dto);
+                obj.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
+                    obj.owner);
+                this.addObject(obj);
+                break;
+            }
+            case 'Bullet': {
+                let obj = Bullet.fromDTO(dto);
+                this.addObject(obj);
+                break;
+            }
+        }
+    }
+
     get objects() { return this.#objects; }
 
     get WIDTH() { return this.ctx.canvas.width }
@@ -49,18 +71,10 @@ class GameEngine {
         addObject(this.#camera);
     }
 
-    start() {
-        this.continue = true;
-
-        window.requestAnimationFrame(function () {
-            this.update(this.#ctx, this.#objects, this.#collider, this.#camera, this);
-        }.bind(this));
-    }
-
-    endGame(ctx, hasPlayer1Objects, hasPlayer2Objects, instance) {
+    endGame(ctx, hasPlayer1Objects, hasPlayer2Objects) {
 
         setTimeout(function () {
-            instance.continue = false;
+            this.continue = false;
             let text = '';
             if (hasPlayer1Objects && !hasPlayer2Objects) {
                 text = `${GameContext.player1.name} wins`;
@@ -74,17 +88,17 @@ class GameEngine {
         }.bind(this), 1000);
     }
 
-    checkWin(ctx, objects, instance) {
+    checkWin(ctx, objects) {
         let hasPlayer1Objects = false;
         let hasPlayer2Objects = false;
 
         objects.foreach(element => {
             if (element instanceof Building || element instanceof Soldier) {
-                let player = element.getProperty(Player.PLAYER_PROPERTY);
+                let player = element.owner;
                 if (player) {
-                    if (player == GameContext.player1) {
+                    if (player.name == GameContext.player1.name) {
                         hasPlayer1Objects = true;
-                    } else if (player == GameContext.player2) {
+                    } else if (player.name == GameContext.player2.name) {
                         hasPlayer2Objects = true;
                     }
                 }
@@ -92,12 +106,12 @@ class GameEngine {
         });
 
         if (!hasPlayer1Objects || !hasPlayer2Objects) {
-            this.endGame(ctx, hasPlayer1Objects, hasPlayer2Objects, instance);
+            this.endGame(ctx, hasPlayer1Objects, hasPlayer2Objects);
         }
     }
 
-    update(ctx, objects, collider, camera, instance) {
-        ctx.clearRect(0, 0, instance.WIDTH, instance.HEIGHT);
+    update(ctx, objects) {
+        ctx.clearRect(0, 0, this.WIDTH, this.HEIGHT);
 
         objects.foreach((obj) => {
             if (obj.x && obj.y
@@ -109,10 +123,14 @@ class GameEngine {
                 return;
             }
 
-            obj.update(ctx, objects, collider, camera);
+            obj.update(ctx, objects);
         });
 
-        this.checkWin(ctx, objects, instance);
+        objects.foreach((obj) => {
+            obj.logic(objects);
+        });
+
+        this.checkWin(ctx, objects);
 
         this.#counter++;
 
@@ -125,10 +143,24 @@ class GameEngine {
             this.#counter = 0;
         }
 
-        if (instance.continue)
+        if (this.continue)
             window.requestAnimationFrame(function () {
-                this.update(this.#ctx, this.#objects, this.#collider, this.#camera, this);
+                this.update(this.#ctx, this.#objects);
             }.bind(this));
+    }
+
+    updateSingleFrame() {
+        window.requestAnimationFrame(function () {
+            this.update(this.#ctx, this.#objects);
+        }.bind(this));
+    }
+
+    start() {
+        this.continue = true;
+
+        window.requestAnimationFrame(function () {
+            this.update(this.#ctx, this.#objects);
+        }.bind(this));
     }
 
     stop() {

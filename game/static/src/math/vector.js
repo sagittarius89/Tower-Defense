@@ -12,8 +12,13 @@ class Vector2d {
     }
 
     get x() { return this.#x; }
-
+    set x(value) { this.#x = value; }
     get y() { return this.#y; }
+    set y(value) { this.#y = value; }
+
+    clone() {
+        return new Vector2d(this.#x, this.#y);
+    }
 
     /** @param {Vector2d} vector - vector2d */
     add(vector) {
@@ -91,4 +96,25 @@ class Vector2d {
 
         return new Vector2d(this.x * scalefactor, this.y * scalefactor);
     }
+
+    toDTO() {
+        let dto = {};
+
+        dto.x = this.x;
+        dto.y = this.y;
+
+        return dto;
+    }
+
+    static fromDTO(dto) {
+        return new Vector2d(dto.x, dto.y);
+    }
+}
+
+try {
+    module.exports = {
+        Vector2d
+    }
+} catch (e) {
+    console.log(e);
 }

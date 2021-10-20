@@ -1,4 +1,6 @@
-class Square {
+const Vector2d = require('../../game/static/src/math/vector').Vector2d;
+
+module.exports = class Square {
     #position;
     #dimension;
 
@@ -39,9 +41,3 @@ class Square {
     set width(value) { this.#position.width = Number.parseFloat(value); }
     set height(value) { this.#position.height = Number.parseFloat(value); }
 }
-
-try {
-    module.exports = {
-        Square
-    }
-} catch (e) { }

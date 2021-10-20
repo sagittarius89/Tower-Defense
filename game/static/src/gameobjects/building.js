@@ -11,12 +11,13 @@ class Building extends SquareObject {
 
         super(tmpImg.width, tmpImg.height, x, y);
 
-        this.#image = tmpImg;
-        this.#imageSelected = tmpImgSel;
+        this.#image = name;
+        this.#imageSelected = nameSelected;
         this.#currFrame = 0;
 
         this.zIndex = 10;
         this.selectable = true;
+        this.syncable = true;
     }
 
     update(ctx, objects) {
@@ -26,13 +27,16 @@ class Building extends SquareObject {
         let centerY = this.height / 2;
         let width = this.width;
         let height = this.height;
-        let image = this.#image;
+        let image = ResourceManager.instance.getImageResource(this.#image);
 
         if (this == Selection.instance.currentSelection) {
-            image = this.#imageSelected;
+            image = ResourceManager.instance.getImageResource(this.#imageSelected);
         }
 
         if (image.frames) {
+            if (image.frames && this.#currFrame >= image.frames.length)
+                this.#currFrame = 0;
+
             image = image.frames[this.#currFrame++].image;
 
             let scale = this.height / image.height;
@@ -55,8 +59,7 @@ class Building extends SquareObject {
                 -height / 2);
         }
 
-        if (this.#image.frames && this.#currFrame >= this.#image.frames.length)
-            this.#currFrame = 0;
+
 
 
 
@@ -89,8 +92,10 @@ class Building extends SquareObject {
         this.hp -= value;
 
         if (this.hp <= 0) {
-            this.#image = ResourceManager.instance.getImageResource("bang");
-            this.imageSelected = this.#image;
+
+            this.#image = "bang";
+            this.#imageSelected = this.#image;
+
             this.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
                 null);
             this.addProperty(Player.PLAYER_PROPERTY,
@@ -100,15 +105,37 @@ class Building extends SquareObject {
                 Selection.instance.currentSelection = null;
             }
 
-            setTimeout(function () {
-                GameContext.engine.objects.delete(this);
-
-
-            }.bind(this), 1000);
-
             return true;
         }
 
         return false;
+    }
+
+    toDTO() {
+        let dto = super.toDTO();
+
+        dto.image = this.#image;
+        dto.imageSelected = this.#imageSelected;
+
+        dto.type = this.constructor.name;
+        return dto;
+    }
+
+    static fromDTO(dto, obj = new Building(
+        dto.image,
+        dto.imageSelected,
+        dto.x,
+        dto.y)) {
+
+        super.fromDTO(dto, obj);
+
+        return obj;
+    }
+
+    sync(dto) {
+        super.sync(dto);
+
+        this.#image = dto.image;
+        this.#imageSelected = dto.imageSelected;
     }
 }

@@ -1,10 +1,18 @@
-class World extends GameObject {
+const GameObject = require('../gameobject');
+const ResourceManager = require('../resourcemanager').ResourceManager;
+
+module.exports = class World extends GameObject {
     #image
+    #width;
+    #height;
 
     constructor(image) {
         super();
 
         this.#image = image;
+        this.#width;
+        this.#height;
+
         this.zIndex = 0;
         this.syncable = true;
     }
@@ -16,27 +24,27 @@ class World extends GameObject {
     }
 
     get width() {
-        return ResourceManager.instance
-            .getImageResource(this.#image).width;
+        return this.#width;
     }
     get height() {
-        return ResourceManager.instance
-            .getImageResource(this.#image).height;
+        return this.#height;
     }
 
 
     toDTO() {
         let dto = super.toDTO();
         dto.image = this.#image;
-        dto.type = this.constructor.name;
-        dto.width = this.width;
-        dto.height = this.height;
 
+        dto.type = this.constructor.name;
         return dto;
     }
 
     static fromDTO(dto, obj = new World(dto.image)) {
-        return super.fromDTO(dto, obj);
+        super.fromDTO(dto, obj);
+        obj.#width = dto.width;
+        obj.#height = dto.height;
+
+        return obj;
     }
 
     sync(dto) {

@@ -1,7 +1,6 @@
 const ColliderShape = {
     SQUARE: "square",
-    CIRCLE: "circle",
-    SURFACE: "surface"
+    CIRCLE: "circle"
 }
 
 class Collider {
@@ -41,14 +40,6 @@ class Collider {
 
         if (shapeA == ColliderShape.CIRCLE && shapeB == ColliderShape.CIRCLE) {
             this.processCircleCircleCollision(
-                objA,
-                colDataA[Collider.STATIC_PROPERTY],
-                objB,
-                colDataB[Collider.STATIC_PROPERTY]
-            );
-        }
-        else if (shapeA == ColliderShape.CIRCLE && shapeB == ColliderShape.SURFACE) {
-            this.processCircleShapeCollision(
                 objA,
                 colDataA[Collider.STATIC_PROPERTY],
                 objB,
@@ -133,3 +124,10 @@ class Collider {
         }
     }
 }
+
+try {
+    module.exports = {
+        Collider,
+        ColliderShape
+    }
+} catch (e) { }

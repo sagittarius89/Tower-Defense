@@ -23,6 +23,8 @@ class Hud extends GameObject {
         this.#grd.addColorStop(1, "rgba(0,0,0,1)");
         this.#grd.addColorStop(0, 'rgba(0,0,0,0)');
 
+        this.syncable = false;
+
     }
 
     drawSection(ctx, name, x, y, width, height) {
@@ -71,7 +73,7 @@ class Hud extends GameObject {
         this.drawSection(ctx, "info", 68, 740, 330, 205);
         this.drawSection(ctx, "actions", 405, 740, 330, 205);
         if (sel) {
-            let player = sel.getProperty(Player.PLAYER_PROPERTY);
+            let player = sel.owner;
             let kills = sel.kills;
 
             drawStrokedText(ctx, sel.name, 70, 770);

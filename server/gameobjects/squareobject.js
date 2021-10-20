@@ -1,4 +1,7 @@
-class SquareObject extends GameObject {
+const GameObject = require('../gameobject');
+const Square = require('./square');
+
+module.exports = class SquareObject extends GameObject {
     #square;
 
     constructor(width, height, x, y) {
@@ -30,8 +33,8 @@ class SquareObject extends GameObject {
         dto.y = this.y;
         dto.width = this.width;
         dto.height = this.height;
-
         dto.type = this.constructor.name;
+
         return dto;
     }
 

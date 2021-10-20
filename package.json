@@ -10,6 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "ejs": "^3.1.6",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "websocket": "1.0.34",
+    "image-size": "1.0.0",
+    "path": "0.12.7"
   }
 }

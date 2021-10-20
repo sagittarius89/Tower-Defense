@@ -1,10 +1,21 @@
-class Soldier extends RoundObject {
+const RoundObject = require('./roundobject');
+const ResourceManager = require('../resourcemanager').ResourceManager;
+const Player = require('../../shared/player.js').Player;
+const Vector2d = require('../../game/static/src/math/vector').Vector2d;
+const Bullet = require('./bullet');
+const Collider = require('../../game/static/src/physics/collider').Collider;
+const ColliderShape = require('../../game/static/src/physics/collider').ColliderShape;
+const CONSTS = require('../../shared/consts').CONSTS;
+
+module.exports = class Soldier extends RoundObject {
     #image;
     #velocity;
     #attackDistance;
     #angle;
     #attackMode;
     #idle;
+    #shotFrequency;
+    #shotTimestamp;
     #imgWidth;
     #imgHeight;
     #currFrame;
@@ -22,8 +33,11 @@ class Soldier extends RoundObject {
         this.#attackDistance = CONSTS.SOLDIER_ATTACK_DISTANCE;
         this.hp = CONSTS.SOLDIER_HP;
         this.maxHp = CONSTS.SOLDIER_HP;
+        this.#shotFrequency = CONSTS.SOLDIER_SHOT_FREQUENCY;
         this.#attackMode = false;
         this.#idle = false;
+        this.#shotTimestamp = new Date().getTime();
+        ;
         this.#imgWidth = tmpImg.width;
         this.#imgHeight = tmpImg.height;
         this.#currFrame = 0;
@@ -35,8 +49,6 @@ class Soldier extends RoundObject {
         this.zIndex = 20;
         this.selectable = true;
         this.syncable = true;
-
-
     }
 
     get angle() { return this.#angle; }
@@ -53,7 +65,6 @@ class Soldier extends RoundObject {
     set kills(value) { this.#kills = Number.parseInt(value); }
 
     update(ctx, objects) {
-        let enemy = this.findClostestEnemy(objects);
 
         this.draw(ctx, enemy);
     }
@@ -65,20 +76,34 @@ class Soldier extends RoundObject {
         if (!this.#attackMode && !this.#idle)
             this.checkCollisions(objects, enemy);
 
-        if (this.hp <= 0) {
-            this.#image = "bang";
-            this.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
-                null);
+        let now = new Date();
+        if (this.#attackMode &&
+            (now.getTime() - this.#shotTimestamp
+                > this.#shotFrequency)
+        ) {
 
-            if (Selection.instance.currentSelection == this) {
-                Selection.instance.currentSelection = null;
-            }
+            this.doShot(objects);
 
-            return true;
+            this.#shotTimestamp = new Date().getTime();
         }
 
 
         this.move();
+    }
+
+    doShot(objects) {
+        let bullet = new Bullet(
+            this.x + (this.radius * Math.cos(this.#angle)),
+            this.y + (this.radius * Math.sin(this.#angle)),
+            new Vector2d(
+                CONSTS.BULLET_VELOCITY * Math.cos(this.#angle),
+                CONSTS.BULLET_VELOCITY * Math.sin(this.#angle)
+            ),
+            this,
+            this.#bulletImage
+        );
+
+        objects.push(bullet);
     }
 
     checkCollisions(objects, clostestEnemy) {
@@ -140,69 +165,11 @@ class Soldier extends RoundObject {
         }
     }
 
-    draw(ctx, clostestEnemy) {
-        ctx.setTransform(1, 0, 0, 1, this.x, this.y); // set position of image center
-
-        let image = ResourceManager.instance.getImageResource(this.#image);
-
-        if (this == Selection.instance.currentSelection) {
-            ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
-            ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
-            ctx.beginPath();
-            ctx.ellipse(
-                this.radius / 2,
-                this.radius / 2,
-                this.radius * 1.5,
-                this.radius,
-                0,
-                0,
-                2 * Math.PI);
-            ctx.fill();
-            ctx.stroke();
-        }
-
-        ctx.rotate(this.#angle - Math.PI); // rotate
-
-        if (image.frames) {
-
-            if (this.#currFrame >= image.frames.length)
-                this.#currFrame = 0;
-            image = image.frames[this.#currFrame++].image;
-        }
-
-        ctx.drawImage(
-            image,
-            -this.#imgWidth / 2,
-            -this.#imgHeight / 2,
-            this.#imgWidth,
-            this.#imgHeight
-        );
-
-
-        ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
-        ctx.restore();
-
-        if (clostestEnemy && GameContext.debug) {
-            let randomColor = Math.floor(Math.random() * 16777215).toString(16);
-
-            ctx.strokeStyle = '#' + randomColor;
-            ctx.beginPath();
-            ctx.moveTo(this.x, this.y);
-            ctx.lineTo(clostestEnemy.x, clostestEnemy.y);
-            ctx.stroke();
-        }
-
-        drawHpStripe(ctx, this.maxHp, this.hp,
-            this.x - this.radius,
-            this.y - (this.radius * 1, 25),
-            this.radius * 2, 5);
-    }
-
     findClostestEnemy(objects) {
         let distance = Number.MAX_VALUE;
         let closestObj = null;
 
-        objects.foreach(((obj) => {
+        objects.foreach((obj) => {
 
             if (obj.owner && obj.owner.name != this.owner.name) {
                 let calculatedD = obj.pos.getDistance(this.pos);
@@ -212,7 +179,7 @@ class Soldier extends RoundObject {
                     closestObj = obj;
                 }
             }
-        }).bind(this));
+        });
 
         if (closestObj != null) {
 
@@ -228,31 +195,41 @@ class Soldier extends RoundObject {
         return closestObj;
     }
 
-    notify(inputEvent) {
-        if (inputEvent.type == MouseEventType.MOUSE_DOWN &&
-            Collider.checkCollisionPointWithSquare(
-                new Vector2d(inputEvent.x, inputEvent.y),
-                new Square(this.x - this.radius,
-                    this.y - this.radius,
-                    this.radius * 2, this.radius * 2))
-        ) {
-            console.log("uuid: " + this.id + " clicked");
+    lumbago(value, objects) {
+        this.hp -= value;
 
-            Selection.instance.currentSelection = this;
+        if (this.hp <= 0) {
+            this.#image = "bang";
+            this.owner = null;
+
+            setTimeout(function () {
+                objects.delete(this);
+            }.bind(this), 1000);
+
+            return true;
         }
+
+        return false;
     }
 
     toDTO() {
         let dto = super.toDTO();
 
+        dto.image = this.#image;
         dto.velocity = this.#velocity;
+        dto.attackDistance = this.#attackDistance;
         dto.angle = this.#angle;
         dto.attackMode = this.#attackMode;
         dto.idle = this.#idle;
+        dto.shotFrequency = this.#shotFrequency;
+        dto.shotTimestamp = this.#shotTimestamp;
         dto.imgWidth = this.#imgWidth;
         dto.imgHeight = this.#imgHeight;
-
+        dto.currFrame = 0;
+        dto.kills = this.#kills;
+        dto.bulletImage = this.#bulletImage;
         dto.type = this.constructor.name;
+
         return dto;
     }
 
@@ -265,29 +242,17 @@ class Soldier extends RoundObject {
 
         super.fromDTO(dto, obj);
 
-        obj.#velocity = dto.velocity;
-        obj.#attackDistance = dto.attackDistance;
         obj.#angle = dto.angle;
         obj.#attackMode = dto.attackMode;
-        obj.#idle = dto.idle;
+        obj.#imgWidth = dto.imgWidth;
+        obj.#imgHeight = dto.imgHeight;
         obj.#kills = dto.kills;
-        obj.#image = dto.image;
-        obj.#bulletImage = dto.bulletImage;
 
         return obj;
     }
 
     sync(dto) {
         super.sync(dto);
-
-        this.#velocity = dto.velocity;
-        this.#attackDistance = dto.attackDistance;
-        this.#angle = dto.angle;
-        this.#attackMode = dto.attackMode;
-        this.#idle = dto.idle;
-        this.#kills = dto.kills;
-        this.#image = dto.image;
-        this.#bulletImage = dto.bulletImage;
 
     }
 }

@@ -68,4 +68,23 @@ class GameObjectList {
     clear() {
         this.#list.clear();
     }
+
+    /**
+     * @param {string} uuid 
+     */
+    byId(uuid) {
+        for (var i = 0; i < this.#list.length; ++i) {
+            if (this.#list[i].id == uuid) {
+                return this.#list[i];
+            }
+        }
+
+        return null;
+    }
 }
+
+try {
+    module.exports = {
+        GameObjectList
+    }
+} catch (e) { }

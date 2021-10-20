@@ -1,21 +1,74 @@
+
 class CreateTower extends GameAction {
     #towerImage;
-    #towerImageName;
     #towerImageSelected;
     #bulletImage;
     #player;
+    #pushFunc;
+    #buildingList;
+    #lock;
 
-    constructor(callback, towerImage, towerImageSelected, bulletImage, player) {
+    constructor(callback, towerImage, towerImageSelected, bulletImage, player, pushFunc) {
         super(callback);
 
-        this.#towerImage = ResourceManager.instance.getImageResource(towerImage);
-        this.#towerImageName = towerImage;
+        this.#towerImage = towerImage;
         this.#towerImageSelected = towerImageSelected;
         this.#bulletImage = bulletImage;
         this.#player = player;
+        this.#pushFunc = pushFunc;
+        this.#lock = true;
+    }
+
+    findClostestBuilding(objects) {
+        this.#buildingList = [];
+
+        let hasBuilding = false;
+        objects.foreach((obj) => {
+            if (obj instanceof Building) {
+                let player = obj.owner;
+
+                if (player.name == this.#player.name) {
+                    this.#buildingList.push(obj);
+
+                    let objPos = new Vector2d(obj.x, obj.y);
+                    let myPos = new Vector2d(GameContext.inputManager.mousePosX,
+                        GameContext.inputManager.mousePosY);
+                    var distance = myPos.getDistance(objPos);
+
+                    hasBuilding = distance < CONSTS.TOWER_BUILDING_DISTANCE || hasBuilding;
+                }
+            }
+
+        });
+
+        this.#lock = !hasBuilding;
+    }
+
+    drawBuildingZone(ctx) {
+        this.#buildingList.forEach(b => {
+            let objPos = new Vector2d(b.x, b.y);
+
+            ctx.setTransform(1, 0, 0, 1,
+                objPos.x,
+                objPos.y);
+            ctx.fillStyle = 'yellow';
+
+            ctx.beginPath();
+            ctx.arc(0, 0, CONSTS.TOWER_BUILDING_DISTANCE, 0, 2 * Math.PI);
+
+            ctx.fill();
+            ctx.closePath();
+
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.restore();
+        });
     }
 
     update(ctx, objects) {
+        this.findClostestBuilding(objects);
+
+        let image = ResourceManager.instance.getImageResource(this.#towerImage);
+
         ctx.globalAlpha = 0.3;
 
         ctx.setTransform(1, 0, 0, 1,
@@ -23,37 +76,53 @@ class CreateTower extends GameAction {
             GameContext.inputManager.mousePosY);
 
         ctx.drawImage(
-            this.#towerImage,
-            -this.#towerImage.width / 2,
-            -this.#towerImage.height / 2);
+            image,
+            -image.width / 2,
+            -image.height / 2);
 
+        ctx.globalAlpha = 0.1;
+
+        if (!this.#lock) {
+            ctx.fillStyle = 'green';
+        } else {
+            ctx.fillStyle = 'red';
+        }
+
+        ctx.beginPath();
+        ctx.arc(0, 0, CONSTS.TOWER_ATTACK_DISTANCE, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.closePath();
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.restore();
+
+        this.drawBuildingZone(ctx);
+
         ctx.globalAlpha = 1;
     }
 
     mouseUp() {
         super.stop();
 
-        let tower = new Tower(
-            new Vector2d(GameContext.inputManager.mousePosX,
-                GameContext.inputManager.mousePosY),
-            new Vector2d(GameContext.inputManager.mousePosX,
-                GameContext.inputManager.mousePosY),
-            this.#towerImageName,
-            this.#towerImageSelected,
-            this.#bulletImage
-        );
+        if (!this.#lock) {
+            let tower = new Tower(
+                new Vector2d(GameContext.inputManager.mousePosX,
+                    GameContext.inputManager.mousePosY),
+                new Vector2d(GameContext.inputManager.mousePosX,
+                    GameContext.inputManager.mousePosY),
+                this.#towerImage,
+                this.#towerImageSelected,
+                this.#bulletImage
+            );
 
-        tower.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
-            this.#player);
+            tower.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
+                this.#player);
 
-        tower.addProperty(Player.PLAYER_PROPERTY,
-            this.#player);
+            tower.owner = this.#player;
 
-        GameContext.engine.addObject(tower);
+            this.#pushFunc(tower);
 
-        this.callback();
+            this.callback();
+        }
     }
 }
 
@@ -65,6 +134,8 @@ class CommandCenterBuilding extends Building {
     #soldierLimit;
     #dronImage;
     #bulletImage;
+    #towerImage;
+    #towerImageSelected;
 
     constructor(pos, spawnPoint, player,
         image, imageSelected,
@@ -73,49 +144,55 @@ class CommandCenterBuilding extends Building {
 
         super(image, imageSelected, pos.x, pos.y);
 
-        this.addProperty(Player.PLAYER_PROPERTY, player);
-        this.#productionTimestamp = new Date();
-        this.#spawnFrequency = 3 * 1000;
+        this.#productionTimestamp = new Date().getTime();
+        this.#spawnFrequency = CONSTS.COMMAND_CENTER_SPAWN_FREQUENCY;
+        this.#soldierLimit = CONSTS.COMMAND_CENTER_SOLDIER_LIMIT;
+        this.hp = CONSTS.COMMAND_CENTER_HP;
+        this.maxHp = CONSTS.COMMAND_CENTER_HP;
         this.#spawnPoint = spawnPoint;
-        this.#soldierLimit = 15;
         this.#dronImage = dronImage;
         this.#bulletImage = bulletImage;
+        this.#towerImage = towerImage;
+        this.#towerImageSelected = towerImageSelected;
 
+        this.owner = player;
         this.selectable = true;
-        this.hp = 1000;
-        this.maxHp = 1000;
+        this.syncable = true;
         this.name = "Command Center";
         this.zIndex = 30;
 
         let actionsList = [];
 
-        let towerAction = new Button(
-            "build tower", CreateTower,
-            [towerImage, towerImageSelected, bulletImage, this.getProperty(Player.PLAYER_PROPERTY)],
-            420, 750, 50, 50, "turret_violet_01", 25, true
-        );
+        if (player.self) {
+            let towerAction = new Button(
+                "build tower", CreateTower,
+                [towerImage, towerImageSelected, bulletImage, this.owner, function (obj) {
+                    let dto = obj.toDTO();
+                    Network.instance.addBuilding(dto);
+                }],
+                420, 750, 50, 50, "turret_violet_01", CONSTS.TOWER_COOLDOWN, true
+            );
+            actionsList.push(towerAction);
+        }
 
-        actionsList.push(towerAction);
 
         this.addProperty(Building.ACTIONS_PROPERY, actionsList);
     }
 
     produceNewSoldier() {
         let soldier = new Soldier(this.#spawnPoint.x, this.#spawnPoint.y,
-            this.#dronImage, this.#bulletImage);
+            this.#dronImage, this.#bulletImage, this.owner);
+
         soldier.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
             this.getProperty(InputManager.INPUT_LISTENER_PROPERTY));
-        soldier.addProperty(Player.PLAYER_PROPERTY,
-            this.getProperty(Player.PLAYER_PROPERTY));
+
         GameContext.engine.addObject(soldier);
     }
 
     soldierCount(objects) {
         let count = 0;
         objects.foreach((obj) => {
-            if (obj instanceof Soldier &&
-                obj.getProperty(Player.PLAYER_PROPERTY) ==
-                this.getProperty(Player.PLAYER_PROPERTY)) {
+            if (obj instanceof Soldier && obj.owner == this.owner) {
                 count++;
             }
         });
@@ -124,15 +201,67 @@ class CommandCenterBuilding extends Building {
     }
 
     update(ctx, objects) {
-        Building.prototype.update.call(this, ctx, objects);
+        super.update(ctx, objects);
+    }
+
+    logic(objects) {
         let now = new Date();
 
-        if (now.getTime() - this.#productionTimestamp.getTime()
+        if (now.getTime() - this.#productionTimestamp
             > this.#spawnFrequency &&
             this.#soldierLimit > this.soldierCount(objects)) {
 
-            this.produceNewSoldier();
-            this.#productionTimestamp = new Date();
+            //this.produceNewSoldier();
+
+            this.#productionTimestamp = new Date().getTime();
         }
+    }
+
+    toDTO() {
+        let dto = super.toDTO();
+
+        dto.productionTimestamp = this.#productionTimestamp;
+        dto.spawnPoint = this.#spawnPoint.toDTO();
+        dto.spawnFrequency = this.#spawnFrequency;
+        dto.soldierLimit = this.#soldierLimit;
+        dto.dronImage = this.#dronImage;
+        dto.bulletImage = this.#bulletImage;
+        dto.towerImage = this.#towerImage;
+        dto.towerImageSelected = this.#towerImageSelected;
+
+        dto.type = this.constructor.name;
+        return dto;
+    }
+
+    static fromDTO(dto, obj = new CommandCenterBuilding(
+        new Vector2d(dto.x, dto.y),
+        Vector2d.fromDTO(dto.spawnPoint),
+        Player.fromDTO(dto.owner),
+        dto.image, dto.imageSelected, dto.dronImage, dto.bulletImage,
+        dto.towerImage, dto.towerImageSelected
+    )) {
+
+        super.fromDTO(dto, obj);
+
+        obj.#productionTimestamp = dto.productionTimestamp;
+        obj.#spawnFrequency = dto.spawnFrequency;
+        obj.#soldierLimit = dto.soldierLimit;
+        obj.#dronImage = dto.dronImage;
+        obj.#bulletImage = dto.bulletImage;
+        obj.#towerImage = dto.towerImage;
+        obj.#towerImageSelected = dto.towerImageSelected;
+
+        return obj;
+    }
+
+    sync(dto) {
+        super.sync(dto);
+
+        this.#productionTimestamp = dto.productionTimestamp;
+        this.#spawnPoint = Vector2d.fromDTO(dto.spawnPoint);
+        this.#spawnFrequency = dto.spawnFrequency;
+        this.#soldierLimit = dto.soldierLimit;
+        this.#dronImage = dto.dronImage;
+        this.#bulletImage = dto.bulletImage;
     }
 }

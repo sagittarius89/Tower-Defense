@@ -1,4 +1,9 @@
-class Tower extends Building {
+const Building = require('./building');
+const Vector2d = require('../../game/static/src/math/vector').Vector2d;
+const Bullet = require('./bullet');
+const CONSTS = require('../../shared/consts').CONSTS;
+
+module.exports = class Tower extends Building {
     #spawnPoint;
     #attackDistance;
     #attackMode;
@@ -26,8 +31,22 @@ class Tower extends Building {
 
         this.selectable = true;
         this.name = "Impulse Tower";
-        this.zIndex = 20;
-        this.syncable = true;
+        this.zIndex = 70;
+    }
+
+    doShot(objects) {
+        let bullet = new Bullet(
+            this.#spawnPoint.x,
+            this.#spawnPoint.y,
+            new Vector2d(
+                CONSTS.BULLET_VELOCITY * Math.cos(this.#angle),
+                CONSTS.BULLET_VELOCITY * Math.sin(this.#angle)
+            ),
+            this,
+            this.#bulletImage
+        );
+
+        objects.push(bullet);
     }
 
 
@@ -38,6 +57,8 @@ class Tower extends Building {
         objects.foreach((obj) => {
 
             if (obj.owner && obj.owner.name != this.owner.name) {
+
+
                 let enemyPos = new Vector2d(obj.x, obj.y);
                 let myPos = new Vector2d(this.x, this.y);
 
@@ -74,22 +95,32 @@ class Tower extends Building {
     }
 
     logic(objects) {
+        this.findClostestEnemy(objects);
 
+        let now = new Date();
+        if (this.#attackMode &&
+            (now.getTime() - this.#shotTimestamp
+                > this.#shotFrequency)
+        ) {
+
+            this.doShot(objects);
+
+            this.#shotTimestamp = new Date().getTime();
+        }
     }
 
     toDTO() {
         let dto = super.toDTO();
 
+        dto.type = this.constructor.name;
         dto.attackDistance = this.#attackDistance;
         dto.attackMode = this.#attackMode;
         dto.shotFrequency = this.#shotFrequency;
         dto.shotTimestamp = this.#shotTimestamp;
         dto.angle = this.#angle;
         dto.kills = this.#kills;
-        dto.bulletImage = this.#bulletImage;
         dto.spawnPoint = this.#spawnPoint.toDTO();
 
-        dto.type = this.constructor.name;
         return dto;
     }
 
@@ -102,11 +133,14 @@ class Tower extends Building {
     ) {
         super.fromDTO(dto, obj);
 
-        obj.#attackDistance = dto.attackDistance;
         obj.#attackMode = dto.attackMode;
+        obj.#angle = dto.angle;
+        obj.#kills = dto.kills;
         obj.#shotFrequency = dto.shotFrequency;
         obj.#shotTimestamp = dto.shotTimestamp;
-        obj.#angle = dto.angle;
+        obj.#spawnPoint = Vector2d.fromDTO(dto.spawnPoint);
+        obj.#attackDistance = dto.attackDistance;
+        obj.#attackMode = dto.attackMode;
         obj.#kills = dto.kills;
 
         return obj;
@@ -115,8 +149,6 @@ class Tower extends Building {
     sync(dto) {
         super.sync(dto);
 
-        this.#attackDistance = dto.attackDistance;
-        this.#attackMode = dto.attackMode;
         this.#angle = dto.angle;
         this.#kills = dto.kills;
     }
