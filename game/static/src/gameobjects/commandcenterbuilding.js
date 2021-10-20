@@ -5,6 +5,8 @@ class CreateTower extends GameAction {
     #bulletImage;
     #player;
     #pushFunc;
+    #buildingList;
+    #lock;
 
     constructor(callback, towerImage, towerImageSelected, bulletImage, player, pushFunc) {
         super(callback);
@@ -14,9 +16,57 @@ class CreateTower extends GameAction {
         this.#bulletImage = bulletImage;
         this.#player = player;
         this.#pushFunc = pushFunc;
+        this.#lock = true;
+    }
+
+    findClostestBuilding(objects) {
+        this.#buildingList = [];
+
+        let hasBuilding = false;
+        objects.foreach((obj) => {
+            if (obj instanceof Building) {
+                let player = obj.owner;
+
+                if (player.name == this.#player.name) {
+                    this.#buildingList.push(obj);
+
+                    let objPos = new Vector2d(obj.x, obj.y);
+                    let myPos = new Vector2d(GameContext.inputManager.mousePosX,
+                        GameContext.inputManager.mousePosY);
+                    var distance = myPos.getDistance(objPos);
+
+                    hasBuilding = distance < CONSTS.TOWER_BUILDING_DISTANCE || hasBuilding;
+                }
+            }
+
+        });
+
+        this.#lock = !hasBuilding;
+    }
+
+    drawBuildingZone(ctx) {
+        this.#buildingList.forEach(b => {
+            let objPos = new Vector2d(b.x, b.y);
+
+            ctx.setTransform(1, 0, 0, 1,
+                objPos.x,
+                objPos.y);
+            ctx.fillStyle = 'yellow';
+
+            ctx.beginPath();
+            ctx.arc(0, 0, CONSTS.TOWER_BUILDING_DISTANCE, 0, 2 * Math.PI);
+
+            ctx.fill();
+            ctx.closePath();
+
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.restore();
+        });
     }
 
     update(ctx, objects) {
+        this.findClostestBuilding(objects);
+
         let image = ResourceManager.instance.getImageResource(this.#towerImage);
 
         ctx.globalAlpha = 0.3;
@@ -30,32 +80,49 @@ class CreateTower extends GameAction {
             -image.width / 2,
             -image.height / 2);
 
+        ctx.globalAlpha = 0.1;
+
+        if (!this.#lock) {
+            ctx.fillStyle = 'green';
+        } else {
+            ctx.fillStyle = 'red';
+        }
+
+        ctx.beginPath();
+        ctx.arc(0, 0, CONSTS.TOWER_ATTACK_DISTANCE, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.closePath();
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.restore();
+
+        this.drawBuildingZone(ctx);
+
         ctx.globalAlpha = 1;
     }
 
     mouseUp() {
         super.stop();
 
-        let tower = new Tower(
-            new Vector2d(GameContext.inputManager.mousePosX,
-                GameContext.inputManager.mousePosY),
-            new Vector2d(GameContext.inputManager.mousePosX,
-                GameContext.inputManager.mousePosY),
-            this.#towerImage,
-            this.#towerImageSelected,
-            this.#bulletImage
-        );
+        if (!this.#lock) {
+            let tower = new Tower(
+                new Vector2d(GameContext.inputManager.mousePosX,
+                    GameContext.inputManager.mousePosY),
+                new Vector2d(GameContext.inputManager.mousePosX,
+                    GameContext.inputManager.mousePosY),
+                this.#towerImage,
+                this.#towerImageSelected,
+                this.#bulletImage
+            );
 
-        tower.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
-            this.#player);
+            tower.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
+                this.#player);
 
-        tower.owner = this.#player;
+            tower.owner = this.#player;
 
-        this.#pushFunc(tower);
+            this.#pushFunc(tower);
 
-        this.callback();
+            this.callback();
+        }
     }
 }
 
