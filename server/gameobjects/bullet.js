@@ -6,7 +6,6 @@ const Building = require('./building');
 const SquareObject = require('./squareobject');
 const Collider = require('../../game/static/src/physics/collider').Collider;
 const ColliderShape = require('../../game/static/src/physics/collider').ColliderShape;
-const CONSTS = require('../../shared/consts').CONSTS;
 
 module.exports = class Bullet extends RoundObject {
     #vector;

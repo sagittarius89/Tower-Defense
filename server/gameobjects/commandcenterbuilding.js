@@ -58,8 +58,12 @@ module.exports = class CommandCenterBuilding extends Building {
         return count;
     }
 
-    logic(objects) {
+    logic(objects, conn) {
         let now = new Date();
+
+        this.#spawnFrequency = conn
+            .playerProp(this.owner)
+            .get('COMMAND_CENTER_SPAWN_FREQUENCY');
 
         if (now.getTime() - this.#productionTimestamp
             > this.#spawnFrequency &&

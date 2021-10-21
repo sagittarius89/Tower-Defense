@@ -74,6 +74,12 @@ class Network {
         }
     }
 
+    incSpawnSpeed(player) {
+        let msg = Message.incSpawnSpeed(player.toDTO());
+
+        this.send(msg);
+    }
+
     addBuilding(dto) {
         let msg = Message.addBuilding(dto);
 

@@ -127,6 +127,22 @@ class CreateTower extends GameAction {
 }
 
 
+class SpawnSpeedAction extends GameAction {
+    #player;
+    #incFunc
+
+    constructor(callback, player, incFunc) {
+        super(callback);
+        this.#player = player;
+        this.#incFunc = incFunc;
+    }
+
+    mouseUp() {
+        this.#incFunc(this.#player);
+        this.callback();
+    }
+}
+
 class CommandCenterBuilding extends Building {
     #productionTimestamp;
     #spawnPoint;
@@ -172,7 +188,15 @@ class CommandCenterBuilding extends Building {
                 }],
                 420, 750, 50, 50, "turret_violet_01", CONSTS.TOWER_COOLDOWN, true
             );
-            actionsList.push(towerAction);
+
+            let incSpawnSpeed = new Button(
+                "increase spawn speed", SpawnSpeedAction,
+                [this.owner, function (owner) {
+                    Network.instance.incSpawnSpeed(owner)
+                }], 480, 750, 50, 50, 'inc_spawn_speed', CONSTS.UPGRADE_SPAWN_SPEED_COOLDOWN, true
+            );
+
+            actionsList.push(towerAction, incSpawnSpeed);
         }
 
 

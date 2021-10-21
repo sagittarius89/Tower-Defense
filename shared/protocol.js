@@ -9,7 +9,8 @@ const MessageType = {
     CLIENT_READY: "client_ready",
     PLAYER_IDX: 'player_idx',
     SYNC_PACK: 'sync_pack',
-    ADD_BUILDING: 'add_building'
+    ADD_BUILDING: 'add_building',
+    INC_SPAWN_SPEED: 'inc_spawn_speed'
 }
 
 class Message {
@@ -111,6 +112,14 @@ class Message {
         let msg = new Message(MessageType.ADD_BUILDING);
 
         msg.set('obj', dto)
+
+        return msg;
+    }
+
+    static incSpawnSpeed(player) {
+        let msg = new Message(MessageType.INC_SPAWN_SPEED);
+
+        msg.set('player', player);
 
         return msg;
     }

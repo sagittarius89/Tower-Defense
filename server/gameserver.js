@@ -3,14 +3,18 @@ const Message = require('../shared/protocol').Message;
 const Player = require('../shared/player').Player;
 const GameContext = require('./servercontext');
 const Tower = require('./gameobjects/towerbuilding');
+const CONSTS = require('../shared/consts').CONSTS;
+const PlayerProperties = require('../shared/playerproperties');
+
 
 class GameServer {
     #player1;
     #player2;
     #p1Conn;
     #p2Conn;
+    #p1prop;
+    #p2prop;
     #gameContext;
-
 
     constructor() {
         this.countDownNumber = 3;
@@ -32,6 +36,9 @@ class GameServer {
                 break;
             case MessageType.ADD_BUILDING:
                 this.processAddBuilding(msg);
+                break;
+            case MessageType.INC_SPAWN_SPEED:
+                this.processIncSpawnSpeed(msg);
                 break;
             default:
                 this.send(connection, Message.error('uknow message type'));
@@ -69,6 +76,17 @@ class GameServer {
         this.broadcast(resp);
     }
 
+    processIncSpawnSpeed(msg) {
+        let pDto = msg.get('player');
+        let p = Player.fromDTO(pDto);
+
+        let ccsf = this.playerProp(p).get('COMMAND_CENTER_SPAWN_FREQUENCY');
+
+        ccsf *= 0.9;
+
+        this.playerProp(p).set('COMMAND_CENTER_SPAWN_FREQUENCY', ccsf);
+    }
+
     processReady(connection) {
         if (connection == this.#p1Conn) {
             this.#player1.ready = true;
@@ -93,19 +111,30 @@ class GameServer {
         }
     }
 
+    playerProp(player) {
+        if (this.#p1prop && this.#p1prop.player.name == player.name) {
+            return this.#p1prop;
+        } else if (this.#p2prop && this.#p2prop.player.name == player.name) {
+            return this.#p2prop;
+        }
+    }
+
     setPlayer(idx, player, conn) {
         if (idx == 0) {
             this.#player1 = player;
             this.#p1Conn = conn;
+            this.#p1prop = new PlayerProperties(player, CONSTS);
         } else if (idx == 1) {
             this.#player2 = player;
             this.#p2Conn = conn;
+            this.#p2prop = new PlayerProperties(player, CONSTS);
         }
     }
 
     registerPlayer(connection) {
         if (!(this.#player1 && this.$player2)) {
             let players = [this.#player1, this.#player2];
+
             let ffSlotIdx = players.findIndex(element => element == null);
 
             let idxMsg = Message.playerIndex(ffSlotIdx);
@@ -158,7 +187,7 @@ class GameServer {
 
     startGame() {
         this.countDown();
-        this.#gameContext = new GameContext(this.#player1, this.#player2);
+        this.#gameContext = new GameContext(this.#player1, this.#player2, this);
 
         let objectList = [];
         this.#gameContext.engine.objects.foreach(element => {

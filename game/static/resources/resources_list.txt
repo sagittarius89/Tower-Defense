@@ -13,3 +13,4 @@ turretlight_violet_01.png
 bullet_orange_01.png
 bullet_violet_01.png
 bang.gif
+inc_spawn_speed.png

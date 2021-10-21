@@ -4,10 +4,10 @@ const CommandCenterBuilding = require('./gameobjects/commandcenterbuilding');
 const Vector2d = require('../game/static/src/math/vector').Vector2d;
 
 module.exports = class GameContext {
-    constructor(player1, player2) {
+    constructor(player1, player2, conn) {
         this.debug = false;
 
-        this.engine = new GameEngine(player1, player2);
+        this.engine = new GameEngine(player1, player2, conn);
 
         this.player1 = player1;
         this.player2 = player2;

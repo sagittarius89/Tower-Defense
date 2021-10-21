@@ -9,14 +9,16 @@ module.exports = class GameEngine {
     #objects;
     #player1;
     #player2;
+    #conn;
 
-    constructor(p1, p2) {
+    constructor(p1, p2, conn) {
 
         /** @member {GameObjectList} */
         this.#objects = new GameObjectList();
         this.#player1 = p1;
         this.#player2 = p2;
         this.continue = false;
+        this.#conn = conn;
     }
 
     /**
@@ -95,7 +97,7 @@ module.exports = class GameEngine {
         });
 
         objects.foreach((obj) => {
-            obj.logic(objects);
+            obj.logic(objects, this.#conn);
         });
 
         this.checkWin(objects);
