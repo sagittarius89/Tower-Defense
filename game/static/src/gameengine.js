@@ -55,6 +55,12 @@ class GameEngine {
                 this.addObject(obj);
                 break;
             }
+            case 'BlackHole': {
+                let obj = BlackHole.fromDTO(dto);
+                obj.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
+                    obj.owner);
+                this.addObject(obj);
+            }
         }
     }
 

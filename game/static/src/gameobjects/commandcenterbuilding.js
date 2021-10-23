@@ -3,10 +3,7 @@ class CreateTower extends GameAction {
     #towerImage;
     #towerImageSelected;
     #bulletImage;
-    #player;
     #pushFunc;
-    #buildingList;
-    #lock;
 
     constructor(callback, towerImage, towerImageSelected, bulletImage, player, pushFunc) {
         super(callback);
@@ -14,54 +11,9 @@ class CreateTower extends GameAction {
         this.#towerImage = towerImage;
         this.#towerImageSelected = towerImageSelected;
         this.#bulletImage = bulletImage;
-        this.#player = player;
+        this.player = player;
         this.#pushFunc = pushFunc;
-        this.#lock = true;
-    }
-
-    findClostestBuilding(objects) {
-        this.#buildingList = [];
-
-        let hasBuilding = false;
-        objects.foreach((obj) => {
-            if (obj instanceof Building) {
-                let player = obj.owner;
-
-                if (player.name == this.#player.name) {
-                    this.#buildingList.push(obj);
-
-                    let objPos = new Vector2d(obj.x, obj.y);
-                    let myPos = new Vector2d(GameContext.inputManager.mousePosX,
-                        GameContext.inputManager.mousePosY);
-                    var distance = myPos.getDistance(objPos);
-
-                    hasBuilding = distance < CONSTS.TOWER_BUILDING_DISTANCE || hasBuilding;
-                }
-            }
-
-        });
-
-        this.#lock = !hasBuilding;
-    }
-
-    drawBuildingZone(ctx) {
-        this.#buildingList.forEach(b => {
-            let objPos = new Vector2d(b.x, b.y);
-
-            ctx.setTransform(1, 0, 0, 1,
-                objPos.x,
-                objPos.y);
-            ctx.fillStyle = 'yellow';
-
-            ctx.beginPath();
-            ctx.arc(0, 0, CONSTS.TOWER_BUILDING_DISTANCE, 0, 2 * Math.PI);
-
-            ctx.fill();
-            ctx.closePath();
-
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.restore();
-        });
+        this.lock = true;
     }
 
     update(ctx, objects) {
@@ -82,7 +34,7 @@ class CreateTower extends GameAction {
 
         ctx.globalAlpha = 0.1;
 
-        if (!this.#lock) {
+        if (!this.lock) {
             ctx.fillStyle = 'green';
         } else {
             ctx.fillStyle = 'red';
@@ -103,7 +55,7 @@ class CreateTower extends GameAction {
     mouseUp() {
         super.stop();
 
-        if (!this.#lock) {
+        if (!this.lock) {
             let tower = new Tower(
                 new Vector2d(GameContext.inputManager.mousePosX,
                     GameContext.inputManager.mousePosY),
@@ -115,9 +67,10 @@ class CreateTower extends GameAction {
             );
 
             tower.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
-                this.#player);
+                this.player);
 
-            tower.owner = this.#player;
+            tower.owner = this.player;
+
 
             this.#pushFunc(tower);
 
@@ -128,18 +81,109 @@ class CreateTower extends GameAction {
 
 
 class SpawnSpeedAction extends GameAction {
-    #player;
     #incFunc
 
     constructor(callback, player, incFunc) {
         super(callback);
-        this.#player = player;
+        this.player = player;
         this.#incFunc = incFunc;
     }
 
     mouseUp() {
-        this.#incFunc(this.#player);
+        this.#incFunc(this.player);
         this.callback();
+    }
+}
+
+class CreateBlackHoleAction extends GameAction {
+    #holeImage;
+    #holeImageSelected;
+    #pushFunc;
+    #mode;
+    #first;
+    #second;
+
+    static MODE_BLANK = 0;
+    static MODE_FIRST_BUILDING = 1;
+    static MODE_SECOND_BUILDING = 2;
+    constructor(callback, holeImage, holeImageSelected, player, pushFunc) {
+        super(callback);
+
+        this.#holeImage = holeImage;
+        this.#holeImageSelected = holeImageSelected;
+        this.player = player;
+        this.#pushFunc = pushFunc;
+        this.lock = true;
+        this.#mode = CreateBlackHoleAction.MODE_BLANK;
+    }
+
+    update(ctx, objects) {
+        this.findClostestBuilding(objects);
+
+        let image = ResourceManager.instance.getImageResource(this.#holeImage);
+
+        ctx.globalAlpha = 0.3;
+
+        ctx.setTransform(1, 0, 0, 1,
+            GameContext.inputManager.mousePosX,
+            GameContext.inputManager.mousePosY);
+
+        ctx.drawImage(
+            image,
+            -image.width / 2,
+            -image.height / 2);
+
+        ctx.globalAlpha = 0.1;
+
+        if (!this.lock) {
+            ctx.fillStyle = 'green';
+        } else {
+            ctx.fillStyle = 'red';
+        }
+
+        ctx.beginPath();
+        ctx.arc(0, 0, CONSTS.TOWER_ATTACK_DISTANCE, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.closePath();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.restore();
+        this.drawBuildingZone(ctx);
+
+        if (this.#mode == CreateBlackHoleAction.MODE_FIRST_BUILDING) {
+            this.#first.update(ctx, objects);
+        }
+
+        ctx.globalAlpha = 1;
+    }
+
+    mouseUp() {
+
+        if (!this.lock) {
+            let tower = new BlackHole(
+                new Vector2d(GameContext.inputManager.mousePosX,
+                    GameContext.inputManager.mousePosY),
+                this.#holeImage,
+                this.#holeImageSelected,
+                null
+            );
+
+            tower.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
+                this.player);
+
+            tower.owner = this.player;
+
+            if (this.#mode == CreateBlackHoleAction.MODE_BLANK) {
+                this.#first = tower;
+                this.#mode = CreateBlackHoleAction.MODE_FIRST_BUILDING;
+            } else if (this.#mode == CreateBlackHoleAction.MODE_FIRST_BUILDING) {
+                super.stop();
+                this.#second = tower;
+                this.#first.sibling = this.#second.id;
+
+                this.#pushFunc(this.#first, this.#second);
+                this.callback();
+            }
+        }
     }
 }
 
@@ -152,11 +196,14 @@ class CommandCenterBuilding extends Building {
     #bulletImage;
     #towerImage;
     #towerImageSelected;
+    #blackHoleImage;
+    #blackHoleImageSelected;
 
     constructor(pos, spawnPoint, player,
         image, imageSelected,
         dronImage, bulletImage,
-        towerImage, towerImageSelected) {
+        towerImage, towerImageSelected,
+        blackHoleImage, blackHoleImageSelected) {
 
         super(image, imageSelected, pos.x, pos.y);
 
@@ -170,6 +217,9 @@ class CommandCenterBuilding extends Building {
         this.#bulletImage = bulletImage;
         this.#towerImage = towerImage;
         this.#towerImageSelected = towerImageSelected;
+
+        this.#blackHoleImage = blackHoleImage;
+        this.#blackHoleImageSelected = blackHoleImageSelected;
 
         this.owner = player;
         this.selectable = true;
@@ -196,7 +246,18 @@ class CommandCenterBuilding extends Building {
                 }], 480, 750, 50, 50, 'inc_spawn_speed', CONSTS.UPGRADE_SPAWN_SPEED_COOLDOWN, true
             );
 
-            actionsList.push(towerAction, incSpawnSpeed);
+            let holeAction = new Button(
+                "build black hole", CreateBlackHoleAction,
+                [blackHoleImage, blackHoleImageSelected, this.owner, function (obj1, obj2) {
+                    let dto1 = obj1.toDTO();
+                    let dto2 = obj2.toDTO();
+                    Network.instance.addBuilding(dto1);
+                    Network.instance.addBuilding(dto2);
+                }],
+                540, 750, 50, 50, "black_holeoviolet", CONSTS.TOWER_COOLDOWN, true
+            );
+
+            actionsList.push(towerAction, incSpawnSpeed, holeAction);
         }
 
 
@@ -252,6 +313,8 @@ class CommandCenterBuilding extends Building {
         dto.bulletImage = this.#bulletImage;
         dto.towerImage = this.#towerImage;
         dto.towerImageSelected = this.#towerImageSelected;
+        dto.blackHoleImage = this.#blackHoleImage;
+        dto.blackHoleImageSelected = this.#blackHoleImageSelected;
 
         dto.type = this.constructor.name;
         return dto;
@@ -262,7 +325,8 @@ class CommandCenterBuilding extends Building {
         Vector2d.fromDTO(dto.spawnPoint),
         Player.fromDTO(dto.owner),
         dto.image, dto.imageSelected, dto.dronImage, dto.bulletImage,
-        dto.towerImage, dto.towerImageSelected
+        dto.towerImage, dto.towerImageSelected,
+        dto.blackHoleImage, dto.blackHoleImageSelected
     )) {
 
         super.fromDTO(dto, obj);
@@ -274,6 +338,8 @@ class CommandCenterBuilding extends Building {
         obj.#bulletImage = dto.bulletImage;
         obj.#towerImage = dto.towerImage;
         obj.#towerImageSelected = dto.towerImageSelected;
+        obj.#blackHoleImage = dto.blackHoleImage;
+        obj.#blackHoleImageSelected = dto.blackHoleImageSelected;
 
         return obj;
     }

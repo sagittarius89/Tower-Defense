@@ -3,6 +3,7 @@ const Message = require('../shared/protocol').Message;
 const Player = require('../shared/player').Player;
 const GameContext = require('./servercontext');
 const Tower = require('./gameobjects/towerbuilding');
+const BlackHole = require('./gameobjects/blackholebuilding');
 const CONSTS = require('../shared/consts').CONSTS;
 const PlayerProperties = require('../shared/playerproperties');
 
@@ -51,6 +52,10 @@ class GameServer {
         switch (dto.type) {
             case Tower.name: {
                 obj = Tower.fromDTO(dto);
+                break;
+            }
+            case BlackHole.name: {
+                obj = BlackHole.fromDTO(dto);
                 break;
             }
         }
@@ -163,6 +168,12 @@ class GameServer {
         if (this.full()) {
             this.startGame();
         }
+    }
+
+    updatePosition(id, pos) {
+        let msg = Message.updatePosition(id, pos.toDTO());
+
+        this.broadcast(msg);
     }
 
     countDown() {

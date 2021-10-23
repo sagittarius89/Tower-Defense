@@ -25,7 +25,9 @@ module.exports = class GameContext {
             "solider_violet_01",
             "bullet_violet_01",
             "turret_violet_01",
-            "turretlight_violet_01"
+            "turretlight_violet_01",
+            "black_holeoviolet",
+            "black_holeovioletselected"
         );
 
         this.engine.addObject(buildingA);
@@ -40,7 +42,9 @@ module.exports = class GameContext {
             "solider_oragne_01",
             "bullet_orange_01",
             "turret_orange_01",
-            "turretlight_orange_01"
+            "turretlight_orange_01",
+            "black_holeorangew",
+            "black_holeorangeselected"
         );
 
         this.engine.addObject(buildingB);

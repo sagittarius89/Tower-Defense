@@ -14,3 +14,7 @@ bullet_orange_01.png
 bullet_violet_01.png
 bang.gif
 inc_spawn_speed.png
+black_holeorangeselected.png
+black_holeorangew.png
+black_holeoviolet.png
+black_holeovioletselected.png

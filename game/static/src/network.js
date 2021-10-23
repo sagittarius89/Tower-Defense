@@ -57,6 +57,15 @@ class Network {
         //check if obj was destroyed
     }
 
+    processUpdatePosition(msg) {
+        let id = msg.get('obj');
+        let newPos = Vector2d.fromDTO(msg.get('pos'));
+
+        let obj = GameContext.engine.objects.byId(id);
+
+        obj.pos = newPos;
+    }
+
     sync() {
         let objList = GameContext.engine.objects;
         let dtoList = [];
@@ -201,6 +210,10 @@ class Network {
                     let objLst = msg.get('obj_list');
 
                     this.processSync(objLst);
+                    break;
+                }
+                case MessageType.UPDATE_POSITION: {
+                    this.processUpdatePosition(msg);
                     break;
                 }
             }

@@ -10,7 +10,8 @@ const MessageType = {
     PLAYER_IDX: 'player_idx',
     SYNC_PACK: 'sync_pack',
     ADD_BUILDING: 'add_building',
-    INC_SPAWN_SPEED: 'inc_spawn_speed'
+    INC_SPAWN_SPEED: 'inc_spawn_speed',
+    UPDATE_POSITION: 'update_position'
 }
 
 class Message {
@@ -112,6 +113,14 @@ class Message {
         let msg = new Message(MessageType.ADD_BUILDING);
 
         msg.set('obj', dto)
+
+        return msg;
+    }
+
+    static updatePosition(id, pos) {
+        let msg = new Message(MessageType.UPDATE_POSITION)
+        msg.set('obj', id);
+        msg.set('pos', pos);
 
         return msg;
     }

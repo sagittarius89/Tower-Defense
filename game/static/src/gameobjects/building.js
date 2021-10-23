@@ -5,7 +5,7 @@ class Building extends SquareObject {
 
     static ACTIONS_PROPERY = "ACTIONS_PROPERY";
 
-    constructor(name, nameSelected, x, y) {
+    constructor(name, nameSelected, x, y, rotating = false) {
         let tmpImg = ResourceManager.instance.getImageResource(name);
         let tmpImgSel = ResourceManager.instance.getImageResource(nameSelected);
 
@@ -18,6 +18,11 @@ class Building extends SquareObject {
         this.zIndex = 10;
         this.selectable = true;
         this.syncable = true;
+
+
+        if (rotating) {
+            this.rotation = 1;
+        }
     }
 
     update(ctx, objects) {
@@ -31,6 +36,15 @@ class Building extends SquareObject {
 
         if (this == Selection.instance.currentSelection) {
             image = ResourceManager.instance.getImageResource(this.#imageSelected);
+        }
+
+        if (this.rotation) {
+            this.rotation += Math.PI / 64;
+            if (this.rotation > Math.PI * 2) {
+                this.rotation = 1;
+            }
+
+            ctx.rotate(this.rotation); // rotate
         }
 
         if (image.frames) {
@@ -52,7 +66,6 @@ class Building extends SquareObject {
                 height * scale);
 
         } else {
-
             ctx.drawImage(
                 image,
                 -width / 2,
@@ -60,16 +73,12 @@ class Building extends SquareObject {
         }
 
 
-
-
-
-        drawHpStripe(ctx, this.maxHp, this.hp,
-            -this.width * 0.4, -this.height * 0.4,
-            this.width, 5);
-
-
         ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
         ctx.restore();
+
+        drawHpStripe(ctx, this.maxHp, this.hp,
+            this.pos.x - this.width * 0.4, this.pos.y - this.height * 0.4,
+            this.width, 5);
     }
 
     notify(inputEvent) {

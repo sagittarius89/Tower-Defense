@@ -13,11 +13,14 @@ module.exports = class CommandCenterBuilding extends Building {
     #bulletImage;
     #towerImage;
     #towerImageSelected;
+    #blackHoleImage;
+    #blackHoleImageSelected;
 
     constructor(pos, spawnPoint, player,
         image, imageSelected,
         dronImage, bulletImage,
-        towerImage, towerImageSelected) {
+        towerImage, towerImageSelected,
+        blackHoleImage, blackHoleImageSelected) {
 
         super(image, imageSelected, pos.x, pos.y);
 
@@ -31,6 +34,8 @@ module.exports = class CommandCenterBuilding extends Building {
         this.#bulletImage = bulletImage;
         this.#towerImage = towerImage;
         this.#towerImageSelected = towerImageSelected;
+        this.#blackHoleImage = blackHoleImage;
+        this.#blackHoleImageSelected = blackHoleImageSelected;
 
 
         this.owner = player;
@@ -87,6 +92,8 @@ module.exports = class CommandCenterBuilding extends Building {
         dto.bulletImage = this.#bulletImage;
         dto.towerImage = this.#towerImage;
         dto.towerImageSelected = this.#towerImageSelected;
+        dto.blackHoleImage = this.#blackHoleImage;
+        dto.blackHoleImageSelected = this.#blackHoleImageSelected;
 
         dto.type = this.constructor.name;
         return dto;
@@ -97,7 +104,8 @@ module.exports = class CommandCenterBuilding extends Building {
         Vector2d.fromDTO(dto.spawnPoint),
         Player.fromDTO(dto.owner),
         obj.image, obj.imageSelected, obj.dronImage, obj.bulletImage,
-        obj.towerImage, obj.towerImageSelected
+        obj.towerImage, obj.towerImageSelected,
+        obj.blackHoleImage, obj.blackHoleImageSelected
     )) {
 
         super.fromDTO(dto, obj);
@@ -109,6 +117,8 @@ module.exports = class CommandCenterBuilding extends Building {
         obj.#bulletImage = dto.bulletImage;
         obj.#towerImage = dto.towerImage;
         obj.#towerImageSelected = dto.towerImageSelected;
+        obj.#blackHoleImage = dto.blackHoleImage;
+        obj.#blackHoleImageSelected = dto.blackHoleImageSelected;
 
         return obj;
     }
