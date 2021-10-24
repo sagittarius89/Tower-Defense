@@ -30,6 +30,8 @@ module.exports = class Bullet extends RoundObject {
         this.#parent = parent.id;
         this.zIndex = 50;
         this.#currFrame = 0;
+
+        this.parentOwner = parent.owner;
     }
 
     logic(objects, conn) {
@@ -41,43 +43,47 @@ module.exports = class Bullet extends RoundObject {
 
     checkCollisions(objects, conn) {
         objects.foreach(obj => {
-            if (obj.id != this.#parent &&
-                (obj.constructor.name == 'Soldier' || obj instanceof Building)) {
+            if (obj.id != this.#parent) {
+                if ((obj.hp > 0) && //prevent shoting to destroyed objects
+                    (obj.owner && this.parentOwner && obj.owner.name != this.parentOwner.name) &&
+                    //turn off friendly fire
+                    (obj.constructor.name == 'Soldier' || obj instanceof Building)) {
 
-                let player = obj.owner;
+                    let player = obj.owner;
 
-                if (player) {
+                    if (player) {
 
-                    if (obj instanceof RoundObject) {
-                        let objPos = new Vector2d(obj.x, obj.y);
-                        let myPos = new Vector2d(this.x, this.y);
+                        if (obj instanceof RoundObject) {
+                            let objPos = new Vector2d(obj.x, obj.y);
+                            let myPos = new Vector2d(this.x, this.y);
 
-                        var distance = myPos.getDistance(objPos);
+                            var distance = myPos.getDistance(objPos);
 
-                        if (distance <= this.radius + obj.radius) {
-                            if (obj.lumbago(20, objects)) {
-                                let parent = objects.byId(this.#parent);
-                                if (parent) {
-                                    parent.kills++;
-                                    conn.addScore(parent.owner, CONSTS.SOLDIER_SALVAGE);
+                            if (distance <= this.radius + obj.radius) {
+                                if (obj.lumbago(15, objects)) {
+                                    let parent = objects.byId(this.#parent);
+                                    if (parent) {
+                                        parent.kills++;
+                                        conn.addScore(parent.owner, CONSTS.SOLDIER_SALVAGE);
+                                    }
                                 }
+
+                                objects.delete(this);
                             }
+                        } else if (obj instanceof SquareObject) {
+                            let myPos = new Vector2d(this.x, this.y);
 
-                            objects.delete(this);
-                        }
-                    } else if (obj instanceof SquareObject) {
-                        let myPos = new Vector2d(this.x, this.y);
-
-                        if (Collider.checkCollisionPointWithSquare(myPos, obj.toSquare())) {
-                            if (obj.lumbago(20, objects)) {
-                                let parent = objects.byId(this.#parent);
-                                if (parent) {
-                                    parent.kills++;
-                                    conn.addScore(parent.owner, CONSTS.TOWER_SALVAGE);
+                            if (Collider.checkCollisionPointWithSquare(myPos, obj.toSquare())) {
+                                if (obj.lumbago(15, objects)) {
+                                    let parent = objects.byId(this.#parent);
+                                    if (parent) {
+                                        parent.kills++;
+                                        conn.addScore(parent.owner, CONSTS.TOWER_SALVAGE);
+                                    }
                                 }
-                            }
 
-                            objects.delete(this);
+                                objects.delete(this);
+                            }
                         }
                     }
                 }

@@ -82,7 +82,7 @@ class Button extends SquareObject {
 
     notify(inputEvent) {
         if (!this.#locked &&
-            GameContext.getCurrentPlayer().score > this.#cost &&
+            GameContext.getCurrentPlayer().score >= this.#cost &&
             inputEvent.type == MouseEventType.MOUSE_DOWN &&
             Collider.checkCollisionPointWithSquare(
                 new Vector2d(inputEvent.x, inputEvent.y),

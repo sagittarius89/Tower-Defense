@@ -12,7 +12,12 @@ class Player {
 
     get name() { return this.#name; }
     get score() { return this.#score; }
-    set score(value) { this.#score = Number.parseInt(value); }
+    set score(value) {
+        let old = this.#score;
+        this.#score = Number.parseInt(value);
+        if (this.#score == null || isNaN(this.#score)) /*prevent null*/
+            this.#score = old;
+    }
     set self(value) { this.#self = Boolean(value); }
     get self() { return this.#self; }
 
@@ -25,7 +30,7 @@ class Player {
     }
 
     sync(dto) {
-        this.#score = dto.score;
+        this.score = dto.score;
     }
 
     static fromDTO(dto, self) {
