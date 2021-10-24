@@ -3,13 +3,14 @@ class Button extends SquareObject {
     #args;
     #icon;
     #onlyIcon;
+    #cost;
     #player;
     #cooldown;
     #lastUse;
     #locked;
 
     constructor(name, action, args, x, y, width, height,
-        icon = null, cooldown = 0, onlyIcon = false,
+        icon = null, cooldown = 0, cost = 0, onlyIcon = false,
         player = Player.player1) {
 
         super(width, height, x + width / 2, y + height / 2);
@@ -17,6 +18,7 @@ class Button extends SquareObject {
         let tmpImg = ResourceManager.instance.getImageResource(icon);
 
         this.#icon = tmpImg;
+        this.#cost = cost;
         this.name = name;
         this.#action = action;
         this.#onlyIcon = onlyIcon;
@@ -65,6 +67,13 @@ class Button extends SquareObject {
                 ctx.fillRect(-this.width / 2, -this.height / 2,
                     this.width, this.height);
             }
+
+            let txtW = mesaureStrokedText(ctx, this.#cost, 30);
+            let wStart = (this.width - txtW) / 2;
+
+            drawStrokedText(ctx, this.#cost,
+                (-this.width / 2) + wStart,
+                (-this.height / 2) + this.height * 0.7, 30);
         }
 
         ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
@@ -72,7 +81,9 @@ class Button extends SquareObject {
     }
 
     notify(inputEvent) {
-        if (!this.#locked && inputEvent.type == MouseEventType.MOUSE_DOWN &&
+        if (!this.#locked &&
+            GameContext.getCurrentPlayer().score > this.#cost &&
+            inputEvent.type == MouseEventType.MOUSE_DOWN &&
             Collider.checkCollisionPointWithSquare(
                 new Vector2d(inputEvent.x, inputEvent.y),
                 this.toSquare())

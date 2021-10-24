@@ -31,6 +31,11 @@ class GameAction extends GameObject {
     findClostestBuilding(objects) {
         this.#buildingList = [];
 
+        if (GameContext.inputManager.mousePosY + 65 > GameContext.hud.Y) {
+            this.#lock = true;
+            return;
+        }
+
         let hasBuilding = false;
         objects.foreach((obj) => {
             if (obj instanceof Building) {
@@ -47,7 +52,6 @@ class GameAction extends GameObject {
                     hasBuilding = distance < CONSTS.TOWER_BUILDING_DISTANCE || hasBuilding;
                 }
             }
-
         });
 
         this.#lock = !hasBuilding;

@@ -97,6 +97,8 @@ class Hud extends GameObject {
         }
 
         ctx.globalAlpha = 1;
+
+        drawStrokedText(ctx, "Your Salvage: " + GameContext.getCurrentPlayer().score, 1000, 30, 30);
     }
 
     notify(inputEvent) {
@@ -117,6 +119,10 @@ class Hud extends GameObject {
                 this.currentAction.mouseUp();
             }
         }
+    }
+
+    get Y() {
+        return 740;
     }
 
 }

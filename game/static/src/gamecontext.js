@@ -50,6 +50,14 @@ var createGameContext = (async function (
     this.hud = new Hud(this.canvas.getContext("2d"));
     this.hud.addProperty(InputManager.INPUT_LISTENER_PROPERTY, this.player1);
     this.engine.addObject(this.hud);
+
+    this.getCurrentPlayer = function () {
+        if (this.player1.self) {
+            return this.player1;
+        } else {
+            return this.player2;
+        }
+    }
 });
 
 var GameContext = null;

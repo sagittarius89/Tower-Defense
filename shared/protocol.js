@@ -11,7 +11,8 @@ const MessageType = {
     SYNC_PACK: 'sync_pack',
     ADD_BUILDING: 'add_building',
     INC_SPAWN_SPEED: 'inc_spawn_speed',
-    UPDATE_POSITION: 'update_position'
+    UPDATE_POSITION: 'update_position',
+    SYNC_SCORE: 'sync_score'
 }
 
 class Message {
@@ -128,6 +129,13 @@ class Message {
     static incSpawnSpeed(player) {
         let msg = new Message(MessageType.INC_SPAWN_SPEED);
 
+        msg.set('player', player);
+
+        return msg;
+    }
+
+    static syncScore(player) {
+        let msg = new Message(MessageType.SYNC_SCORE);
         msg.set('player', player);
 
         return msg;

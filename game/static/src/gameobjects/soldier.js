@@ -178,6 +178,17 @@ class Soldier extends RoundObject {
             this.#imgHeight
         );
 
+        if (this.hit && this.hp > 0 && this.hit > 0) {
+            ctx.globalAlpha = 0.3;
+            ctx.fillStyle = 'red';
+            ctx.beginPath();
+            ctx.arc(0, 0, this.radius, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.closePath();
+            ctx.globalAlpha = 1.0;
+            this.hit -= 1;
+        }
+
 
         ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
         ctx.restore();
@@ -192,10 +203,12 @@ class Soldier extends RoundObject {
             ctx.stroke();
         }
 
-        drawHpStripe(ctx, this.maxHp, this.hp,
-            this.x - this.radius,
-            this.y - (this.radius * 1, 25),
-            this.radius * 2, 5);
+        if (this.hp > 0) {
+            drawHpStripe(ctx, this.maxHp, this.hp,
+                this.x - this.radius,
+                this.y - (this.radius * 1, 25),
+                this.radius * 2, 5);
+        }
     }
 
     findClostestEnemy(objects) {
@@ -254,6 +267,10 @@ class Soldier extends RoundObject {
 
         dto.type = this.constructor.name;
         return dto;
+    }
+
+    lumbago() {
+        this.hit = 10;
     }
 
     static fromDTO(dto, obj = new Soldier(

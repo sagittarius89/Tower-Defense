@@ -72,6 +72,16 @@ class Building extends SquareObject {
                 -height / 2);
         }
 
+        if (this.hit && this.hit > 0) {
+            ctx.globalAlpha = 0.3;
+            ctx.fillStyle = 'red';
+            ctx.beginPath();
+            ctx.arc(0, 0, this.width * 0.25, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.closePath();
+            ctx.globalAlpha = 1.0;
+            this.hit -= 1;
+        }
 
         ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
         ctx.restore();
@@ -88,8 +98,8 @@ class Building extends SquareObject {
                 new Square(
                     this.x,
                     this.y,
-                    this.width,
-                    this.height))
+                    this.width * 0.8,
+                    this.height * 0.8))
         ) {
             console.log("uuid: " + this.id + " clicked");
 
@@ -97,27 +107,8 @@ class Building extends SquareObject {
         }
     }
 
-    lumbago(value) {
-        this.hp -= value;
-
-        if (this.hp <= 0) {
-
-            this.#image = "bang";
-            this.#imageSelected = this.#image;
-
-            this.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
-                null);
-            this.addProperty(Player.PLAYER_PROPERTY,
-                null);
-
-            if (Selection.instance.currentSelection == this) {
-                Selection.instance.currentSelection = null;
-            }
-
-            return true;
-        }
-
-        return false;
+    lumbago() {
+        this.hit = 10;
     }
 
     toDTO() {

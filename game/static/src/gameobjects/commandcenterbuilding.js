@@ -235,15 +235,19 @@ class CommandCenterBuilding extends Building {
                 [towerImage, towerImageSelected, bulletImage, this.owner, function (obj) {
                     let dto = obj.toDTO();
                     Network.instance.addBuilding(dto);
+                    console.log('addBuilding');
                 }],
-                420, 750, 50, 50, "turret_violet_01", CONSTS.TOWER_COOLDOWN, true
+                420, 750, 50, 50, "turret_violet_01", CONSTS.TOWER_COOLDOWN,
+                CONSTS.TOWER_COST, true, player
             );
 
             let incSpawnSpeed = new Button(
                 "increase spawn speed", SpawnSpeedAction,
                 [this.owner, function (owner) {
-                    Network.instance.incSpawnSpeed(owner)
-                }], 480, 750, 50, 50, 'inc_spawn_speed', CONSTS.UPGRADE_SPAWN_SPEED_COOLDOWN, true
+                    Network.instance.incSpawnSpeed(owner);
+                    console.log('incSpawnSpeed');
+                }], 480, 750, 50, 50, 'inc_spawn_speed', CONSTS.UPGRADE_SPAWN_SPEED_COOLDOWN,
+                CONSTS.UPGRADE_SPAWN_SPEED_COST, true, player
             );
 
             let holeAction = new Button(
@@ -253,8 +257,11 @@ class CommandCenterBuilding extends Building {
                     let dto2 = obj2.toDTO();
                     Network.instance.addBuilding(dto1);
                     Network.instance.addBuilding(dto2);
+
+                    console.log('addBuilding');
                 }],
-                540, 750, 50, 50, "black_holeoviolet", CONSTS.TOWER_COOLDOWN, true
+                540, 750, 50, 50, "black_holeoviolet", CONSTS.TOWER_COOLDOWN,
+                CONSTS.BLACK_HOLE_COST, true, player
             );
 
             actionsList.push(towerAction, incSpawnSpeed, holeAction);

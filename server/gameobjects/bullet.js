@@ -6,6 +6,7 @@ const Building = require('./building');
 const SquareObject = require('./squareobject');
 const Collider = require('../../game/static/src/physics/collider').Collider;
 const ColliderShape = require('../../game/static/src/physics/collider').ColliderShape;
+const CONSTS = require('../../shared/consts').CONSTS;
 
 module.exports = class Bullet extends RoundObject {
     #vector;
@@ -31,14 +32,14 @@ module.exports = class Bullet extends RoundObject {
         this.#currFrame = 0;
     }
 
-    logic(objects) {
+    logic(objects, conn) {
         this.x += this.#vector.x;
         this.y += this.#vector.y;
 
-        this.checkCollisions(objects);
+        this.checkCollisions(objects, conn);
     }
 
-    checkCollisions(objects) {
+    checkCollisions(objects, conn) {
         objects.foreach(obj => {
             if (obj.id != this.#parent &&
                 (obj.constructor.name == 'Soldier' || obj instanceof Building)) {
@@ -56,8 +57,10 @@ module.exports = class Bullet extends RoundObject {
                         if (distance <= this.radius + obj.radius) {
                             if (obj.lumbago(20, objects)) {
                                 let parent = objects.byId(this.#parent);
-                                if (parent)
+                                if (parent) {
                                     parent.kills++;
+                                    conn.addScore(parent.owner, CONSTS.SOLDIER_SALVAGE);
+                                }
                             }
 
                             objects.delete(this);
@@ -68,8 +71,10 @@ module.exports = class Bullet extends RoundObject {
                         if (Collider.checkCollisionPointWithSquare(myPos, obj.toSquare())) {
                             if (obj.lumbago(20, objects)) {
                                 let parent = objects.byId(this.#parent);
-                                if (parent)
+                                if (parent) {
                                     parent.kills++;
+                                    conn.addScore(parent.owner, CONSTS.TOWER_SALVAGE);
+                                }
                             }
 
                             objects.delete(this);

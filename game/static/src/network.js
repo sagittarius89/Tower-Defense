@@ -57,6 +57,16 @@ class Network {
         //check if obj was destroyed
     }
 
+    syncScore(msg) {
+        let dto = msg.get('player');
+
+        if (dto.name == GameContext.player1.name) {
+            GameContext.player1.sync(dto);
+        } else if (dto.name == GameContext.player2.name) {
+            GameContext.player2.sync(dto);
+        }
+    }
+
     processUpdatePosition(msg) {
         let id = msg.get('obj');
         let newPos = Vector2d.fromDTO(msg.get('pos'));
@@ -216,14 +226,18 @@ class Network {
                     this.processUpdatePosition(msg);
                     break;
                 }
+                case MessageType.SYNC_SCORE: {
+                    this.syncScore(msg);
+                    break;
+                }
             }
         }
-    };
+    }
 
     send(msg) {
         this.#client.send(msg.serialize());
     }
-}
+};
 
 Network.instance = new Network();
 GameContext = null;

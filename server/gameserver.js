@@ -52,10 +52,12 @@ class GameServer {
         switch (dto.type) {
             case Tower.name: {
                 obj = Tower.fromDTO(dto);
+                this.addScore(obj.owner, -CONSTS.TOWER_COST);
                 break;
             }
             case BlackHole.name: {
                 obj = BlackHole.fromDTO(dto);
+                this.addScore(obj.owner, -CONSTS.BLACK_HOLE_COST);
                 break;
             }
         }
@@ -90,6 +92,7 @@ class GameServer {
         ccsf *= 0.9;
 
         this.playerProp(p).set('COMMAND_CENTER_SPAWN_FREQUENCY', ccsf);
+        this.addScore(p, -CONSTS.UPGRADE_SPAWN_SPEED_COST);
     }
 
     processReady(connection) {
@@ -173,6 +176,22 @@ class GameServer {
     updatePosition(id, pos) {
         let msg = Message.updatePosition(id, pos.toDTO());
 
+        this.broadcast(msg);
+    }
+
+    addScore(player, score) {
+        let tPlayer = null;
+        if (this.#player1.name == player.name) {
+            this.#player1.score += score;
+
+            tPlayer = this.#player1;
+        } else if (this.#player2.name == player.name) {
+            this.#player2.score += score;
+
+            tPlayer = this.#player2;
+        }
+
+        let msg = Message.syncScore(tPlayer.toDTO());
         this.broadcast(msg);
     }
 
