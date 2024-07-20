@@ -21,6 +21,7 @@
   },
   "scripts": {
     "build": "npm install",
+    "start": "node idex.js",
     "deploy": "gh-pages -d ."
   }
 }
