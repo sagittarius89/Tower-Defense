@@ -1,0 +1,460 @@
+<html>
+	<head>
+	
+	</head>
+	<body>
+		<canvas id="canvas" width="1000" height="800">
+		</canvas>
+		
+		<script>
+		
+	d=document.getElementById("canvas");
+	
+	var Screen =
+	{
+		ctx: d.getContext("2d"),
+		width: canvas.width,
+		height: canvas.height
+	}
+	
+	var Consts =
+	{
+		Keyboard:
+		{
+			keyLeft: 37,
+			keyUp: 38,
+			keyRight: 39,
+			keyDown: 40
+		},
+		Physics:
+		{
+			friction: 0.01,
+			elasticity: -0.98,
+			grav: 0.25
+		},
+		radius: 25,
+		force: 2
+	}
+	
+	var GameCtx = 
+	{
+		balls: []
+	}
+	
+	var keysState = {};
+	
+	var wallXLeft = 0;
+	var wallXRight = Screen.width;
+	var wallYTop = 0;
+	var wallYBottom = Screen.height;
+	
+	var collisions = {};
+	var idCounter=0;
+	function createBall(pmX, pmY, pmName,pmColor)
+	{
+		var object =
+		{
+			id: ++idCounter,
+			name: pmName,
+			positionX: pmX,
+			positionY: pmY,
+			accX: 0,
+			accY: 0,
+			color: pmColor,
+			getPos: function()
+			{
+				return createVector2d(this.positionX,this.positionY);
+			},
+			getAcc: function()
+			{
+				return createVector2d(this.accX,this.accY);
+			},
+			setPos: function(vector)
+			{
+				this.positionX=vector.x;
+				this.positionY=vector.y;
+			},
+			setAcc: function(vector)
+			{
+				this.accX=vector.x;
+				this.accY=vector.y;
+			}
+			
+		};
+	
+		GameCtx.balls.push(object);
+	}
+	
+	function createVector2d(pmX, pmY)
+	{
+		var object =
+		{
+			x: pmX,
+			y: pmY,
+			add: function (vector)
+			{
+				return createVector2d(this.x + vector.x,this.y + vector.y);
+			},
+			substract: function (vector)
+			{
+				return createVector2d(this.x - vector.x,object.y - vector.y);
+			},
+			multiply: function (vector)
+			{
+				return createVector2d(this.x * vector.x,this.y * vector.y);
+			},
+			divide: function (vector)
+			{
+				var subX = this.x / vector.x;
+				var subY = this.y / vector.y;
+				
+				return createVector2d(subX,subY);
+			},
+			multiplyByFloat: function (f)
+			{
+				return createVector2d(this.x * f,this.y * f);
+			},
+			divideByFloat: function (f)
+			{
+				return createVector2d(this.x / f,this.y / f);
+			},
+			getDistance: function (vector)
+			{
+				return Math.sqrt(
+					Math.pow(this.x - vector.x, 2) +
+					Math.pow(this.y - vector.y, 2)
+				);
+			},
+			rotate: function (angle)
+			{
+				var ca = Math.cos(angle);
+				var sa = Math.sin(angle);
+				this.x = this.x * ca + this.y * sa;
+				this.y = this.x * sa - this.y * ca;
+			},
+			getLength: function ()
+			{
+				return Math.sqrt((this.x * this.x) + (this.y * this.y));
+			},
+			getSquaredLength: function ()
+			{
+				return (this.x * this.x) + (this.y * this.y);
+			},
+			dot(vector)
+			{
+				return this.x*vector.x + this.y*vector.y;
+			},
+			normalize: function ()
+			{
+				var scalefactor;
+				var length = this.getLength();
+				
+				//return if length is 1 or 0
+				if (length == 1 || length == 0) 
+				{
+					return;
+				}
+				scalefactor = 1.0 / length;
+				
+				return createVector2d(this.x * scalefactor,this.y * scalefactor);
+			}
+		};
+		
+		return object;
+	}
+	
+	function checkCollisions(ball1, ball2)
+	{
+		var ball1Pos = ball1.getPos();
+		var ball2Pos = ball2.getPos();
+		
+		var distance = ball1Pos.getDistance(ball2Pos);
+		
+		
+		var collisionId = ball1.id + '&' + ball2.id;
+		if(distance <= 2*Consts.radius)
+		{
+			if(collisions[collisionId] != true)
+			{
+				collisions[collisionId]=true;
+				resolveCollisionWith(ball1,ball2);
+			}
+		}
+		else
+		{
+			collisions[collisionId]=false;
+		}
+	}
+	
+	/*function resolveCollision(ball1, ball2)
+	{
+		var ball1V2d = createVector2d(ball1.positionX,ball1.positionY);
+		var ball2V2d = createVector2d(ball2.positionX,ball2.positionY);
+		
+		var ball1V2dAcc = createVector2d(ball1.accX,ball1.accY);
+		var ball2V2dAcc = createVector2d(ball2.accX,ball2.accY);
+		
+		var delta = (ball1V2d.substract(ball2V2d));
+		var d = delta.getLength();
+		
+		var mtd = delta.multiplyByFloat(((2*Consts.radius)-d)/d); 
+		
+		ball1V2d = ball1V2d.add(mtd.multiplyByFloat(0.5));
+		ball2V2d = ball2V2d.substract(mtd.multiplyByFloat(0.5));
+		
+		ball1.positionX = ball1V2d.x;
+		ball1.positionY = ball1V2d.y;
+		
+		ball2.positionX = ball2V2d.x;
+		ball2.positionY = ball2V2d.y;
+		
+		var v = (ball1V2dAcc.substract(ball2V2dAcc));
+		var vn = v.dot(mtd.normalize());
+		
+		var i = (-(1 + vn)) / 2;
+		var impulse = mtd.multiplyByFloat(i);
+		
+		ball1V2dAcc = ball1V2dAcc.add(impulse);
+		ball2V2dAcc = ball2V2dAcc.substract(impulse);
+		
+		ball1.accX = ball1V2dAcc.x;
+		ball1.accY = ball1V2dAcc.y;
+		
+		ball2.accX = ball2V2dAcc.x;
+		ball2.accY = ball2V2dAcc.y;
+		
+		console.log('ball1: [' + ball1.accX + ',' + ball1.accY + '] ball2[' + ball2.accX + ',' + ball2.accY + ']');
+	}*/
+	
+	
+	function resolveCollisionWith(ball1,ball2)
+	{
+	
+		resolveIntersectionWith(ball1,ball2);
+		var ball1Pos = ball1.getPos();
+		var ball2Pos = ball2.getPos();
+		
+		var ball1Acc = ball1.getAcc();
+		var ball2Acc = ball2.getAcc();
+		
+		//Unit normal vector uN is the unit-vector that links the two centers.
+		var uN = ball1Pos.substract(ball2Pos).normalize();
+
+		//Unit tangent vector uT is the unit-vector normal to uN. It's tangent to both the    two balls.
+		var uT = createVector2d(-uN.y, uN.x);
+
+		//Project the two balls velocities onto the collision axis(uT and uN vectors).
+		var v1n = uN.dot(ball1Acc);
+		var v1t = uT.dot(ball1Acc);
+		
+		var v2n = uN.dot(ball2Acc)
+		var v2t = uT.dot(ball2Acc);
+
+		//Calculate the post collision normal velocities (tangent velocities don't change).
+		var v1nPost = v2n;
+		var v2nPost = v1n;
+
+		//Convert scalar velocities to vectors.
+		var postV1N = uN.multiplyByFloat(v1nPost);
+		var postV1T = uT.multiplyByFloat(v1t);
+		var postV2N = uN.multiplyByFloat(v2nPost); 
+		var postV2T = uT.multiplyByFloat(v2t);
+
+		//Change the balls velocities.
+		ball1.setAcc(postV1N.add(postV1T));
+		ball2.setAcc(postV2N.add(postV2T));
+	}
+
+	function resolveIntersectionWith(ball1,ball2)
+	{
+		var ball1Pos = ball1.getPos();
+		var ball2Pos = ball2.getPos();
+	
+		var n = ball1Pos.substract(ball2Pos);
+		
+		// How much the distance between centers is less than the radii's sum.
+		var offset = 2*Consts.radius- (n.getLength());
+		n = n.normalize();
+		n = n.multiplyByFloat(offset);
+		
+		// Bring back the two ball according to their mass.
+		ball1Pos = ball1Pos.add(n = n.multiplyByFloat(0.5));
+		ball2Pos = ball2Pos.substract(n = n.multiplyByFloat(0.5));
+		
+		ball1.setPos(ball1Pos);
+		ball2.setPos(ball2Pos);
+	}
+	
+	function updatePosition(ball) {
+		
+		if(ball.id==1)
+		{
+			//force
+			if(keysState[Consts.Keyboard.keyLeft])
+			{
+				ball.accX -= Consts.force;
+			}
+			if(keysState[Consts.Keyboard.keyRight])
+			{
+				ball.accX += Consts.force;
+			}
+			if(keysState[Consts.Keyboard.keyUp])
+			{
+				ball.accY -= Consts.force;
+			}
+			if(keysState[Consts.Keyboard.keyDown])
+			{
+				ball.accY += Consts.force;
+			}
+		}
+		var signX = ball.accX >= 0 ? 1 : -1;
+		var signY = ball.accY >= 0 ? 1 : -1;
+		var accXAbs = Math.abs(ball.accX);
+		var accYAbs = Math.abs(ball.accY);
+		
+		
+		ball.accX -= signX*Consts.Physics.friction*accXAbs;
+		ball.accY -= signY*Consts.Physics.friction*accYAbs;
+		
+		ball.accY += Consts.Physics.grav;
+		
+		ball.positionX+=ball.accX;
+		ball.positionY+=ball.accY;
+		
+		if(ball.positionY >= wallYBottom - Consts.radius)
+		{
+			ball.positionY = wallYBottom - Consts.radius;
+			ball.accY = Consts.Physics.elasticity*ball.accY;
+		}
+		
+		if(ball.positionX >= wallXRight - Consts.radius)
+		{
+			ball.positionX = wallXRight - Consts.radius;
+			ball.accX = Consts.Physics.elasticity*ball.accX;
+		}
+		
+		if(ball.positionY <= wallYTop + Consts.radius)
+		{
+			ball.positionY = wallYTop + Consts.radius;
+			ball.accY = Consts.Physics.elasticity*ball.accY;
+		}
+		
+		if(ball.positionX <= wallXLeft + Consts.radius)
+		{
+			ball.positionX = wallXLeft + Consts.radius;
+			ball.accX = Consts.Physics.elasticity*ball.accX;
+		}
+	}
+	
+	function render() {
+		
+		Screen.ctx.clearRect(0, 0, Screen.width, Screen.height);
+		for(var i=0; i<GameCtx.balls.length; ++i)
+		{
+			var ball=GameCtx.balls[i];
+			Screen.ctx.beginPath();
+			Screen.ctx.arc(ball.positionX, ball.positionY, Consts.radius, 0, 2 * Math.PI, false);
+			Screen.ctx.fillStyle = ball.color;
+			Screen.ctx.fill();
+			Screen.ctx.lineWidth = 5;
+			Screen.ctx.strokeStyle = '#003300';
+			Screen.ctx.stroke();
+		}
+	}
+	
+	function handleUp(e) {
+		e = e || window.event;
+		
+		keysState[e.keyCode]=true;
+	}
+	
+	function handleDown(e) {
+		e = e || window.event;
+		
+		keysState[e.keyCode]=false;
+	}
+	
+	function update()
+	{
+		for(var i=0; i<GameCtx.balls.length; ++i)
+		{
+			var ball=GameCtx.balls[i];
+			
+			updatePosition(ball);
+		}
+		
+		for(var i=0; i<GameCtx.balls.length; ++i)
+		{
+			var ball1=GameCtx.balls[i];
+			
+			for(var j=i+1; j<GameCtx.balls.length;++j)
+			{
+				var ball2=GameCtx.balls[j];
+				checkCollisions(ball1,ball2);
+			}
+		}
+		
+		render();
+	}
+	
+	function init()
+	{
+		var delta=Consts.radius*4;
+		
+		
+		createBall(Math.random()*Screen.width, Math.random()*Screen.height, 'huj'+i, 'orange');
+		
+		for(var i=0;i<6; ++i)
+		{
+			createBall(Math.random()*Screen.width, Math.random()*Screen.height, 'huj'+i, 'green');
+		}
+		
+		/*createBall(Screen.width/2, Screen.height/2+20, 'huj');
+		createBall(Screen.width/2 + delta, Screen.height/2, 'huj2');
+		createBall(Screen.width/2 + delta*2, Screen.height/2, 'huj3');
+		createBall(Screen.width/2 - delta, Screen.height/2, 'huj4');*/
+	}
+	
+	onkeydown = onkeyup = function(e) {
+		e = e || event; // to deal with IE
+		keysState[e.keyCode] = e.type == 'keydown';
+	}
+	
+	init();
+	setInterval(update,20);
+	
+	function WebSocketTest()
+	{
+		if ("WebSocket" in window)
+		{
+			alert("WebSocket is supported by your Browser!");
+			// Let us open a web socket
+			var ws = new WebSocket("ws://localhost:9998/echo");
+			ws.onopen = function()
+			{
+				// Web Socket is connected, send data using send()
+				ws.send("Message to send");
+				alert("Message is sent...");
+			};
+			ws.onmessage = function (evt) 
+			{
+				var received_msg = evt.data;
+				alert("Message is received...");
+			};
+			ws.onclose = function()
+			{
+				// websocket is closed.
+				alert("Connection is closed..."); 
+			};
+		}
+		else
+		{
+			// The browser doesn't support WebSocket
+			alert("WebSocket NOT supported by your Browser!");
+		}
+	}
+	
+	WebSocketTest();
+		</script>
+	</body>
+</html>

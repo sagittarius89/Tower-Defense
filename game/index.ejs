@@ -1,0 +1,75 @@
+<script src="src/math/vector.js"></script>
+<script src="src/math/square.js"></script>
+<script src="src/utils/queue.js"></script>
+<script src="src/physics/consts.js"></script>
+<script src="src/utils/helpers.js"></script>
+<script src="utils.js"></script>
+<script src="consts.js"></script>
+
+<script src="src/lib/gif.js"></script>
+<script src="src/resourcemanager.js"></script>
+<script src="src/selection.js"></script>
+<script src="src/gameobject.js"></script>
+<script src="src/gameobjectlist.js"></script>
+
+<script src="player.js"></script>
+
+<script src="src/input/inputdevice.js"></script>
+<script src="src/input/mouse.js"></script>
+<script src="src/input/inputmanager.js"></script>
+
+<script src="src/physics/collider.js"></script>
+<script src="src/camera.js"></script>
+
+<script src="src/gameobjects/world.js"></script>
+<script src="src/gameaction.js"></script>
+
+<script src="src/gameobjects/squareobject.js"></script>
+<script src="src/gameobjects/roundobject.js"></script>
+<script src="src/gameobjects/button.js"></script>
+<script src="src/gameobjects/hud.js"></script>
+<script src="src/gameobjects/soldier.js"></script>
+<script src="src/gameobjects/building.js"></script>
+<script src="src/gameobjects/bullet.js"></script>
+<script src="src/gameobjects/commandcenterbuilding.js"></script>
+<script src="src/gameobjects/towerbuilding.js"></script>
+<script src="src/gameobjects/blackholebuilding.js"></script>
+<script src="protocol.js"></script>
+
+<script src="src/gameengine.js"></script>
+
+<html>
+
+
+<body>
+    <canvas id="canvas">
+
+    </canvas>
+</body>
+
+<script>
+    let canvas = document.getElementById("canvas");
+
+    async function renderBg() {
+        while (!ResourceManager.instance.isReady()) {
+            console.log('Resource manager not ready');
+            await sleep(500);
+        }
+
+        let background = ResourceManager.instance.getImageResource('bg_03');
+        let ctx = canvas.getContext("2d");
+        this.canvas.width = background.width;
+        this.canvas.height = background.height;
+
+        ctx.drawImage(background, 0, 0);
+        drawStrokedText(ctx, "Waiting for players...",
+            background.width / 2, background.height / 2, 40);
+    }
+
+    renderBg();
+</script>
+
+<script src="src/network.js"></script>
+<script src="src/gamecontext.js"></script>
+
+</html>
