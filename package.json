@@ -8,11 +8,22 @@
   },
   "author": "Sagittarius89",
   "license": "ISC",
+  "homepage": "https://sagittarius89.github.io/Tower-Defense",
   "dependencies": {
-    "ejs": "^3.1.6",
-    "express": "^4.17.1",
-    "websocket": "1.0.34",
-    "image-size": "1.0.0",
-    "path": "0.12.7"
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "image-size": "^1.0.0",
+    "path": "0.12.7",
+    "websocket": "1.0.34"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.1.1"
+  },
+  "scripts": {
+    "build": "npm install",
+    //"predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+    // ... other scripts
+    //"deploy": "node index.js"
   }
 }
