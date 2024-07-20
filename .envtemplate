@@ -1,0 +1,7 @@
+#change name of this file to .env in order to enable cutom configuration of following values:
+
+#PORT=8080 #http port
+#WSPORT=3000 #websocket port
+#WSPROTOCOL=ws #websocket protocol
+#DOMAIN_NAME=127.0.0.1 #webapp domain
+#WEBSOCKET_URL=127.0.0.1 #websocket domain
