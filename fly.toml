@@ -1,0 +1,62 @@
+# fly.toml app configuration file generated for tower-defense on 2024-07-20T14:42:59+02:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'tower-defense'
+primary_region = 'waw'
+
+[build]
+
+[env]
+PORT = "8080"
+WEBSOCKET_PORT = "3000"
+
+[[services]]
+internal_port = 8080
+protocol = "tcp"
+
+[services.concurrency]
+type = "connections"
+hard_limit = 25
+soft_limit = 20
+
+[[services.ports]]
+port = 80
+handlers = ["http"]
+
+[[services.ports]]
+port = 443
+handlers = ["tls", "http"]
+
+[[services]]
+internal_port = 3000
+protocol = "tcp"
+
+[services.concurrency]
+type = "connections"
+hard_limit = 25
+soft_limit = 20
+
+[[services.ports]]
+port = "3000"
+handlers = ["tls", "http"]
+
+[[services.tcp_checks]]
+port = 8080
+interval = "15s"
+timeout = "2s"
+grace_period = "5s"
+restart_limit = 0
+
+[[services.tcp_checks]]
+port = 3000
+interval = "15s"
+timeout = "2s"
+grace_period = "5s"
+restart_limit = 0
+
+[[vm]]
+memory = '1gb'
+cpu_kind = 'shared'
+cpus = 1

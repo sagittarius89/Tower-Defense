@@ -1,6 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
-const port = 8080;
+const httpPort = process.env.PORT || 8080;
+const wsPort = process.env.WSPORT || 3000;
+const wsProtocol = process.env.WSPROTOCOL || 'wss';
+
 const path = require('path');
 const GameServer = require('./server/gameserver')
 const Message = require('./shared/protocol').Message;
@@ -14,10 +18,15 @@ app.use(express.static('game/static'));
 app.use(express.static('shared'));
 
 app.get('/', (req, res) => {
-    res.render('index', { foo: 'FOO' });
+    res.render('index',
+        {
+            wsSocket: process.env.WEBSOCKET_URL,
+            wsPort: wsPort,
+            wsProtocol: wsProtocol
+        });
 });
 
-app.listen(port);
+app.listen(httpPort);
 
 let webSocketServer = require('websocket').server;
 
@@ -26,8 +35,8 @@ var httpServer = http.createServer(function (request, response) {
     response.end();
 });
 
-httpServer.listen(8081, function () {
-    console.log((new Date()) + ' wsSocket is listening on port 8081');
+httpServer.listen(wsPort, function () {
+    console.log((new Date()) + ' wsSocket is listening on port ' + wsPort);
 });
 
 let wsServer = new webSocketServer({

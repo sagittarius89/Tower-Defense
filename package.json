@@ -4,12 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npm install",
+    "start": "node index.js",
+    "deploy": "gh-pages -d ."
   },
   "author": "Sagittarius89",
   "license": "ISC",
   "homepage": "https://sagittarius89.github.io/Tower-Defense",
   "dependencies": {
+    "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
     "image-size": "^1.0.0",
@@ -18,10 +21,5 @@
   },
   "devDependencies": {
     "gh-pages": "^6.1.1"
-  },
-  "scripts": {
-    "build": "npm install",
-    "start": "node index.js",
-    "deploy": "gh-pages -d ."
   }
 }

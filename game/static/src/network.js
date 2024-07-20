@@ -6,7 +6,7 @@ class Network {
     #gameContext;
 
     constructor() {
-        this.#client = new WebSocket('ws://tower-defense.fly.dev:8081/', 'echo-protocol');
+        this.#client = new WebSocket(`${wsProtocol}://${wsSocket}:${wsPort}/`, 'echo-protocol');
 
         this.#client.addEventListener('error', this.onError.bind(this));
 
