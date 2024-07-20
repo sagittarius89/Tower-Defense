@@ -35,9 +35,9 @@ module.exports = class GameEngine {
     get HEIGHT() { return this.ctx.canvas.height; }
 
     endGame(hasPlayer1Objects, hasPlayer2Objects) {
-
+        console.log("end game");
         //setTimeout(function () {
-        //    this.continue = false;
+        this.continue = false;
 
         //@todo
 
@@ -70,9 +70,9 @@ module.exports = class GameEngine {
             if (element instanceof Building || element instanceof Soldier) {
                 let player = element.owner;
                 if (player) {
-                    if (player == this.player1) {
+                    if (player == this.#player1) {
                         hasPlayer1Objects = true;
-                    } else if (player == this.player2) {
+                    } else if (player == this.#player2) {
                         hasPlayer2Objects = true;
                     }
                 }

@@ -110,13 +110,15 @@ class GameServer {
     }
 
     playerDisconnected(conn) {
+
+
         if (conn == this.#p1Conn) {
-            this.#p1Conn = null;
-            this.#player1 = null;
+            this.#gameContext.engine.endGame(true, false);
         } else if (conn == this.#p2Conn) {
-            this.#p2Conn = null;
-            this.#player2 = null;
+            this.#gameContext.engine.endGame(false, true);
         }
+
+        //this.#gameContext.engine.stop();
     }
 
     playerProp(player) {
@@ -205,11 +207,11 @@ class GameServer {
         this.#gameContext.engine.objects.foreach(element => {
             objectList.push(element.toDTO());
         });
-
+ 
         let msg = Message.objectsSync(objectList);
-
+ 
         this.broadcast(msg);
-
+ 
         setTimeout(function () {
             this.sync();
         }.bind(this), 50);

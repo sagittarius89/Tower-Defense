@@ -10,3 +10,6 @@ Simple tower defense game.
 2. type in terminal:
 node index.js
 3. launch browser, and navigate to localhost:8080
+
+# Deploy
+1. fly deploy
