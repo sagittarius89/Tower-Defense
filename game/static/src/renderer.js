@@ -33,7 +33,6 @@ class GraphicsContextWrapper {
 
     clearCanvas() {
         this.#ctx.setTransform(1, 0, 0, 1, 0, 0);
-        this.#ctx.restore();
 
         this.#ctx.fillStyle = "black";
         this.#ctx.fillRect(0, 0, this.#ctx.canvas.width, this.#ctx.canvas.height);
@@ -76,9 +75,22 @@ class GraphicsContextWrapper {
         return this.#y + (y / GraphicsContextWrapper.HEIGHT) * this.#realHeight;
     }
 
-    moveTo(x, y) { this.#ctx.moveTo(this.trX(x), this.trY(y)); }
+    moveTo(x, y, angle) {
 
-    lineTo(x, y) { this.#ctx.lineTo(this.trX(x), this.trY(y)); }
+        if (!angle) {
+            this.#ctx.moveTo(this.trX(x), this.trY(y));
+        } else {
+            this.#ctx.moveTo(this.trX(x + Math.cos(angle)), this.trY(y + Math.sin(angle)));
+        }
+    }
+
+    lineTo(x, y, angle) {
+        if (!angle) {
+            this.#ctx.lineTo(this.trX(x), this.trY(y));
+        } else {
+            this.#ctx.lineTo(this.trX(x * Math.cos(angle) - y * Math.sin(angle)), this.trY(y * Math.cos(angle) + x * Math.sin(angle)));
+        }
+    }
 
     ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle, anticlockwise) {
         this.#ctx.ellipse(

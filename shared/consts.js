@@ -2,11 +2,12 @@ var CONSTS = {
     BULLET_VELOCITY: 6,
     SOLDIER_VELOCITY: 4,
     SOLDIER: {
-        RADIUS: 20,
+        RADIUS: 60,
         ATTACK_DISTANCE: 260,
         SHOT_FREQUENCY: 1000,
         HP: 30,
         SOLDIER_SALVAGE: 10,
+
     },
     TOWER_COOLDOWN: 0,
     TOWER_ATTACK_DISTANCE: 400,
@@ -20,7 +21,7 @@ var CONSTS = {
         SOLDIER_LIMIT: 15,
         HP: 700,
         WIDTH: 100,
-        HEIGHT: 100,
+        HEIGHT: 250,
         A_POS_X: 27,
         A_POS_Y: 1079,
         A_SPAWN_X: 54,

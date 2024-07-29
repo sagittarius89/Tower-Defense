@@ -14,7 +14,7 @@ class World extends GameObject {
 
         //ctx.drawImage(image, 0, 0);
         ctx.fillStyle = 'lightblue';
-        CTX.drawRect(0, 0, CTX.WIDTH, CTX.HEIGHT);
+        CTX.drawRect(0, 0, GraphicsContextWrapper.WIDTH, GraphicsContextWrapper.HEIGHT);
     }
 
     get width() {

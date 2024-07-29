@@ -141,12 +141,40 @@ class Soldier extends RoundObject {
     }
 
     draw(ctx, clostestEnemy) {
-        //ctx.resetTransform();
-        //CTX.translate(this.x, this.y);
         CTX.setTransform(1, 0, 0, 1, this.x, this.y);
-        //let image = ResourceManager.instance.getImageResource(this.#image);
+        drawStrokedText(ctx, `${Math.floor(CTX.trX(this.x))} ${Math.floor(CTX.trY(this.y))} ${Math.floor(this.#angle, 2)}`,
+            -this.radius / 2, -this.radius * 1.5, 10);
 
-        /*if (this == Selection.instance.currentSelection) {
+        ctx.fillStyle = "red";
+        CTX.drawRect(-5, -5, 10, 10);
+
+        if (this.hp > 0)
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+
+        ctx.beginPath();
+        CTX.moveTo(0, 0, this.#angle);
+        CTX.lineTo(-this.radius / 2, -this.radius / 2, this.#angle);
+        CTX.lineTo(this.radius, 0, this.#angle);
+        CTX.lineTo(-this.radius / 2, this.radius / 2, this.#angle);
+        CTX.lineTo(0, 0, this.#angle);
+        ctx.stroke();
+        ctx.fill();
+
+        if (this.hp > 0) {
+            drawHpStripe(ctx, this.maxHp, this.hp,
+                -this.radius / 2,
+                -this.radius,
+                this.radius * 1.5, 10);
+        }
+
+        CTX.setTransform(1, 0, 0, 1, 0, 0);
+
+        /*ifctx.resetTransform();
+        CTX.translate(this.x, this.y);
+        CTX.setTransform(1, 0, 0, 1, this.x, this.y);
+        let image = ResourceManager.instance.getImageResource(this.#image);
+
+        if (this == Selection.instance.currentSelection) {
             ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
             ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
             ctx.beginPath();
@@ -160,49 +188,27 @@ class Soldier extends RoundObject {
                 2 * Math.PI);
             ctx.fill();
             ctx.stroke();
-        }*/
+        }
 
-        ctx.fillStyle = 'rgba(1, 0, 0, 1)';
-        CTX.drawRect(0, 0, 10, 10);
-
-        drawStrokedText(ctx, `${Math.floor(CTX.trX(this.x))} ${Math.floor(CTX.trY(this.y))} ${Math.floor(this.#angle)}`, 0, -40, 10);
-
-        CTX.translate(0, 0);
-        CTX.rotate(this.#angle);
-
-        ctx.fillStyle = 'rgba(0, 1, 0, 1)';
-        CTX.drawRect(0, 0, 10, 10);
-
-        //CTX.translate(this.x, this.y);
+        CTX.translate(this.x, this.y);
 
 
-        /*if (image.frames) {
+        if (image.frames) {
 
             if (this.#currFrame >= image.frames.length)
                 this.#currFrame = 0;
             image = image.frames[this.#currFrame++].image;
-        }*/
+        }
 
-
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.beginPath();
-        CTX.moveTo(0, 0);
-        CTX.lineTo(-30, -30);
-        CTX.lineTo(60, 0);
-        CTX.lineTo(-30, 30);
-        CTX.lineTo(0, 0);
-        ctx.stroke();
-        ctx.fill();
-
-        /*ctx.drawImage(
+        ctx.drawImage(
             image,
             -this.#imgWidth / 2,
             -this.#imgHeight / 2,
             this.#imgWidth,
             this.#imgHeight
-        );*/
+        );
 
-        /*ctx.beginPath();
+        ctx.beginPath();
         CTX.ellipse(
             this.radius / 2,
             this.radius / 2,
@@ -224,9 +230,9 @@ class Soldier extends RoundObject {
             0,
             2 * Math.PI);
         ctx.fill();
-        ctx.stroke();*/
+        ctx.stroke();
 
-        /*if (this.hit && this.hp > 0 && this.hit > 0) {
+        if (this.hit && this.hp > 0 && this.hit > 0) {
             ctx.globalAlpha = 0.3;
             ctx.fillStyle = 'red';
             ctx.beginPath();
@@ -237,9 +243,6 @@ class Soldier extends RoundObject {
             this.hit -= 1;
         }*/
 
-        ctx.restore();
-        ctx.resetTransform();
-
         if (clostestEnemy) {
             let randomColor = Math.floor(Math.random() * 16777215).toString(16);
 
@@ -248,13 +251,6 @@ class Soldier extends RoundObject {
             CTX.moveTo(this.x, this.y);
             CTX.lineTo(clostestEnemy.x, clostestEnemy.y);
             ctx.stroke();
-        }
-
-        if (this.hp > 0) {
-            drawHpStripe(ctx, this.maxHp, this.hp,
-                this.x - this.radius,
-                this.y - (this.radius * 1, 25),
-                this.radius * 2, 5);
         }
     }
 

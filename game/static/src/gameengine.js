@@ -123,8 +123,8 @@ class GameEngine {
 
         objects.foreach((obj) => {
             if (obj.x && obj.y
-                && (obj.x > CTX.WIDTH ||
-                    obj.y > CTX.HEIGHT ||
+                && (obj.x > GraphicsContextWrapper.WIDTH ||
+                    obj.y > GraphicsContextWrapper.HEIGHT ||
                     obj.x < 0 || obj.y < 0)
             ) {
                 objects.delete(obj);
