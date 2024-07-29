@@ -16,12 +16,12 @@ function drawStrokedText(ctx, text, x, y, textSize = 29) {
     ctx.fillStyle = 'white';
     ctx.lineWidth = 1;
 
-    ctx.fillText(text, x, y);
+    ctx.fillText(text, CTX.trX(x), CTX.trY(y));
 
     ctx.strokeStyle = 'black';
-    ctx.strokeText(text, x, y);
+    ctx.strokeText(text, CTX.trX(x), CTX.trY(y));
 
-    return ctx.measureText(text).width;
+    return CTX.trX(ctx.measureText(text).width);
 }
 
 function drawHpStripe(ctx, maxHp, cHp, x, y, width, height, showText = false) {
@@ -30,15 +30,15 @@ function drawHpStripe(ctx, maxHp, cHp, x, y, width, height, showText = false) {
         cHp = 0
 
     ctx.fillStyle = '#FF8989';
-    ctx.fillRect(x, y, width, height);
+    CTX.drawRect(x, y, width, height);
 
     ctx.fillStyle = '#ADF7A5';
     let widthG = cHp * width / maxHp;
-    ctx.fillRect(x, y, widthG, height);
+    CTX.drawRect(x, y, widthG, height);
 
     ctx.strokeStyle = 'black';
     ctx.lineWidth = 1;
-    ctx.strokeRect(x, y, width, height);
+    CTX.strokeRect(x, y, width, height);
 
     if (showText)
         drawStrokedText(ctx, `${cHp}\\${maxHp}`, x, y - 5, 18);

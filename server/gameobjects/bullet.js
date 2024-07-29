@@ -64,7 +64,7 @@ module.exports = class Bullet extends RoundObject {
                                     let parent = objects.byId(this.#parent);
                                     if (parent) {
                                         parent.kills++;
-                                        conn.addScore(parent.owner, CONSTS.SOLDIER_SALVAGE);
+                                        conn.addScore(parent.owner, CONSTS.SOLDIER.SALVAGE);
                                     }
                                 }
 

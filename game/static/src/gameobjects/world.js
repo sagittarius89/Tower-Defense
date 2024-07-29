@@ -12,7 +12,9 @@ class World extends GameObject {
     update(ctx, objects) {
         let image = ResourceManager.instance.getImageResource(this.#image);
 
-        ctx.drawImage(image, 0, 0);
+        //ctx.drawImage(image, 0, 0);
+        ctx.fillStyle = 'lightblue';
+        CTX.drawRect(0, 0, CTX.WIDTH, CTX.HEIGHT);
     }
 
     get width() {

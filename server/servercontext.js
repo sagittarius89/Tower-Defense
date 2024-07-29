@@ -2,6 +2,8 @@ const GameEngine = require('./serverengine');
 const World = require('./gameobjects/world');
 const CommandCenterBuilding = require('./gameobjects/commandcenterbuilding');
 const Vector2d = require('../game/static/src/math/vector').Vector2d;
+const CONSTS = require('../shared/consts').CONSTS;
+
 
 module.exports = class GameContext {
     constructor(player1, player2, conn) {
@@ -17,8 +19,10 @@ module.exports = class GameContext {
 
 
         let buildingA = new CommandCenterBuilding(
-            new Vector2d(67, 425),
-            new Vector2d(73, 440),
+            new Vector2d(CONSTS.COMMAND_CENTER.A_POS_X,
+                CONSTS.COMMAND_CENTER.A_POS_Y),
+            new Vector2d(CONSTS.COMMAND_CENTER.A_SPAWN_X,
+                CONSTS.COMMAND_CENTER.A_SPAWN_Y),
             this.player1,
             "tower_violet_01",
             "towerlight_violet_01",
@@ -34,8 +38,10 @@ module.exports = class GameContext {
         buildingA.produceNewSoldier(this.engine.objects);
 
         let buildingB = new CommandCenterBuilding(
-            new Vector2d(1356, 435),
-            new Vector2d(1292, 460),
+            new Vector2d(CONSTS.COMMAND_CENTER.B_POS_X,
+                CONSTS.COMMAND_CENTER.B_POS_Y),
+            new Vector2d(CONSTS.COMMAND_CENTER.B_SPAWN_X,
+                CONSTS.COMMAND_CENTER.B_SPAWN_Y),
             this.player2,
             "tower_orange_01",
             "towerlight_orange_01",
@@ -43,8 +49,8 @@ module.exports = class GameContext {
             "bullet_orange_01",
             "turret_orange_01",
             "turretlight_orange_01",
-            "black_holeorangew",
-            "black_holeorangeselected"
+            "black_holeoorange",
+            "black_holeoorangeselected"
         );
 
         this.engine.addObject(buildingB);

@@ -41,17 +41,33 @@
 <script src="src/gameobjects/towerbuilding.js"></script>
 <script src="src/gameobjects/blackholebuilding.js"></script>
 <script src="protocol.js"></script>
-
 <script src="src/gameengine.js"></script>
 
 <html>
 
+<head>
+    <title>Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            background-color: #000;
+        }
+    </style>
+
+</head>
 
 <body>
     <canvas id="canvas">
 
     </canvas>
 </body>
+
+<script src="src/renderer.js"></script>
 
 <script>
     let canvas = document.getElementById("canvas");
@@ -61,15 +77,10 @@
             console.log('Resource manager not ready');
             await sleep(500);
         }
-
-        let background = ResourceManager.instance.getImageResource('bg_03');
         let ctx = canvas.getContext("2d");
-        this.canvas.width = background.width;
-        this.canvas.height = background.height;
 
-        ctx.drawImage(background, 0, 0);
         drawStrokedText(ctx, "Waiting for players...",
-            background.width / 2, background.height / 2, 40);
+            GraphicsContextWrapper.WIDTH / 2, GraphicsContextWrapper.HEIGHT / 2, 40);
     }
 
     renderBg();

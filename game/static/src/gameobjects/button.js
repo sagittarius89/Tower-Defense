@@ -64,7 +64,7 @@ class Button extends SquareObject {
                 this.toSquare())
             ) {
                 ctx.fillStyle = 'rgb(0,0,0,0.25)';
-                ctx.fillRect(-this.width / 2, -this.height / 2,
+                CTX.drawRect(-this.width / 2, -this.height / 2,
                     this.width, this.height);
             }
 

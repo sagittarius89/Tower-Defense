@@ -24,16 +24,16 @@ module.exports = class Soldier extends RoundObject {
 
     constructor(x, y, dronImage, bulletImage, owner) {
         let tmpImg = ResourceManager.instance.getImageResource(dronImage);
-        super(tmpImg.width / 2, x, y);
+        super(CONSTS.SOLDIER.RADIUS, x, y);
 
         this.#image = dronImage;
         this.#angle = 0;
 
         this.#velocity = CONSTS.SOLDIER_VELOCITY;
-        this.#attackDistance = CONSTS.SOLDIER_ATTACK_DISTANCE;
-        this.hp = CONSTS.SOLDIER_HP;
-        this.maxHp = CONSTS.SOLDIER_HP;
-        this.#shotFrequency = CONSTS.SOLDIER_SHOT_FREQUENCY;
+        this.#attackDistance = CONSTS.SOLDIER.ATTACK_DISTANCE;
+        this.hp = CONSTS.SOLDIER.HP;
+        this.maxHp = CONSTS.SOLDIER.HP;
+        this.#shotFrequency = CONSTS.SOLDIER.SHOT_FREQUENCY;
         this.#attackMode = false;
         this.#idle = false;
         this.#shotTimestamp = new Date().getTime();

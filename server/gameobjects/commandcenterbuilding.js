@@ -25,10 +25,10 @@ module.exports = class CommandCenterBuilding extends Building {
         super(image, imageSelected, pos.x, pos.y);
 
         this.#productionTimestamp = new Date().getTime();
-        this.#spawnFrequency = CONSTS.COMMAND_CENTER_SPAWN_FREQUENCY;
-        this.#soldierLimit = CONSTS.COMMAND_CENTER_SOLDIER_LIMIT;
-        this.hp = CONSTS.COMMAND_CENTER_HP;
-        this.maxHp = CONSTS.COMMAND_CENTER_HP;
+        this.#spawnFrequency = CONSTS.COMMAND_CENTER.SPAWN_FREQUENCY;
+        this.#soldierLimit = CONSTS.COMMAND_CENTER.SOLDIER_LIMIT;
+        this.hp = CONSTS.COMMAND_CENTER.HP;
+        this.maxHp = CONSTS.COMMAND_CENTER.HP;
         this.#spawnPoint = spawnPoint;
         this.#dronImage = dronImage;
         this.#bulletImage = bulletImage;
@@ -68,7 +68,7 @@ module.exports = class CommandCenterBuilding extends Building {
 
         this.#spawnFrequency = conn
             .playerProp(this.owner)
-            .get('COMMAND_CENTER_SPAWN_FREQUENCY');
+            .get('COMMAND_CENTER.SPAWN_FREQUENCY');
 
         if (now.getTime() - this.#productionTimestamp
             > this.#spawnFrequency &&

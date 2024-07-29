@@ -205,13 +205,15 @@ class CommandCenterBuilding extends Building {
         towerImage, towerImageSelected,
         blackHoleImage, blackHoleImageSelected) {
 
-        super(image, imageSelected, pos.x, pos.y);
+        super(CONSTS.COMMAND_CENTER.WIDTH,
+            CONSTS.COMMAND_CENTER.HEIGHT,
+            pos.x, pos.y, player.self ? 'blue' : 'red');
 
         this.#productionTimestamp = new Date().getTime();
-        this.#spawnFrequency = CONSTS.COMMAND_CENTER_SPAWN_FREQUENCY;
-        this.#soldierLimit = CONSTS.COMMAND_CENTER_SOLDIER_LIMIT;
-        this.hp = CONSTS.COMMAND_CENTER_HP;
-        this.maxHp = CONSTS.COMMAND_CENTER_HP;
+        this.#spawnFrequency = CONSTS.COMMAND_CENTER.SPAWN_FREQUENCY;
+        this.#soldierLimit = CONSTS.COMMAND_CENTER.SOLDIER_LIMIT;
+        this.hp = CONSTS.COMMAND_CENTER.HP;
+        this.maxHp = CONSTS.COMMAND_CENTER.HP;
         this.#spawnPoint = spawnPoint;
         this.#dronImage = dronImage;
         this.#bulletImage = bulletImage;
@@ -303,7 +305,7 @@ class CommandCenterBuilding extends Building {
             > this.#spawnFrequency &&
             this.#soldierLimit > this.soldierCount(objects)) {
 
-            //this.produceNewSoldier();
+            this.produceNewSoldier();
 
             this.#productionTimestamp = new Date().getTime();
         }

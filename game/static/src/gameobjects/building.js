@@ -2,17 +2,19 @@ class Building extends SquareObject {
     #image;
     #imageSelected;
     #currFrame;
+    #color;
 
     static ACTIONS_PROPERY = "ACTIONS_PROPERY";
 
-    constructor(name, nameSelected, x, y, rotating = false) {
-        let tmpImg = ResourceManager.instance.getImageResource(name);
-        let tmpImgSel = ResourceManager.instance.getImageResource(nameSelected);
+    constructor(width, height, x, y, color, rotating = false) {
+        //let tmpImg = ResourceManager.instance.getImageResource(name);
+        //let tmpImgSel = ResourceManager.instance.getImageResource(nameSelected);
 
-        super(tmpImg.width, tmpImg.height, x, y);
+        super(width, height, x, y);
 
-        this.#image = name;
-        this.#imageSelected = nameSelected;
+        //this.#image = name;
+        //this.#imageSelected = nameSelected;
+        this.#color = color;
         this.#currFrame = 0;
 
         this.zIndex = 10;
@@ -26,13 +28,19 @@ class Building extends SquareObject {
     }
 
     update(ctx, objects) {
-        ctx.setTransform(1, 0, 0, 1, this.x, this.y); // set position of image center
+        CTX.setTransform(1, 0, 0, 1, this.x, this.y); // set position of image center
 
         let centerX = this.width / 2;
         let centerY = this.height / 2;
         let width = this.width;
         let height = this.height;
-        let image = ResourceManager.instance.getImageResource(this.#image);
+
+
+        ctx.fillStyle = 'blue'; // Set the fill color
+        CTX.drawRect(-centerX, -centerY, width, height); // Draw the rectangle
+
+
+        /*let image = ResourceManager.instance.getImageResource(this.#image);
 
         if (this == Selection.instance.currentSelection) {
             image = ResourceManager.instance.getImageResource(this.#imageSelected);
@@ -81,14 +89,14 @@ class Building extends SquareObject {
             ctx.closePath();
             ctx.globalAlpha = 1.0;
             this.hit -= 1;
-        }
-
-        ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
-        ctx.restore();
+        }*/
 
         drawHpStripe(ctx, this.maxHp, this.hp,
-            this.pos.x - this.width * 0.4, this.pos.y - this.height * 0.4,
+            - 0.5 * this.width, - 0.6 * this.height,
             this.width, 5);
+
+        CTX.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
+        CTX.restore();
     }
 
     notify(inputEvent) {

@@ -13,15 +13,15 @@ class Soldier extends RoundObject {
 
     constructor(x, y, dronImage, bulletImage, owner) {
         let tmpImg = ResourceManager.instance.getImageResource(dronImage);
-        super(tmpImg.width / 2, x, y);
+        super(CONSTS.SOLDIER.RADIUS, x, y);
 
         this.#image = dronImage;
         this.#angle = 0;
 
         this.#velocity = CONSTS.SOLDIER_VELOCITY;
-        this.#attackDistance = CONSTS.SOLDIER_ATTACK_DISTANCE;
-        this.hp = CONSTS.SOLDIER_HP;
-        this.maxHp = CONSTS.SOLDIER_HP;
+        this.#attackDistance = CONSTS.SOLDIER.ATTACK_DISTANCE;
+        this.hp = CONSTS.SOLDIER.HP;
+        this.maxHp = CONSTS.SOLDIER.HP;
         this.#attackMode = false;
         this.#idle = false;
         this.#imgWidth = tmpImg.width;
@@ -141,15 +141,16 @@ class Soldier extends RoundObject {
     }
 
     draw(ctx, clostestEnemy) {
-        ctx.setTransform(1, 0, 0, 1, this.x, this.y); // set position of image center
+        //ctx.resetTransform();
+        //CTX.translate(this.x, this.y);
+        CTX.setTransform(1, 0, 0, 1, this.x, this.y);
+        //let image = ResourceManager.instance.getImageResource(this.#image);
 
-        let image = ResourceManager.instance.getImageResource(this.#image);
-
-        if (this == Selection.instance.currentSelection) {
+        /*if (this == Selection.instance.currentSelection) {
             ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
             ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
             ctx.beginPath();
-            ctx.ellipse(
+            CTX.ellipse(
                 this.radius / 2,
                 this.radius / 2,
                 this.radius * 1.5,
@@ -159,26 +160,73 @@ class Soldier extends RoundObject {
                 2 * Math.PI);
             ctx.fill();
             ctx.stroke();
-        }
+        }*/
 
-        ctx.rotate(this.#angle - Math.PI); // rotate
+        ctx.fillStyle = 'rgba(1, 0, 0, 1)';
+        CTX.drawRect(0, 0, 10, 10);
 
-        if (image.frames) {
+        drawStrokedText(ctx, `${Math.floor(CTX.trX(this.x))} ${Math.floor(CTX.trY(this.y))} ${Math.floor(this.#angle)}`, 0, -40, 10);
+
+        CTX.translate(0, 0);
+        CTX.rotate(this.#angle);
+
+        ctx.fillStyle = 'rgba(0, 1, 0, 1)';
+        CTX.drawRect(0, 0, 10, 10);
+
+        //CTX.translate(this.x, this.y);
+
+
+        /*if (image.frames) {
 
             if (this.#currFrame >= image.frames.length)
                 this.#currFrame = 0;
             image = image.frames[this.#currFrame++].image;
-        }
+        }*/
 
-        ctx.drawImage(
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.beginPath();
+        CTX.moveTo(0, 0);
+        CTX.lineTo(-30, -30);
+        CTX.lineTo(60, 0);
+        CTX.lineTo(-30, 30);
+        CTX.lineTo(0, 0);
+        ctx.stroke();
+        ctx.fill();
+
+        /*ctx.drawImage(
             image,
             -this.#imgWidth / 2,
             -this.#imgHeight / 2,
             this.#imgWidth,
             this.#imgHeight
-        );
+        );*/
 
-        if (this.hit && this.hp > 0 && this.hit > 0) {
+        /*ctx.beginPath();
+        CTX.ellipse(
+            this.radius / 2,
+            this.radius / 2,
+            this.radius * 1.5,
+            this.radius,
+            0,
+            0,
+            2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.beginPath();
+        CTX.ellipse(
+            this.radius / 2,
+            this.radius / 2,
+            this.radius * 1.5,
+            this.radius,
+            0,
+            0,
+            2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();*/
+
+        /*if (this.hit && this.hp > 0 && this.hit > 0) {
             ctx.globalAlpha = 0.3;
             ctx.fillStyle = 'red';
             ctx.beginPath();
@@ -187,19 +235,18 @@ class Soldier extends RoundObject {
             ctx.closePath();
             ctx.globalAlpha = 1.0;
             this.hit -= 1;
-        }
+        }*/
 
-
-        ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
         ctx.restore();
+        ctx.resetTransform();
 
-        if (clostestEnemy && GameContext.debug) {
+        if (clostestEnemy) {
             let randomColor = Math.floor(Math.random() * 16777215).toString(16);
 
             ctx.strokeStyle = '#' + randomColor;
             ctx.beginPath();
-            ctx.moveTo(this.x, this.y);
-            ctx.lineTo(clostestEnemy.x, clostestEnemy.y);
+            CTX.moveTo(this.x, this.y);
+            CTX.lineTo(clostestEnemy.x, clostestEnemy.y);
             ctx.stroke();
         }
 

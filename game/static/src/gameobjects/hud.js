@@ -64,7 +64,7 @@ class Hud extends GameObject {
         // Fill with gradient
         ctx.fillStyle = this.#grd;
 
-        ctx.fillRect(0, 740,
+        CTX.drawRect(0, 740,
             GameContext.engine.background.width,
             GameContext.engine.background.height - 740);
 

@@ -37,7 +37,7 @@ module.exports = class GameEngine {
     endGame(hasPlayer1Objects, hasPlayer2Objects) {
         console.log("end game");
         //setTimeout(function () {
-        this.continue = false;
+        //this.continue = false;
 
         //@todo
 

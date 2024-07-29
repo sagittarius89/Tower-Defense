@@ -112,17 +112,19 @@ class GameEngine {
         });
 
         if (!hasPlayer1Objects || !hasPlayer2Objects) {
-            this.endGame(ctx, hasPlayer1Objects, hasPlayer2Objects);
+            //this.endGame(ctx, hasPlayer1Objects, hasPlayer2Objects);
         }
     }
 
     update(ctx, objects) {
-        ctx.clearRect(0, 0, this.WIDTH, this.HEIGHT);
+        //ctx.clearRect(0, 0, this.WIDTH, this.HEIGHT);
+
+        CTX.clearCanvas();
 
         objects.foreach((obj) => {
             if (obj.x && obj.y
-                && (obj.x > GameContext.engine.background.width ||
-                    obj.y > GameContext.engine.background.height ||
+                && (obj.x > CTX.WIDTH ||
+                    obj.y > CTX.HEIGHT ||
                     obj.x < 0 || obj.y < 0)
             ) {
                 objects.delete(obj);
@@ -153,6 +155,9 @@ class GameEngine {
             window.requestAnimationFrame(function () {
                 this.update(this.#ctx, this.#objects);
             }.bind(this));
+
+        // Draw mouse position at (0, 0)
+        drawStrokedText(ctx, `Mouse: (${GameContext.inputManager.mousePosX}, ${GameContext.inputManager.mousePosY})`, 150, 150, 15);
     }
 
     updateSingleFrame() {
