@@ -28,6 +28,14 @@ class Building extends SquareObject {
     }
 
     update(ctx, objects) {
+        if (CONSTS.BLOCKOUT) {
+            this.blockout(ctx);
+        } else {
+            this.drawRealGraphic(ctx);
+        }
+    }
+
+    blockout(ctx) {
         CTX.setTransform(1, 0, 0, 1, this.x, this.y); // set position of image center
 
         let centerX = this.width / 2;
@@ -39,8 +47,16 @@ class Building extends SquareObject {
         ctx.fillStyle = 'blue'; // Set the fill color
         CTX.drawRect(-centerX, -centerY, width, height); // Draw the rectangle
 
+        drawHpStripe(ctx, this.maxHp, this.hp,
+            - 0.5 * this.width, - 0.6 * this.height,
+            this.width, 5);
 
-        /*let image = ResourceManager.instance.getImageResource(this.#image);
+        CTX.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
+        CTX.restore();
+    }
+
+    drawRealGraphic(ctx) {
+        let image = ResourceManager.instance.getImageResource(this.#image);
 
         if (this == Selection.instance.currentSelection) {
             image = ResourceManager.instance.getImageResource(this.#imageSelected);
@@ -89,15 +105,9 @@ class Building extends SquareObject {
             ctx.closePath();
             ctx.globalAlpha = 1.0;
             this.hit -= 1;
-        }*/
-
-        drawHpStripe(ctx, this.maxHp, this.hp,
-            - 0.5 * this.width, - 0.6 * this.height,
-            this.width, 5);
-
-        CTX.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
-        CTX.restore();
+        }
     }
+
 
     notify(inputEvent) {
         if (inputEvent.type == MouseEventType.MOUSE_DOWN &&

@@ -39,8 +39,8 @@ module.exports = class Tower extends Building {
             this.#spawnPoint.x,
             this.#spawnPoint.y,
             new Vector2d(
-                CONSTS.BULLET_VELOCITY * Math.cos(this.#angle),
-                CONSTS.BULLET_VELOCITY * Math.sin(this.#angle)
+                CONSTS.BULLET.VELOCITY * Math.cos(this.#angle),
+                CONSTS.BULLET.VELOCITY * Math.sin(this.#angle)
             ),
             this,
             this.#bulletImage

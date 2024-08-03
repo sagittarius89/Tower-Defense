@@ -21,6 +21,10 @@ module.exports = class Soldier extends RoundObject {
     #currFrame;
     #kills;
     #bulletImage;
+    #movement;
+    #enemyAngle;
+    #movementAngle;
+    #lastActonCooldown;
 
     constructor(x, y, dronImage, bulletImage, owner) {
         let tmpImg = ResourceManager.instance.getImageResource(dronImage);
@@ -28,6 +32,9 @@ module.exports = class Soldier extends RoundObject {
 
         this.#image = dronImage;
         this.#angle = 0;
+        this.#enemyAngle = 0;
+        this.#movementAngle = 0;
+        this.#lastActonCooldown = 0;
 
         this.#velocity = CONSTS.SOLDIER_VELOCITY;
         this.#attackDistance = CONSTS.SOLDIER.ATTACK_DISTANCE;
@@ -37,7 +44,8 @@ module.exports = class Soldier extends RoundObject {
         this.#attackMode = false;
         this.#idle = false;
         this.#shotTimestamp = new Date().getTime();
-        ;
+        this.#movement = new Vector2d(0, 0);
+
         this.#imgWidth = tmpImg.width;
         this.#imgHeight = tmpImg.height;
         this.#currFrame = 0;
@@ -61,8 +69,13 @@ module.exports = class Soldier extends RoundObject {
         this.y = value.y;
     }
 
+    get movement() { return this.#movement; }
+    set movement(value) { this.#movement.x = value.x; this.#movement.y = value.y; }
+
     get kills() { return this.#kills; }
     set kills(value) { this.#kills = Number.parseInt(value); }
+
+    lastActonCooldownRestart() { this.#lastActonCooldown = 150; }
 
     update(ctx, objects) {
 
@@ -88,16 +101,22 @@ module.exports = class Soldier extends RoundObject {
         }
 
 
+        if (this.#lastActonCooldown > 0) {
+            this.#lastActonCooldown -= 1;
+        } else {
+            this.#movement = new Vector2d(0, 0);
+        }
+
         this.move();
     }
 
     doShot(objects) {
         let bullet = new Bullet(
-            this.x + (this.radius * Math.cos(this.#angle)),
-            this.y + (this.radius * Math.sin(this.#angle)),
+            this.x + (this.radius * Math.cos(this.#enemyAngle)),
+            this.y + (this.radius * Math.sin(this.#enemyAngle)),
             new Vector2d(
-                CONSTS.BULLET_VELOCITY * Math.cos(this.#angle),
-                CONSTS.BULLET_VELOCITY * Math.sin(this.#angle)
+                CONSTS.BULLET.VELOCITY * Math.cos(this.#enemyAngle),
+                CONSTS.BULLET.VELOCITY * Math.sin(this.#enemyAngle)
             ),
             this,
             this.#bulletImage
@@ -159,9 +178,12 @@ module.exports = class Soldier extends RoundObject {
     }
 
     move() {
-        if (!this.#idle && !this.#attackMode) {
-            this.x += this.#velocity * Math.cos(this.#angle);
-            this.y += this.#velocity * Math.sin(this.#angle);
+        if (this.#movement.x != 0 || this.#movement.y != 0) {
+            this.x += this.#velocity * Math.cos(this.#movementAngle);
+            this.y += this.#velocity * Math.sin(this.#movementAngle);
+        } else if (!this.#idle && !this.#attackMode) {
+            this.x += this.#velocity * Math.cos(this.#enemyAngle);
+            this.y += this.#velocity * Math.sin(this.#enemyAngle);
         }
     }
 
@@ -183,7 +205,16 @@ module.exports = class Soldier extends RoundObject {
 
         if (closestObj != null) {
 
+            let enemyDir = new Vector2d(closestObj.x - this.x, closestObj.y - this.y);
+            let absDir = enemyDir.add(this.#movement);
+
             this.#angle = Math.atan2(
+                absDir.y, absDir.x
+            );
+
+            this.#movementAngle = Math.atan2(this.#movement.y, this.#movement.x);
+
+            this.#enemyAngle = Math.atan2(
                 closestObj.y - this.y, closestObj.x - this.x
             );
 
@@ -229,6 +260,7 @@ module.exports = class Soldier extends RoundObject {
         dto.kills = this.#kills;
         dto.bulletImage = this.#bulletImage;
         dto.type = this.constructor.name;
+        dto.movement = this.#movement.toDTO();
 
         return dto;
     }
@@ -253,6 +285,5 @@ module.exports = class Soldier extends RoundObject {
 
     sync(dto) {
         super.sync(dto);
-
     }
 }

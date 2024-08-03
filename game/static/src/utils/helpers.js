@@ -24,6 +24,19 @@ function drawStrokedText(ctx, text, x, y, textSize = 29) {
     return CTX.trX(ctx.measureText(text).width);
 }
 
+function drawStrokedTextAbs(ctx, text, x, y, textSize = 29) {
+    ctx.font = `${textSize}px Menlo, monospace`;
+    ctx.fillStyle = 'white';
+    ctx.lineWidth = 1;
+
+    ctx.fillText(text, x, y);
+
+    ctx.strokeStyle = 'black';
+    ctx.strokeText(text, x, y);
+
+    return ctx.measureText(text).width;
+}
+
 function drawHpStripe(ctx, maxHp, cHp, x, y, width, height, showText = false) {
 
     if (cHp < 0)

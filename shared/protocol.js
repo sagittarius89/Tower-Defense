@@ -12,7 +12,8 @@ const MessageType = {
     ADD_BUILDING: 'add_building',
     INC_SPAWN_SPEED: 'inc_spawn_speed',
     UPDATE_POSITION: 'update_position',
-    SYNC_SCORE: 'sync_score'
+    SYNC_SCORE: 'sync_score',
+    MOVE_SOLDIER: 'move_soldier'
 }
 
 class Message {
@@ -113,7 +114,15 @@ class Message {
     static addBuilding(dto) {
         let msg = new Message(MessageType.ADD_BUILDING);
 
-        msg.set('obj', dto)
+        msg.set('obj', dto);
+
+        return msg;
+    }
+
+    static moveSoldier(id, pos) {
+        let msg = new Message(MessageType.MOVE_SOLDIER)
+        msg.set('id', id);
+        msg.set('movement', pos);
 
         return msg;
     }

@@ -28,14 +28,13 @@ class Hud extends GameObject {
     }
 
     drawSection(ctx, name, x, y, width, height) {
-
         ctx.beginPath();
         ctx.moveTo(x, y);
         ctx.lineTo(x + 10, y);
         ctx.stroke();
         ctx.closePath();
 
-        let txtWidth = drawStrokedText(ctx, name, x + 20, y + 4, 16);
+        let txtWidth = drawStrokedTextAbs(ctx, name, x + 20, y + 4, 12);
         let endPoint = width - (x + 10 + txtWidth);
 
         ctx.beginPath();
@@ -50,7 +49,7 @@ class Hud extends GameObject {
 
     update(ctx, objects) {
 
-        ctx.globalAlpha = 0.5;
+        /*ctx.globalAlpha = 0.5;
 
         if (GameContext.debug) {
             let text = `x: ${GameContext.inputManager.mousePosX}` +
@@ -97,6 +96,12 @@ class Hud extends GameObject {
         }
 
         ctx.globalAlpha = 1;
+
+        */
+
+        ctx.fillStyle = this.#grd;
+        this.drawSection(ctx, "menu", CTX.trX(1550), CTX.trY(1880), CTX.trX(740), CTX.trHeight(280));
+
 
         drawStrokedText(ctx, "Your Salvage: " + GameContext.getCurrentPlayer().score, 1000, 30, 30);
     }

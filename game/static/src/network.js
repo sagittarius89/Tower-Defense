@@ -113,6 +113,12 @@ class Network {
         }
     }
 
+    moveSoldier(id, pos) {
+        let msg = Message.moveSoldier(id, pos.toDTO());
+
+        this.send(msg);
+    }
+
     initGameContext(dtoList) {
         let cmdCntP1 = null;
         let cmdCntP2 = null;

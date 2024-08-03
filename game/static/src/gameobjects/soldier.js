@@ -1,3 +1,40 @@
+class MoveSoldier extends GameAction {
+    #soldier;
+    #lock;
+
+    constructor(callback, player, soldier) {
+        super(callback, player, soldier);
+        this.#soldier = soldier;
+        this.player = player;
+        this.#lock = true;
+    }
+
+    update(ctx, objects) {
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        CTX.moveTo(this.#soldier.x, this.#soldier.y);
+        ctx.lineTo(GameContext.inputManager.mousePosX, GameContext.inputManager.mousePosY);
+        ctx.stroke();
+        ctx.closePath();
+    }
+
+    mouseUp() {
+        super.stop();
+
+        let pos = new Vector2d(
+            GameContext.inputManager.mousePosX - CTX.trX(this.#soldier.x),
+            GameContext.inputManager.mousePosY - CTX.trY(this.#soldier.y)
+        );
+
+
+        Network.instance.moveSoldier(this.#soldier.id, pos);
+
+        console.log("Move soldier to: " + this.#soldier.movement.x + " " + this.#soldier.movement.y);
+    }
+}
+
+
 class Soldier extends RoundObject {
     #image;
     #velocity;
@@ -10,6 +47,9 @@ class Soldier extends RoundObject {
     #currFrame;
     #kills;
     #bulletImage;
+    #movement;
+    #enemyAngle;
+    #movementAngle;
 
     constructor(x, y, dronImage, bulletImage, owner) {
         let tmpImg = ResourceManager.instance.getImageResource(dronImage);
@@ -17,11 +57,14 @@ class Soldier extends RoundObject {
 
         this.#image = dronImage;
         this.#angle = 0;
+        this.#enemyAngle = 0;
+        this.#movementAngle = 0;
 
         this.#velocity = CONSTS.SOLDIER_VELOCITY;
         this.#attackDistance = CONSTS.SOLDIER.ATTACK_DISTANCE;
         this.hp = CONSTS.SOLDIER.HP;
         this.maxHp = CONSTS.SOLDIER.HP;
+        this.#movement = new Vector2d(0, 0);
         this.#attackMode = false;
         this.#idle = false;
         this.#imgWidth = tmpImg.width;
@@ -48,6 +91,8 @@ class Soldier extends RoundObject {
         this.x = value.x;
         this.y = value.y;
     }
+    set movement(value) { this.#movement = value; }
+    get movement() { return this.#movement; }
 
     get kills() { return this.#kills; }
     set kills(value) { this.#kills = Number.parseInt(value); }
@@ -77,7 +122,6 @@ class Soldier extends RoundObject {
             return true;
         }
 
-
         this.move();
     }
 
@@ -95,7 +139,6 @@ class Soldier extends RoundObject {
                     let myPos = new Vector2d(nextX, nextY);
 
                     var distance = myPos.getDistance(objPos);
-
                     if (distance <= this.radius + obj.radius) {
 
                         Collider.resolveIntersectionBallBall(this, obj);
@@ -125,6 +168,7 @@ class Soldier extends RoundObject {
                             this.#angle = angle2;
                     }
                 }
+
             });
         }
     }
@@ -134,42 +178,36 @@ class Soldier extends RoundObject {
     }
 
     move() {
-        if (!this.#idle && !this.#attackMode) {
-            this.x += this.#velocity * Math.cos(this.#angle);
-            this.y += this.#velocity * Math.sin(this.#angle);
+        if (this.#movement.x != 0 || this.#movement.y != 0) {
+            this.x += this.#velocity * Math.cos(this.#movementAngle);
+            this.y += this.#velocity * Math.sin(this.#movementAngle);
+        } else if (!this.#idle && !this.#attackMode) {
+            this.x += this.#velocity * Math.cos(this.#enemyAngle);
+            this.y += this.#velocity * Math.sin(this.#enemyAngle);
         }
     }
 
     draw(ctx, clostestEnemy) {
-        CTX.setTransform(1, 0, 0, 1, this.x, this.y);
-        drawStrokedText(ctx, `${Math.floor(CTX.trX(this.x))} ${Math.floor(CTX.trY(this.y))} ${Math.floor(this.#angle, 2)}`,
-            -this.radius / 2, -this.radius * 1.5, 10);
-
-        ctx.fillStyle = "red";
-        CTX.drawRect(-5, -5, 10, 10);
-
-        if (this.hp > 0)
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-
-        ctx.beginPath();
-        CTX.moveTo(0, 0, this.#angle);
-        CTX.lineTo(-this.radius / 2, -this.radius / 2, this.#angle);
-        CTX.lineTo(this.radius, 0, this.#angle);
-        CTX.lineTo(-this.radius / 2, this.radius / 2, this.#angle);
-        CTX.lineTo(0, 0, this.#angle);
-        ctx.stroke();
-        ctx.fill();
-
-        if (this.hp > 0) {
-            drawHpStripe(ctx, this.maxHp, this.hp,
-                -this.radius / 2,
-                -this.radius,
-                this.radius * 1.5, 10);
+        if (CONSTS.BLOCKOUT) {
+            this.blockout(ctx);
+        }
+        else {
+            this.drawRealGraphic(ctx);
         }
 
-        CTX.setTransform(1, 0, 0, 1, 0, 0);
+        if (CONSTS.debug && clostestEnemy) {
+            let randomColor = Math.floor(Math.random() * 16777215).toString(16);
 
-        /*ifctx.resetTransform();
+            ctx.strokeStyle = '#' + randomColor;
+            ctx.beginPath();
+            CTX.moveTo(this.x, this.y);
+            CTX.lineTo(clostestEnemy.x, clostestEnemy.y);
+            ctx.stroke();
+        }
+    }
+
+    drawRealGraphic(ctx) {
+        ctx.resetTransform();
         CTX.translate(this.x, this.y);
         CTX.setTransform(1, 0, 0, 1, this.x, this.y);
         let image = ResourceManager.instance.getImageResource(this.#image);
@@ -241,17 +279,48 @@ class Soldier extends RoundObject {
             ctx.closePath();
             ctx.globalAlpha = 1.0;
             this.hit -= 1;
-        }*/
-
-        if (clostestEnemy) {
-            let randomColor = Math.floor(Math.random() * 16777215).toString(16);
-
-            ctx.strokeStyle = '#' + randomColor;
-            ctx.beginPath();
-            CTX.moveTo(this.x, this.y);
-            CTX.lineTo(clostestEnemy.x, clostestEnemy.y);
-            ctx.stroke();
         }
+    }
+
+    blockout(ctx) {
+        CTX.setTransform(1, 0, 0, 1, this.x, this.y);
+        drawStrokedText(ctx, `${Math.floor(CTX.trX(this.x))} ${Math.floor(CTX.trY(this.y))} ${this.#angle}`,
+            -this.radius / 2, -this.radius * 1.5, 10);
+
+        ctx.fillStyle = "red";
+        CTX.drawRect(-5, -5, 10, 10);
+
+        if (this.hp > 0)
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+
+        ctx.beginPath();
+        CTX.moveTo(0, 0, this.#angle);
+        CTX.lineTo(-this.radius / 2, -this.radius / 2, this.#angle);
+        CTX.lineTo(this.radius, 0, this.#angle);
+        CTX.lineTo(-this.radius / 2, this.radius / 2, this.#angle);
+        CTX.lineTo(0, 0, this.#angle);
+        ctx.stroke();
+        ctx.fill();
+        ctx.closePath();
+
+
+        ctx.strokeStyle = 'rgba(0, 0, 1)';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        CTX.moveTo(0, 0);
+        CTX.lineTo(this.radius * 1.2, 0, this.#enemyAngle);
+        ctx.stroke();
+        ctx.closePath();
+        ctx.lineWidth = 1;
+
+        if (this.hp > 0) {
+            drawHpStripe(ctx, this.maxHp, this.hp,
+                -this.radius / 2,
+                -this.radius,
+                this.radius * 1.5, 10);
+        }
+
+        CTX.setTransform(1, 0, 0, 1, 0, 0);
     }
 
     findClostestEnemy(objects) {
@@ -272,7 +341,16 @@ class Soldier extends RoundObject {
 
         if (closestObj != null) {
 
+            let enemyDir = new Vector2d(closestObj.x - this.x, closestObj.y - this.y);
+            let absDir = enemyDir.add(this.#movement);
+
             this.#angle = Math.atan2(
+                absDir.y, absDir.x
+            );
+
+            this.#movementAngle = Math.atan2(this.#movement.y, this.#movement.x);
+
+            this.#enemyAngle = Math.atan2(
                 closestObj.y - this.y, closestObj.x - this.x
             );
 
@@ -288,13 +366,24 @@ class Soldier extends RoundObject {
         if (inputEvent.type == MouseEventType.MOUSE_DOWN &&
             Collider.checkCollisionPointWithSquare(
                 new Vector2d(inputEvent.x, inputEvent.y),
-                new Square(this.x - this.radius,
-                    this.y - this.radius,
-                    this.radius * 2, this.radius * 2))
+                new Square(
+                    CTX.trX(this.x - this.radius),
+                    CTX.trY(this.y - this.radius),
+                    CTX.trX(this.radius * 5),
+                    CTX.trHeight(this.radius * 5)))
         ) {
             console.log("uuid: " + this.id + " clicked");
 
-            Selection.instance.currentSelection = this;
+
+            let action = new MoveSoldier(() => {
+                console.log("Move soldier");
+            }, this.owner, this);
+
+
+            GameContext.engine.addObject(action);
+            GameContext.hud.currentAction = action;
+
+            //Selection.instance.currentSelection = this;
         }
     }
 
@@ -307,6 +396,7 @@ class Soldier extends RoundObject {
         dto.idle = this.#idle;
         dto.imgWidth = this.#imgWidth;
         dto.imgHeight = this.#imgHeight;
+        dto.movement = this.#movement.toDTO();
 
         dto.type = this.constructor.name;
         return dto;
@@ -333,6 +423,7 @@ class Soldier extends RoundObject {
         obj.#kills = dto.kills;
         obj.#image = dto.image;
         obj.#bulletImage = dto.bulletImage;
+        obj.#movement = Vector2d.fromDTO(dto.movement);
 
         return obj;
     }
@@ -344,10 +435,11 @@ class Soldier extends RoundObject {
         this.#attackDistance = dto.attackDistance;
         this.#angle = dto.angle;
         this.#attackMode = dto.attackMode;
-        this.#idle = dto.idle;
+        //this.#idle = dto.idle;
         this.#kills = dto.kills;
         this.#image = dto.image;
         this.#bulletImage = dto.bulletImage;
+        this.#movement = Vector2d.fromDTO(dto.movement);
 
     }
 }

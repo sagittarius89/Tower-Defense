@@ -39,9 +39,9 @@ module.exports = class RoundObject extends GameObject {
     }
 
     sync(dto) {
-        super.sync(dto)
+        super.sync(dto);
 
-        this.#pos = Vector2d.fromDTO(dto.pos);
-        this.#radius = dto.radius;
+        //this.#pos = Vector2d.fromDTO(dto.pos);
+        //this.#radius = dto.radius;
     }
 }

@@ -7,9 +7,14 @@ class Bullet extends RoundObject {
     #imgHeight;
 
     constructor(x, y, vector, parent, image) {
-        super(5, x, y);
-
         let tmpImg = ResourceManager.instance.getImageResource(image);
+
+        if (CONSTS.BLOCKOUT) {
+            super(CONSTS.BULLET.RADIUS, x, y);
+        } else {
+            super(tmpImg.width, x, y);
+        }
+
 
         this.#image = image;
         this.#imgWidth = tmpImg.width;
@@ -23,6 +28,35 @@ class Bullet extends RoundObject {
     }
 
     update(ctx, objects) {
+        if (CONSTS.BLOCKOUT) {
+            this.blockout(ctx);
+        } else {
+            this.realGraphic(ctx);
+        }
+    }
+
+    blockout(ctx) {
+        CTX.setTransform(1, 0, 0, 1, this.x, this.y);
+
+        ctx.fillStyle = 'blue';
+
+        ctx.beginPath();
+        CTX.ellipse(
+            this.radius / 2,
+            this.radius / 2,
+            this.radius,
+            this.radius,
+            0,
+            0,
+            2 * Math.PI);
+        ctx.fill();
+        ctx.fill();
+        ctx.stroke();
+
+        CTX.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
+    }
+
+    realGraphic(ctx) {
         let image = ResourceManager.instance.getImageResource(this.#image);
 
         ctx.setTransform(1, 0, 0, 1, this.x, this.y);
@@ -45,7 +79,6 @@ class Bullet extends RoundObject {
             this.#currFrame = 0;
 
         ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
-        ctx.restore();
     }
 
 

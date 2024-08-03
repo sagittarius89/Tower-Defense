@@ -6,6 +6,7 @@ const Tower = require('./gameobjects/towerbuilding');
 const BlackHole = require('./gameobjects/blackholebuilding');
 const CONSTS = require('../shared/consts').CONSTS;
 const PlayerProperties = require('../shared/playerproperties');
+const Vector2d = require('../game/static/src/math/vector').Vector2d;
 
 
 class GameServer {
@@ -41,9 +42,22 @@ class GameServer {
             case MessageType.INC_SPAWN_SPEED:
                 this.processIncSpawnSpeed(msg);
                 break;
+            case MessageType.MOVE_SOLDIER:
+                this.processMoveSoldier(msg);
+                break;
             default:
                 this.send(connection, Message.error('uknow message type'));
         }
+    }
+
+    processMoveSoldier(msg) {
+        let id = msg.get('id');
+        let pos = msg.get('movement');
+        let soldier = this.#gameContext.engine.objects.byId(id);
+
+        soldier.movement = new Vector2d(pos.x, pos.y);
+        soldier.lastActonCooldownRestart();
+        soldier.idle = false;
     }
 
     processAddBuilding(msg) {
