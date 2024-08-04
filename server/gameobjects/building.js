@@ -1,5 +1,6 @@
 const SquareObject = require('./squareobject');
 const ResourceManager = require('../resourcemanager').ResourceManager;
+const CONSTS = require('../../shared/consts').CONSTS;
 
 module.exports = class Building extends SquareObject {
     #image;
@@ -8,10 +9,8 @@ module.exports = class Building extends SquareObject {
 
     static ACTIONS_PROPERY = "ACTIONS_PROPERY";
 
-    constructor(name, nameSelected, x, y) {
-        let tmpImg = ResourceManager.instance.getImageResource(name);
-
-        super(tmpImg.width, tmpImg.height, x, y);
+    constructor(name, nameSelected, x, y, width, height) {
+        super(width, height, x, y);
 
         this.#image = name;
         this.#imageSelected = nameSelected;

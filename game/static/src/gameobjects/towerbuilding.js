@@ -12,17 +12,18 @@ class Tower extends Building {
     set kills(value) { this.#kills = Number.parseInt(value); }
 
     constructor(pos, spawnPoint, image, imageSelected, bulletImage) {
-        super(image, imageSelected, pos.x, pos.y);
+        super(CONSTS.TOWER.RADIUS, CONSTS.TOWER.RADIUS, pos.x, pos.y, 'blue');
 
         this.#spawnPoint = spawnPoint;
         this.#bulletImage = bulletImage;
-        this.#attackDistance = CONSTS.TOWER_ATTACK_DISTANCE;
-        this.hp = CONSTS.TOWER_HP;
-        this.maxHp = CONSTS.TOWER_HP;
-        this.#shotFrequency = CONSTS.TOWER_SHOT_FREQUENCY;
+        this.#attackDistance = CONSTS.TOWER.ATTACK_DISTANCE;
+        this.hp = CONSTS.TOWER.HP;
+        this.maxHp = CONSTS.TOWER.HP;
+        this.#shotFrequency = CONSTS.TOWER.SHOT_FREQUENCY;
         this.#attackMode = false;
         this.idle = false;
         this.#shotTimestamp = new Date().getTime();
+        this.#angle = 0;
 
         this.selectable = true;
         this.name = "Impulse Tower";
@@ -70,8 +71,56 @@ class Tower extends Building {
     }
 
     update(ctx, objects) {
-        super.update(ctx, objects);
+        if (CONSTS.BLOCKOUT) {
+            this.blockout(ctx, objects);
+        } else {
+            super.update(ctx, objects);
+        }
     }
+
+    blockout(ctx, objects) {
+
+
+        if (this.hp > 0)
+            ctx.fillStyle = 'lightgreen';
+
+        ctx.beginPath();
+        ctx.ellipse(CTX.trX(this.x), CTX.trY(this.y), CTX.trX(this.width), CTX.trHeight(this.height), 0, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(0, 0, 1)';
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        CTX.setTransform(1, 0, 0, 1, this.x, this.y); // set position of image center
+
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        CTX.moveTo(0, 0);
+        CTX.lineTo(this.width * 1.2, 0, this.#angle);
+        ctx.stroke();
+        ctx.closePath();
+        ctx.lineWidth = 1;
+
+        ctx.fillStyle = "red";
+        CTX.drawRect(-5, -5, 10, 10);
+
+
+        if (this.hp > 0) {
+            drawHpStripe(ctx, this.maxHp, this.hp,
+                -this.width / 2,
+                -this.height * 1.2,
+                this.width * 1.5, 10);
+        }
+
+        drawStrokedTextAbs(ctx,
+            `${Math.floor(CTX.trX(this.x))} ${Math.floor(CTX.trY(this.y))} ${this.#angle}`,
+            -CTX.trX(this.width) / 2, -CTX.trHeight(this.height) * 1.5, 10);
+
+        CTX.setTransform(1, 0, 0, 1, 0, 0);
+
+
+    }
+
 
     logic(objects) {
 

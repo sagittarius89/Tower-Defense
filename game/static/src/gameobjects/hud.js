@@ -102,8 +102,21 @@ class Hud extends GameObject {
         ctx.fillStyle = this.#grd;
         this.drawSection(ctx, "menu", CTX.trX(1550), CTX.trY(1880), CTX.trX(740), CTX.trHeight(280));
 
+        let sel = Selection.instance.currentSelection;
+        if (sel) {
+            let actionsList = sel.getProperty(Building.ACTIONS_PROPERY);
+            if (actionsList) {
+                actionsList.forEach(element => {
+                    ctx.globalAlpha = 1;
+                    element.draw(ctx);
+                    ctx.globalAlpha = 0.5;
+                });
+            }
+        }
+        ctx.globalAlpha = 1;
 
-        drawStrokedText(ctx, "Your Salvage: " + GameContext.getCurrentPlayer().score, 1000, 30, 30);
+
+
     }
 
     notify(inputEvent) {

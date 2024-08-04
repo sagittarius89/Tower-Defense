@@ -55,9 +55,11 @@ class GameServer {
         let pos = msg.get('movement');
         let soldier = this.#gameContext.engine.objects.byId(id);
 
-        soldier.movement = new Vector2d(pos.x, pos.y);
-        soldier.lastActonCooldownRestart();
-        soldier.idle = false;
+        if (soldier) {
+            soldier.movement = new Vector2d(pos.x, pos.y);
+            soldier.lastActonCooldownRestart();
+            soldier.idle = false;
+        }
     }
 
     processAddBuilding(msg) {
@@ -66,7 +68,7 @@ class GameServer {
         switch (dto.type) {
             case Tower.name: {
                 obj = Tower.fromDTO(dto);
-                this.addScore(obj.owner, -CONSTS.TOWER_COST);
+                this.addScore(obj.owner, -CONSTS.TOWER.COST);
                 break;
             }
             case BlackHole.name: {
@@ -132,7 +134,7 @@ class GameServer {
             this.#gameContext.engine.endGame(false, true);
         }
 
-        //this.#gameContext.engine.stop();
+        this.#gameContext.engine.stop();
     }
 
     playerProp(player) {

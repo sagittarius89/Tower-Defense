@@ -29,8 +29,8 @@ class CreateTower extends GameAction {
 
         ctx.drawImage(
             image,
-            -image.width / 2,
-            -image.height / 2);
+            -CONSTS.TOWER.RADIUS / 2,
+            -CONSTS.TOWER.RADIUS / 2);
 
         ctx.globalAlpha = 0.1;
 
@@ -41,7 +41,7 @@ class CreateTower extends GameAction {
         }
 
         ctx.beginPath();
-        ctx.arc(0, 0, CONSTS.TOWER_ATTACK_DISTANCE, 0, 2 * Math.PI);
+        ctx.arc(0, 0, CONSTS.TOWER.ATTACK_DISTANCE, 0, 2 * Math.PI);
         ctx.fill();
         ctx.closePath();
         ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -57,10 +57,12 @@ class CreateTower extends GameAction {
 
         if (!this.lock) {
             let tower = new Tower(
-                new Vector2d(GameContext.inputManager.mousePosX,
-                    GameContext.inputManager.mousePosY),
-                new Vector2d(GameContext.inputManager.mousePosX,
-                    GameContext.inputManager.mousePosY),
+                new Vector2d(
+                    CTX.trAbsX(GameContext.inputManager.mousePosX),
+                    CTX.trAbsY(GameContext.inputManager.mousePosY)),
+                new Vector2d(
+                    CTX.trAbsX(GameContext.inputManager.mousePosX),
+                    CTX.trAbsY(GameContext.inputManager.mousePosY)),
                 this.#towerImage,
                 this.#towerImageSelected,
                 this.#bulletImage
@@ -142,7 +144,7 @@ class CreateBlackHoleAction extends GameAction {
         }
 
         ctx.beginPath();
-        ctx.arc(0, 0, CONSTS.TOWER_ATTACK_DISTANCE, 0, 2 * Math.PI);
+        ctx.arc(0, 0, CONSTS.TOWER.ATTACK_DISTANCE, 0, 2 * Math.PI);
         ctx.fill();
         ctx.closePath();
         ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -239,8 +241,8 @@ class CommandCenterBuilding extends Building {
                     Network.instance.addBuilding(dto);
                     console.log('addBuilding');
                 }],
-                420, 750, 50, 50, "turret_violet_01", CONSTS.TOWER_COOLDOWN,
-                CONSTS.TOWER_COST, true, player
+                1570, 1900, 200, 200, "turret_violet_01", CONSTS.TOWER.COOLDOWN,
+                CONSTS.TOWER.COST, true, player
             );
 
             let incSpawnSpeed = new Button(
@@ -248,7 +250,7 @@ class CommandCenterBuilding extends Building {
                 [this.owner, function (owner) {
                     Network.instance.incSpawnSpeed(owner);
                     console.log('incSpawnSpeed');
-                }], 480, 750, 50, 50, 'inc_spawn_speed', CONSTS.UPGRADE_SPAWN_SPEED_COOLDOWN,
+                }], 1790, 1900, 200, 200, 'inc_spawn_speed', CONSTS.UPGRADE_SPAWN_SPEED_COOLDOWN,
                 CONSTS.UPGRADE_SPAWN_SPEED_COST, true, player
             );
 
@@ -262,11 +264,13 @@ class CommandCenterBuilding extends Building {
 
                     console.log('addBuilding');
                 }],
-                540, 750, 50, 50, "black_holeoviolet", CONSTS.TOWER_COOLDOWN,
+                2010, 1900, 200, 200, "black_holeoviolet", CONSTS.TOWER.COOLDOWN,
                 CONSTS.BLACK_HOLE_COST, true, player
             );
 
             actionsList.push(towerAction, incSpawnSpeed, holeAction);
+
+            Selection.instance.currentSelection = this;
         }
 
 

@@ -158,6 +158,7 @@ class GameEngine {
 
         // Draw mouse position at (0, 0)
         drawStrokedText(ctx, `Mouse: (${GameContext.inputManager.mousePosX}, ${GameContext.inputManager.mousePosY})`, 150, 150, 15);
+        drawStrokedText(ctx, `Mouse: (${CTX.trAbsX(GameContext.inputManager.mousePosX)}, ${CTX.trAbsY(GameContext.inputManager.mousePosY)})`, 150, 200, 15);
     }
 
     updateSingleFrame() {

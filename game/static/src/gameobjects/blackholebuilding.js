@@ -6,8 +6,8 @@ class BlackHole extends Building {
 
         this.#sibling = sibling;
 
-        this.hp = CONSTS.TOWER_HP;
-        this.maxHp = CONSTS.TOWER_HP;
+        this.hp = CONSTS.TOWER.HP;
+        this.maxHp = CONSTS.TOWER.HP;
 
         this.selectable = true;
         this.name = "Black Hole";

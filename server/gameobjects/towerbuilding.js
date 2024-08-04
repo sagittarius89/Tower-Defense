@@ -17,14 +17,14 @@ module.exports = class Tower extends Building {
     set kills(value) { this.#kills = Number.parseInt(value); }
 
     constructor(pos, spawnPoint, image, imageSelected, bulletImage) {
-        super(image, imageSelected, pos.x, pos.y);
+        super(image, imageSelected, pos.x, pos.y, CONSTS.TOWER.RADIUS, CONSTS.TOWER.RADIUS);
 
         this.#spawnPoint = spawnPoint;
         this.#bulletImage = bulletImage;
-        this.#attackDistance = CONSTS.TOWER_ATTACK_DISTANCE;
-        this.hp = CONSTS.TOWER_HP;
-        this.maxHp = CONSTS.TOWER_HP;
-        this.#shotFrequency = CONSTS.TOWER_SHOT_FREQUENCY;
+        this.#attackDistance = CONSTS.TOWER.ATTACK_DISTANCE;
+        this.hp = CONSTS.TOWER.HP;
+        this.maxHp = CONSTS.TOWER.HP;
+        this.#shotFrequency = CONSTS.TOWER.SHOT_FREQUENCY;
         this.#attackMode = false;
         this.idle = false;
         this.#shotTimestamp = new Date().getTime();
@@ -102,7 +102,6 @@ module.exports = class Tower extends Building {
             (now.getTime() - this.#shotTimestamp
                 > this.#shotFrequency)
         ) {
-
             this.doShot(objects);
 
             this.#shotTimestamp = new Date().getTime();
@@ -149,7 +148,7 @@ module.exports = class Tower extends Building {
     sync(dto) {
         super.sync(dto);
 
-        this.#angle = dto.angle;
-        this.#kills = dto.kills;
+        //this.#angle = dto.angle;
+        //this.#kills = dto.kills;
     }
 }

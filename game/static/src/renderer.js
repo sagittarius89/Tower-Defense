@@ -75,6 +75,14 @@ class GraphicsContextWrapper {
         return this.#y + (y / GraphicsContextWrapper.HEIGHT) * this.#realHeight;
     }
 
+    trAbsX(x) {
+        return (x / this.#realWidth) * GraphicsContextWrapper.WIDTH;
+    }
+
+    trAbsY(y) {
+        return (y - this.#y) * (GraphicsContextWrapper.HEIGHT / this.#realHeight);
+    }
+
     moveTo(x, y, angle) {
 
         if (!angle) {

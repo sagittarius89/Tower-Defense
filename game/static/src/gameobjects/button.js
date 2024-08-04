@@ -36,48 +36,53 @@ class Button extends SquareObject {
         let now = new Date().getTime();
         let diff = now - this.#lastUse;
 
-        ctx.setTransform(1, 0, 0, 1, this.x, this.y);
+        ctx.setTransform(1, 0, 0, 1, CTX.trX(this.x), CTX.trY(this.y));
 
         ctx.drawImage(
             this.#icon,
-            -this.width / 2,
-            -this.height / 2,
-            this.width,
-            this.height
+            -CTX.trX(this.width) / 2,
+            -CTX.trHeight(this.height) / 2,
+            CTX.trX(this.width),
+            CTX.trHeight(this.height)
         );
 
         if (diff < this.#cooldown * 1000) {
             this.#locked = true;
 
             let timeLast = Number.parseInt(this.#cooldown - (diff / 1000));
-            let txtW = mesaureStrokedText(ctx, timeLast, 30);
-            let wStart = (this.width - txtW) / 2;
+            let txtW = mesaureStrokedText(ctx, timeLast, 22);
+            let wStart = (CTX.trX(this.width) - txtW) / 2;
 
             drawStrokedText(ctx, timeLast,
-                (-this.width / 2) + wStart,
-                (-this.height / 2) + this.height * 0.7, 30);
+                CTX.trX(-this.width / 2) + wStart,
+                CTX.trHeight(-this.height / 2 + this.height * 0.7), 22);
         } else {
             this.#locked = false;
-            if (!Collider.checkCollisionPointWithSquare(
+            /*if (!Collider.checkCollisionPointWithSquare(
                 new Vector2d(GameContext.inputManager.mousePosX,
                     GameContext.inputManager.mousePosY),
-                this.toSquare())
+                new Vector2d(CTX.trX(this.toSquare().x), CTX.trY(this.toSquare().y)))
             ) {
-                ctx.fillStyle = 'rgb(0,0,0,0.25)';
-                CTX.drawRect(-this.width / 2, -this.height / 2,
-                    this.width, this.height);
-            }
 
-            let txtW = mesaureStrokedText(ctx, this.#cost, 30);
-            let wStart = (this.width - txtW) / 2;
+            }*/
 
-            drawStrokedText(ctx, this.#cost,
-                (-this.width / 2) + wStart,
-                (-this.height / 2) + this.height * 0.7, 30);
+            ctx.fillStyle = 'rgb(0,0,0,0.25)';
+            ctx.fillRect(
+                -CTX.trX(this.width) / 2,
+                -CTX.trHeight(this.height) / 2,
+                CTX.trX(this.width),
+                CTX.trHeight(this.height)
+            );
+
+            let txtW = mesaureStrokedText(ctx, this.#cost, 22);
+            let wStart = (CTX.trX(this.width) - txtW) / 2;
+
+            drawStrokedTextAbs(ctx, this.#cost,
+                CTX.trX(-this.width / 2) + wStart,
+                CTX.trHeight(-this.height / 2 + this.height * 0.7), 22);
         }
 
-        ctx.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
-        ctx.restore();
+        CTX.setTransform(1, 0, 0, 1, 0, 0); // restore default transform
     }
 
     notify(inputEvent) {
@@ -86,7 +91,11 @@ class Button extends SquareObject {
             inputEvent.type == MouseEventType.MOUSE_DOWN &&
             Collider.checkCollisionPointWithSquare(
                 new Vector2d(inputEvent.x, inputEvent.y),
-                this.toSquare())
+                new Square(
+                    CTX.trX(this.x),
+                    CTX.trY(this.y),
+                    CTX.trX(this.width),
+                    CTX.trHeight(this.height)))
         ) {
             let args = this.#args.map(x => x);
 

@@ -31,10 +31,10 @@ class GameAction extends GameObject {
     findClostestBuilding(objects) {
         this.#buildingList = [];
 
-        if (GameContext.inputManager.mousePosY + 65 > GameContext.hud.Y) {
-            this.#lock = true;
-            return;
-        }
+        //if (GameContext.inputManager.mousePosY + 65 > GameContext.hud.Y) {
+        //    this.#lock = true;
+        //    return;
+        //}
 
         let hasBuilding = false;
         objects.foreach((obj) => {
@@ -45,11 +45,13 @@ class GameAction extends GameObject {
                     this.#buildingList.push(obj);
 
                     let objPos = new Vector2d(obj.x, obj.y);
-                    let myPos = new Vector2d(GameContext.inputManager.mousePosX,
-                        GameContext.inputManager.mousePosY);
+                    let myPos = new Vector2d(
+                        CTX.trAbsX(GameContext.inputManager.mousePosX),
+                        CTX.trAbsY(GameContext.inputManager.mousePosY)
+                    );
                     var distance = myPos.getDistance(objPos);
 
-                    hasBuilding = distance < CONSTS.TOWER_BUILDING_DISTANCE || hasBuilding;
+                    hasBuilding = distance < CONSTS.TOWER.BUILDING_DISTANCE || hasBuilding;
                 }
             }
         });
@@ -61,19 +63,17 @@ class GameAction extends GameObject {
         this.#buildingList.forEach(b => {
             let objPos = new Vector2d(b.x, b.y);
 
-            ctx.setTransform(1, 0, 0, 1,
-                objPos.x,
-                objPos.y);
+
             ctx.fillStyle = 'yellow';
 
             ctx.beginPath();
-            ctx.arc(0, 0, CONSTS.TOWER_BUILDING_DISTANCE, 0, 2 * Math.PI);
+            ctx.arc(
+                CTX.trX(objPos.x),
+                CTX.trY(objPos.y),
+                CTX.trX(CONSTS.TOWER.BUILDING_DISTANCE), 0, 2 * Math.PI);
 
             ctx.fill();
             ctx.closePath();
-
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.restore();
         });
     }
 
