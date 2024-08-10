@@ -2,6 +2,7 @@ const GameEngine = require('./serverengine');
 const World = require('./gameobjects/world');
 const CommandCenterBuilding = require('./gameobjects/commandcenterbuilding');
 const Vector2d = require('../game/static/src/math/vector').Vector2d;
+const AStarPathFinder = require('../shared/astarpathfinder').AStarPathFinder;
 const CONSTS = require('../shared/consts').CONSTS;
 
 
@@ -16,6 +17,8 @@ module.exports = class GameContext {
 
         this.engine.background = new World('bg_03');
         this.engine.addObject(this.engine.background);
+        this.engine.aStrPthFnd = new AStarPathFinder(CONSTS.GFX.WIDTH,
+            CONSTS.GFX.HEIGHT, CONSTS.GFX.TILE_SIZE);
 
 
         let buildingA = new CommandCenterBuilding(

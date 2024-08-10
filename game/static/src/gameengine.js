@@ -167,12 +167,28 @@ class GameEngine {
         }.bind(this));
     }
 
+    updateAStarMap() {
+        this.aStrPthFnd.refreshMap(this.#objects);
+
+        setTimeout(function () {
+            this.updateAStarMap();
+        }.bind(this), 500);
+    }
+
     start() {
         this.continue = true;
 
         window.requestAnimationFrame(function () {
             this.update(this.#ctx, this.#objects);
         }.bind(this));
+
+        setTimeout(function () {
+            this.update(this.#ctx, this.#objects);
+        }.bind(this), 17);
+
+        setTimeout(function () {
+            this.updateAStarMap();
+        }.bind(this), 500);
     }
 
     stop() {

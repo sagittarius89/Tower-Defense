@@ -1,8 +1,8 @@
 class GraphicsContextWrapper {
     // Constants
-    static ASPECT_RATIO = 16 / 9;
-    static WIDTH = 3840;
-    static HEIGHT = 2160;
+    static ASPECT_RATIO = CONSTS.GFX.ASPECT_RATIO;
+    static WIDTH = CONSTS.GFX.ABS_WIDTH;
+    static HEIGHT = CONSTS.GFX.ABS_HEIGHT;
 
     // Private fields
     #ctx;

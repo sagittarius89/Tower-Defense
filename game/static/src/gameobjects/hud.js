@@ -47,6 +47,23 @@ class Hud extends GameObject {
         ctx.closePath();
     }
 
+
+    renderAStarMap(ctx, map) {
+        let cellSize = 20;
+
+        let absX = 31;
+        let absY = 1600;
+
+        for (let node of map) {
+            ctx.fillStyle = node.walkable ? '#ffffff' : '#333333'; // Biały dla wolnych, szary dla przeszkód
+            CTX.drawRect(
+                absX + node.x * cellSize,
+                absY + node.y * cellSize,
+                cellSize,
+                cellSize);
+        }
+    }
+
     update(ctx, objects) {
 
         /*ctx.globalAlpha = 0.5;
@@ -117,6 +134,9 @@ class Hud extends GameObject {
 
         drawStrokedText(ctx, "Your Salvage: " + GameContext.getCurrentPlayer().score, 2348, 2016, 20);
 
+        if (CONSTS.DEBUG) {
+            this.renderAStarMap(ctx, GameContext.engine.aStrPthFnd.map);
+        }
     }
 
     notify(inputEvent) {

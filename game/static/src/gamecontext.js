@@ -20,6 +20,8 @@ var createGameContext = (async function (
         this.mouseInput);
 
     this.engine.addObject(this.inputManager);
+    this.engine.aStrPthFnd = new AStarPathFinder(GraphicsContextWrapper.WIDTH,
+        GraphicsContextWrapper.HEIGHT, CONSTS.GFX.TILE_SIZE);
 
     //Command Centers
     buildingA.addProperty(InputManager.INPUT_LISTENER_PROPERTY, this.player1);

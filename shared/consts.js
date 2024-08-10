@@ -1,7 +1,12 @@
 var CONSTS = {
     BLOCKOUT: true,
     DEBUG: true,
-
+    GFX: {
+        ASPECT_RATIO: 16 / 9,
+        ABS_WIDTH: 3840,
+        ABS_HEIGHT: 2160,
+        TILE_SIZE: 80,
+    },
     BULLET: {
         VELOCITY: 7,
         RADIUS: 7,
