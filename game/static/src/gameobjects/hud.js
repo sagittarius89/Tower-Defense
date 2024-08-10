@@ -115,7 +115,7 @@ class Hud extends GameObject {
         }
         ctx.globalAlpha = 1;
 
-
+        drawStrokedText(ctx, "Your Salvage: " + GameContext.getCurrentPlayer().score, 2348, 2016, 20);
 
     }
 

@@ -12,7 +12,7 @@ var CONSTS = {
         ATTACK_DISTANCE: 460,
         SHOT_FREQUENCY: 1000,
         HP: 30,
-        SOLDIER_SALVAGE: 10,
+        SALVAGE: 10,
 
     },
     TOWER: {
@@ -22,7 +22,7 @@ var CONSTS = {
         HP: 200,
         COST: 60,
         BUILDING_DISTANCE: 800,
-        TOWE_SALVAGE: 30,
+        SALVAGE: 30,
         RADIUS: 100,
     },
     COMMAND_CENTER: {
