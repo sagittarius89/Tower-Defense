@@ -50,6 +50,7 @@ class Soldier extends RoundObject {
     #movement;
     #enemyAngle;
     #movementAngle;
+    #path;
 
     constructor(x, y, dronImage, bulletImage, owner) {
         let tmpImg = ResourceManager.instance.getImageResource(dronImage);
@@ -59,6 +60,7 @@ class Soldier extends RoundObject {
         this.#angle = 0;
         this.#enemyAngle = 0;
         this.#movementAngle = 0;
+        this.#path = [];
 
         this.#velocity = CONSTS.SOLDIER_VELOCITY;
         this.#attackDistance = CONSTS.SOLDIER.ATTACK_DISTANCE;
@@ -104,7 +106,6 @@ class Soldier extends RoundObject {
     }
 
     logic(objects) {
-
         let enemy = this.findClostestEnemy(objects);
 
         if (!this.#attackMode && !this.#idle)
@@ -321,6 +322,27 @@ class Soldier extends RoundObject {
         }
 
         CTX.setTransform(1, 0, 0, 1, 0, 0);
+
+        if (CONSTS.DEBUG) {
+
+
+            ctx.beginPath();
+            CTX.moveTo(this.pos.x, this.pos.y);
+            ctx.fillStyle = 'red';
+            this.#path.forEach((point) => {
+                CTX.lineTo(
+                    GameContext.engine.aStrPthFnd.trX(point.x),
+                    GameContext.engine.aStrPthFnd.trY(point.y)
+                );
+                CTX.drawRect(
+                    GameContext.engine.aStrPthFnd.trX(point.x),
+                    GameContext.engine.aStrPthFnd.trY(point.y),
+                    5, 5);
+            });
+            ctx.strokeStyle = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+            ctx.stroke();
+            ctx.closePath();
+        }
     }
 
     findClostestEnemy(objects) {
@@ -348,11 +370,27 @@ class Soldier extends RoundObject {
                 absDir.y, absDir.x
             );
 
+            let nextStepX1 = closestObj.x;
+            let nextStepY1 = closestObj.y;
+            let nextStepX2 = this.x;
+            let nextStepY2 = this.y;
+
+            if (this.#path.length > 1) {
+                nextStepX1 = GameContext.engine.aStrPthFnd.trX(this.#path[0].x);
+                nextStepY1 = GameContext.engine.aStrPthFnd.trY(this.#path[0].y);
+                nextStepX2 = GameContext.engine.aStrPthFnd.trX(this.#path[1].x);
+                nextStepY2 = GameContext.engine.aStrPthFnd.trY(this.#path[1].y);
+            }
+
+            this.#enemyAngle = Math.atan(
+                (nextStepY2 - nextStepY1) / (nextStepX2 - nextStepX1)
+            );
+
             this.#movementAngle = Math.atan2(this.#movement.y, this.#movement.x);
 
-            this.#enemyAngle = Math.atan2(
-                closestObj.y - this.y, closestObj.x - this.x
-            );
+            //this.#enemyAngle = Math.atan2(
+            //    closestObj.y - this.y, closestObj.x - this.x
+            //);
 
             this.#attackMode = this.#attackDistance > distance;
         } else {
@@ -424,6 +462,7 @@ class Soldier extends RoundObject {
         obj.#image = dto.image;
         obj.#bulletImage = dto.bulletImage;
         obj.#movement = Vector2d.fromDTO(dto.movement);
+        obj.#path = dto.path;
 
         return obj;
     }
@@ -440,6 +479,7 @@ class Soldier extends RoundObject {
         this.#image = dto.image;
         this.#bulletImage = dto.bulletImage;
         this.#movement = Vector2d.fromDTO(dto.movement);
+        this.#path = dto.path;
 
     }
 }

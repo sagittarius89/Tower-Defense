@@ -172,7 +172,7 @@ class GameEngine {
 
         setTimeout(function () {
             this.updateAStarMap();
-        }.bind(this), 500);
+        }.bind(this), 100);
     }
 
     start() {
@@ -188,7 +188,7 @@ class GameEngine {
 
         setTimeout(function () {
             this.updateAStarMap();
-        }.bind(this), 500);
+        }.bind(this), 16);
     }
 
     stop() {

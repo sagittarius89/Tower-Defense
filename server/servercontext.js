@@ -17,8 +17,8 @@ module.exports = class GameContext {
 
         this.engine.background = new World('bg_03');
         this.engine.addObject(this.engine.background);
-        this.engine.aStrPthFnd = new AStarPathFinder(CONSTS.GFX.WIDTH,
-            CONSTS.GFX.HEIGHT, CONSTS.GFX.TILE_SIZE);
+        this.engine.aStrPthFnd = new AStarPathFinder(CONSTS.GFX.ABS_WIDTH,
+            CONSTS.GFX.ABS_HEIGHT, CONSTS.GFX.TILE_SIZE);
 
 
         let buildingA = new CommandCenterBuilding(

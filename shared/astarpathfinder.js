@@ -1,5 +1,16 @@
-require('../server/gameobjects/squareobject');
-require('../server/gameobjects/roundobject');
+var SquareObjectR = require('../server/gameobjects/squareobject');
+var RoundObjectR = require('../server/gameobjects/roundobject');
+var SoldierR = require('../server/gameobjects/soldier');
+var BuildingR = require('../server/gameobjects/building');
+const { PerformanceObserver, performance } = require('perf_hooks');
+
+// if we are in nodejs environment do a override
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    Soldier = SoldierR;
+    Building = BuildingR;
+    SquareObject = SquareObjectR;
+    RoundObject = RoundObjectR;
+}
 
 class Node {
     constructor(x, y, walkable = true) {
@@ -36,6 +47,14 @@ class AStarPathFinder {
 
     get map() { return this.#map; }
 
+    trX(x) {
+        return x * this.#density;
+    }
+
+    trY(y) {
+        return y * this.#density;
+    }
+
     heurictic(a, b) {
         // heurictic Manhattan
         return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
@@ -51,7 +70,7 @@ class AStarPathFinder {
 
     getTile(x, y) {
         let tx = Math.floor(x / this.#density);
-        let tY = Math.floor(y / this.#density);
+        let ty = Math.floor(y / this.#density);
         return this.#map[tx + (ty * this.#x)];
     }
 
@@ -108,6 +127,15 @@ class AStarPathFinder {
     zeroMap() {
         for (let i = 0; i < this.#map.length; i++) {
             this.#map[i].walkable = true;
+            this.#map[i].g = this.#map[i].h = this.#map[i].f = 0;
+            this.#map[i].parent = null;
+        }
+    }
+
+    cleanupWages() {
+        for (let i = 0; i < this.#map.length; i++) {
+            this.#map[i].g = this.#map[i].h = this.#map[i].f = 0;
+            this.#map[i].parent = null;
         }
     }
 
@@ -118,11 +146,13 @@ class AStarPathFinder {
             if (obj instanceof Soldier || obj instanceof Building) {
                 if (obj instanceof SquareObject) {
                     this.getOccupiedTilesBySquare(obj.x, obj.y, obj.width, obj.height).forEach(tile => {
-                        tile.walkable = false;
+                        if (tile)
+                            tile.walkable = false;
                     });
                 } else if (obj instanceof RoundObject) {
                     this.getOccupiedTilesForCircle(obj.x, obj.y, obj.radius).forEach(tile => {
-                        tile.walkable = false;
+                        if (tile)
+                            tile.walkable = false;
                     });
                 }
             }
@@ -150,7 +180,29 @@ class AStarPathFinder {
         return neighbors;
     }
 
-    aStar(startNode, goalNode) {
+    printMap() {
+        let str = "";
+        for (let y = 0; y < this.#y; y++) {
+            for (let x = 0; x < this.#x; x++) {
+                let node = this.#map[x + y * this.#x];
+                str += node.walkable ? "." : "X";
+            }
+            str += "\n";
+        }
+
+        console.log(str);
+    }
+
+    aStar(startNode, goalNode, ignoreObjs = []) {
+        /* @todo
+         * 1. get nodes covered by objects from ignoreObjs
+         * 2. set those nodes as walkable
+         */
+
+
+
+        this.cleanupWages();
+
         let openList = [];
         let closedList = [];
         openList.push(startNode);
@@ -171,6 +223,7 @@ class AStarPathFinder {
                     path.push(curr);
                     curr = curr.parent;
                 }
+
                 path.push(startNode);
                 return path.reverse();
             }
@@ -178,9 +231,12 @@ class AStarPathFinder {
             openList.splice(lowIndex, 1);
             closedList.push(currentNode);
 
-            let neighbors = getNeighbors(currentNode, this.#map);
+            let neighbors = this.getNeighbors(currentNode, this.#map);
             for (let neighbor of neighbors) {
-                if (!neighbor.walkable || closedList.includes(neighbor)) {
+
+                let affectedObjs = neighbor == startNode || neighbor == goalNode;
+
+                if (!(neighbor.walkable || affectedObjs) || closedList.includes(neighbor)) {
                     continue;
                 }
 
@@ -193,7 +249,7 @@ class AStarPathFinder {
                 }
 
                 neighbor.g = tentativeG;
-                neighbor.h = heurictic(neighbor, goalNode);
+                neighbor.h = this.heurictic(neighbor, goalNode);
                 neighbor.f = neighbor.g + neighbor.h;
                 neighbor.parent = currentNode;
             }

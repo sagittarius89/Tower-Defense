@@ -97,7 +97,7 @@ module.exports = class GameEngine {
         });
 
         objects.foreach((obj) => {
-            obj.logic(objects, this.#conn);
+            obj.logic(objects, this.#conn, this.aStrPthFnd);
         });
 
         this.checkWin(objects);
@@ -108,12 +108,30 @@ module.exports = class GameEngine {
             }.bind(this), CONSTS.FRAME_RATE);
     }
 
+    updateAStarMap(objects) {
+        this.aStrPthFnd.refreshMap(objects);
+        objects.foreach((obj) => {
+            if (obj instanceof Soldier) {
+                obj.solveAngle(objects, this.aStrPthFnd);
+            }
+        });
+
+        if (this.continue)
+            setTimeout(function () {
+                this.updateAStarMap(this.#objects);
+            }.bind(this), 50);
+    }
+
     start() {
         this.continue = true;
 
         setTimeout(function () {
             this.update(this.#objects);
         }.bind(this), 17);
+
+        setTimeout(function () {
+            this.updateAStarMap(this.#objects);
+        }.bind(this), 10);
     }
 
     stop() {

@@ -6,6 +6,7 @@ const Bullet = require('./bullet');
 const Collider = require('../../game/static/src/physics/collider').Collider;
 const ColliderShape = require('../../game/static/src/physics/collider').ColliderShape;
 const CONSTS = require('../../shared/consts').CONSTS;
+const Utils = require('../../shared/utils.js');
 
 module.exports = class Soldier extends RoundObject {
     #image;
@@ -25,6 +26,7 @@ module.exports = class Soldier extends RoundObject {
     #enemyAngle;
     #movementAngle;
     #lastActonCooldown;
+    #path;
 
     constructor(x, y, dronImage, bulletImage, owner) {
         let tmpImg = ResourceManager.instance.getImageResource(dronImage);
@@ -35,6 +37,7 @@ module.exports = class Soldier extends RoundObject {
         this.#enemyAngle = 0;
         this.#movementAngle = 0;
         this.#lastActonCooldown = 0;
+        this.#path = [];
 
         this.#velocity = CONSTS.SOLDIER_VELOCITY;
         this.#attackDistance = CONSTS.SOLDIER.ATTACK_DISTANCE;
@@ -82,9 +85,9 @@ module.exports = class Soldier extends RoundObject {
         this.draw(ctx, enemy);
     }
 
-    logic(objects) {
+    logic(objects, conn, astrpthfnd) {
 
-        let enemy = this.findClostestEnemy(objects);
+        let enemy = this.findClostestEnemy(objects, astrpthfnd);
 
         if (!this.#attackMode && !this.#idle)
             this.checkCollisions(objects, enemy);
@@ -187,7 +190,40 @@ module.exports = class Soldier extends RoundObject {
         }
     }
 
-    findClostestEnemy(objects) {
+    solveAngle(objects, astrpthfnd) {
+        let closestObj = this.findClostestEnemy(objects, astrpthfnd);
+
+        if (closestObj != null &&
+            Utils.isPointInSquare(this.pos, 0, 0, CONSTS.GFX.ABS_WIDTH, CONSTS.GFX.ABS_HEIGHT) &&
+            Utils.isPointInSquare(closestObj.pos, 0, 0, CONSTS.GFX.ABS_WIDTH, CONSTS.GFX.ABS_HEIGHT)
+        ) {
+            let startNode = astrpthfnd.getTile(this.x, this.y);
+            let endNode = astrpthfnd.getTile(closestObj.x, closestObj.y);
+
+            this.#path = astrpthfnd.aStar(startNode, endNode);
+
+            console.clear();
+            astrpthfnd.printMap();
+
+            let nextStepX1 = this.x;
+            let nextStepY1 = this.y;
+            let nextStepX2 = closestObj.x;
+            let nextStepY2 = closestObj.y;
+
+            if (this.#path.length > 3) {
+                nextStepX1 = astrpthfnd.trX(this.#path[0].x);
+                nextStepY1 = astrpthfnd.trY(this.#path[0].y);
+                nextStepX2 = astrpthfnd.trX(this.#path[3].x);
+                nextStepY2 = astrpthfnd.trY(this.#path[3].y);
+            }
+
+            this.#enemyAngle = Math.atan(
+                (nextStepY2 - nextStepY1) / (nextStepX2 - nextStepX1)
+            );
+        }
+    }
+
+    findClostestEnemy(objects, astrpthfnd) {
         let distance = Number.MAX_VALUE;
         let closestObj = null;
 
@@ -203,7 +239,27 @@ module.exports = class Soldier extends RoundObject {
             }
         });
 
-        if (closestObj != null) {
+        if (closestObj != null &&
+            Utils.isPointInSquare(this.pos, 0, 0, CONSTS.GFX.ABS_WIDTH, CONSTS.GFX.ABS_HEIGHT) &&
+            Utils.isPointInSquare(closestObj.pos, 0, 0, CONSTS.GFX.ABS_WIDTH, CONSTS.GFX.ABS_HEIGHT)
+        ) {
+            //let startNode = astrpthfnd.getTile(this.x, this.y);
+            //let endNode = astrpthfnd.getTile(closestObj.x, closestObj.y);
+
+            //this.#path = astrpthfnd.aStar(startNode, endNode);
+
+            //let nextStepX1 = closestObj.x;
+            //let nextStepY1 = closestObj.y;
+            //let nextStepX2 = this.x;
+            //let nextStepY2 = this.y;
+
+            //if (this.#path.length > 1) {
+            //    nextStepX1 = astrpthfnd.trX(this.#path[0].x);
+            //    nextStepY1 = astrpthfnd.trY(this.#path[0].y);
+            //    nextStepX2 = astrpthfnd.trX(this.#path[1].x);
+            //    nextStepY2 = astrpthfnd.trY(this.#path[1].y);
+            // }
+
 
             let enemyDir = new Vector2d(closestObj.x - this.x, closestObj.y - this.y);
             let absDir = enemyDir.add(this.#movement);
@@ -214,9 +270,9 @@ module.exports = class Soldier extends RoundObject {
 
             this.#movementAngle = Math.atan2(this.#movement.y, this.#movement.x);
 
-            this.#enemyAngle = Math.atan2(
-                closestObj.y - this.y, closestObj.x - this.x
-            );
+            //this.#enemyAngle = Math.atan(
+            //    (nextStepY2 - nextStepY1) / (nextStepX2 - nextStepX1)
+            //);
 
             this.#attackMode = this.#attackDistance > distance;
         } else {
@@ -261,6 +317,7 @@ module.exports = class Soldier extends RoundObject {
         dto.bulletImage = this.#bulletImage;
         dto.type = this.constructor.name;
         dto.movement = this.#movement.toDTO();
+        dto.path = Utils.serializePath(this.#path);
 
         return dto;
     }
