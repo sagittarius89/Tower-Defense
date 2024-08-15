@@ -88,9 +88,7 @@ class Network {
 
         this.send(Message.syncPack(dtoList));
 
-        if (GameContext.engine.continue) {
-            setTimeout(this.sync.bind(this), CONSTS.SYNC_TIMEOUT);
-        }
+        setTimeout(this.sync.bind(this), CONSTS.SYNC_TIMEOUT);
     }
 
     incSpawnSpeed(player) {
@@ -115,6 +113,26 @@ class Network {
 
     moveSoldier(id, pos) {
         let msg = Message.moveSoldier(id, pos.toDTO());
+
+        this.send(msg);
+    }
+
+    stopGame() {
+        GameContext.engine.continue = false;
+    }
+
+    resumeGame() {
+        GameContext.engine.continue = true;
+    }
+
+    sendStopGame() {
+        let msg = Message.stopGame();
+
+        this.send(msg);
+    }
+
+    sendResumeGame() {
+        let msg = Message.resumeGame();
 
         this.send(msg);
     }
@@ -234,6 +252,14 @@ class Network {
                 }
                 case MessageType.SYNC_SCORE: {
                     this.syncScore(msg);
+                    break;
+                }
+                case MessageType.STOP_GAME: {
+                    this.stopGame();
+                    break;
+                }
+                case MessageType.RESUME_GAME: {
+                    this.resumeGame();
                     break;
                 }
             }

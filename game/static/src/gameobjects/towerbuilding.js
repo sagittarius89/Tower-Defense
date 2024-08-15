@@ -117,8 +117,6 @@ class Tower extends Building {
             -CTX.trX(this.width) / 2, -CTX.trHeight(this.height) * 1.5, 10);
 
         CTX.setTransform(1, 0, 0, 1, 0, 0);
-
-
     }
 
 

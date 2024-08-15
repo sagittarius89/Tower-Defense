@@ -45,6 +45,14 @@ class GameServer {
             case MessageType.MOVE_SOLDIER:
                 this.processMoveSoldier(msg);
                 break;
+            case MessageType.STOP_GAME:
+                this.#gameContext.engine.stop();
+                this.broadcast(Message.stopGame());
+                break;
+            case MessageType.RESUME_GAME:
+                this.#gameContext.engine.resume();
+                this.broadcast(Message.resumeGame());
+                break;
             default:
                 this.send(connection, Message.error('uknow message type'));
         }

@@ -64,6 +64,34 @@ class Hud extends GameObject {
         }
     }
 
+    renderAStarGrid(ctx, grid) {
+        if (!grid) return;
+
+        ctx.strokeStyle = 'rgba(255,255,0,0.4)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < grid.length; i++) {
+            let nodeX = GameContext.engine.aStrPthFnd.trX((grid[i]).x);
+            let nodeY = GameContext.engine.aStrPthFnd.trY((grid[i]).y);
+
+            CTX.strokeRect(
+                nodeX - CONSTS.GFX.TILE_SIZE / 2,
+                nodeY - CONSTS.GFX.TILE_SIZE / 2,
+                CONSTS.GFX.TILE_SIZE,
+                CONSTS.GFX.TILE_SIZE
+            );
+
+            if (!grid[i].walkable) {
+                ctx.fillStyle = 'rgba(255,255,0,0.4)';
+                CTX.drawRect(
+                    nodeX - CONSTS.GFX.TILE_SIZE / 2,
+                    nodeY - CONSTS.GFX.TILE_SIZE / 2,
+                    CONSTS.GFX.TILE_SIZE,
+                    CONSTS.GFX.TILE_SIZE
+                );
+            }
+        }
+    }
+
     update(ctx, objects) {
 
         /*ctx.globalAlpha = 0.5;
@@ -137,6 +165,10 @@ class Hud extends GameObject {
         if (CONSTS.DEBUG) {
             this.renderAStarMap(ctx, GameContext.engine.aStrPthFnd.map);
         }
+
+        if (CONSTS.DEBUG && CONSTS.SHOW_GRID_CLIENT) {
+            this.renderAStarGrid(ctx, GameContext.engine.aStrPthFnd.map);
+        }
     }
 
     notify(inputEvent) {
@@ -155,6 +187,14 @@ class Hud extends GameObject {
         } else if (inputEvent.type == MouseEventType.MOUSE_UP) {
             if (this.currentAction) {
                 this.currentAction.mouseUp();
+            }
+        } else if (inputEvent.type == MouseEventType.MOUSE_RIGHT_CLICK) {
+            if (CONSTS.DEBUG) {
+                if (GameContext.engine.continue) {
+                    Network.instance.sendStopGame();
+                } else {
+                    Network.instance.sendResumeGame();
+                }
             }
         }
     }

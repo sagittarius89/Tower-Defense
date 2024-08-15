@@ -48,8 +48,9 @@ class Soldier extends RoundObject {
     #kills;
     #bulletImage;
     #movement;
+    #pathAngle;
     #enemyAngle;
-    #movementAngle;
+    #forcedMovementAngle;
     #path;
 
     constructor(x, y, dronImage, bulletImage, owner) {
@@ -58,8 +59,9 @@ class Soldier extends RoundObject {
 
         this.#image = dronImage;
         this.#angle = 0;
+        this.#pathAngle = 0;
         this.#enemyAngle = 0;
-        this.#movementAngle = 0;
+        this.#forcedMovementAngle = 0;
         this.#path = [];
 
         this.#velocity = CONSTS.SOLDIER_VELOCITY;
@@ -123,7 +125,7 @@ class Soldier extends RoundObject {
             return true;
         }
 
-        this.move();
+        this.move(objects);
     }
 
     checkCollisions(objects, clostestEnemy) {
@@ -178,13 +180,56 @@ class Soldier extends RoundObject {
 
     }
 
-    move() {
+    getPathDirectionY(astrpthfnd) {
+        if (this.#path.length >= 4) {
+            return astrpthfnd.trY(this.#path[0].y + this.#path[1].y + this.#path[2].y + this.#path[3].y) / 4 > this.y;
+        }
+
+        return false;
+    }
+
+    move(objectList) {
         if (this.#movement.x != 0 || this.#movement.y != 0) {
-            this.x += this.#velocity * Math.cos(this.#movementAngle);
-            this.y += this.#velocity * Math.sin(this.#movementAngle);
+
+            for (let i = 0; i < 8; i++) {
+                let deltaX = Math.round(this.#velocity * Math.cos(this.#forcedMovementAngle), 4);
+                let deltaY = Math.round(this.#velocity * Math.sin(this.#forcedMovementAngle), 4);
+
+                this.x += deltaX;
+                this.y += deltaY;
+
+                if (GameContext.engine.aStrPthFnd.checkObjsObjCollision(objectList, this)) {
+                    this.x -= deltaX;
+                    this.y -= deltaY;
+
+                    this.#forcedMovementAngle += Math.PI / 8;
+                } else {
+                    break;
+                }
+            }
+
         } else if (!this.#idle && !this.#attackMode) {
-            this.x += this.#velocity * Math.cos(this.#enemyAngle);
-            this.y += this.#velocity * Math.sin(this.#enemyAngle);
+
+            for (let i = 0; i < 8; i++) {
+                let deltaX = Math.round(this.#velocity * Math.cos(this.#pathAngle), 4);
+                let deltaY = Math.round(this.#velocity * Math.sin(this.#pathAngle), 4);
+
+                this.x += deltaX;
+                this.y += deltaY;
+
+                if (GameContext.engine.aStrPthFnd.checkObjsObjCollision(objectList, this)) {
+                    this.x -= deltaX;
+                    this.y -= deltaY;
+
+
+                    if (!this.getPathDirectionY(astrpthfnd))
+                        this.#forcedMovementAngle += Math.PI / 8;
+                    else
+                        this.#forcedMovementAngle -= Math.PI / 8;
+                } else {
+                    break;
+                }
+            }
         }
     }
 
@@ -294,12 +339,15 @@ class Soldier extends RoundObject {
         if (this.hp > 0)
             ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
 
+
+        let angle = this.#forcedMovementAngle != 0 ? this.#forcedMovementAngle : this.#pathAngle;
+
         ctx.beginPath();
-        CTX.moveTo(0, 0, this.#angle);
-        CTX.lineTo(-this.radius / 2, -this.radius / 2, this.#angle);
-        CTX.lineTo(this.radius, 0, this.#angle);
-        CTX.lineTo(-this.radius / 2, this.radius / 2, this.#angle);
-        CTX.lineTo(0, 0, this.#angle);
+        CTX.moveTo(0, 0, angle);
+        CTX.lineTo(-this.radius / 2, -this.radius / 2, angle);
+        CTX.lineTo(this.radius, 0, angle);
+        CTX.lineTo(-this.radius / 2, this.radius / 2, angle);
+        CTX.lineTo(0, 0, angle);
         ctx.stroke();
         ctx.fill();
         ctx.closePath();
@@ -323,11 +371,13 @@ class Soldier extends RoundObject {
 
         CTX.setTransform(1, 0, 0, 1, 0, 0);
 
-        if (CONSTS.DEBUG) {
-
-
+        if (CONSTS.DEBUG && this.#path[0] && this.owner.name == "Player 2") {
             ctx.beginPath();
-            CTX.moveTo(this.pos.x, this.pos.y);
+            CTX.moveTo(
+                GameContext.engine.aStrPthFnd.trX(this.#path[0].x),
+                GameContext.engine.aStrPthFnd.trY(this.#path[0].y)
+            )
+                ;
             ctx.fillStyle = 'red';
             this.#path.forEach((point) => {
                 CTX.lineTo(
@@ -382,15 +432,16 @@ class Soldier extends RoundObject {
                 nextStepY2 = GameContext.engine.aStrPthFnd.trY(this.#path[1].y);
             }
 
-            this.#enemyAngle = Math.atan(
-                (nextStepY2 - nextStepY1) / (nextStepX2 - nextStepX1)
+            this.#pathAngle = Math.atan2(
+                (nextStepY2 - nextStepY1),
+                (nextStepX2 - nextStepX1)
             );
 
-            this.#movementAngle = Math.atan2(this.#movement.y, this.#movement.x);
+            this.#enemyAngle = Math.atan2(
+                closestObj.y - this.y, closestObj.x - this.x
+            );
 
-            //this.#enemyAngle = Math.atan2(
-            //    closestObj.y - this.y, closestObj.x - this.x
-            //);
+            this.#forcedMovementAngle = Math.atan2(this.#movement.y, this.#movement.x);
 
             this.#attackMode = this.#attackDistance > distance;
         } else {

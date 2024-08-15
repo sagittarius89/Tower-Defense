@@ -23,8 +23,9 @@ module.exports = class Soldier extends RoundObject {
     #kills;
     #bulletImage;
     #movement;
+    #pathAngle;
     #enemyAngle;
-    #movementAngle;
+    #forcedMovementAngle;
     #lastActonCooldown;
     #path;
 
@@ -34,8 +35,9 @@ module.exports = class Soldier extends RoundObject {
 
         this.#image = dronImage;
         this.#angle = 0;
+        this.#pathAngle = 0;
         this.#enemyAngle = 0;
-        this.#movementAngle = 0;
+        this.#forcedMovementAngle = 0;
         this.#lastActonCooldown = 0;
         this.#path = [];
 
@@ -110,7 +112,7 @@ module.exports = class Soldier extends RoundObject {
             this.#movement = new Vector2d(0, 0);
         }
 
-        this.move();
+        this.move(objects, astrpthfnd);
     }
 
     doShot(objects) {
@@ -180,13 +182,54 @@ module.exports = class Soldier extends RoundObject {
 
     }
 
-    move() {
+    move(objectList, astrpthfnd) {
+        let deltaX = 0;
+        let deltaY = 0;
+
         if (this.#movement.x != 0 || this.#movement.y != 0) {
-            this.x += this.#velocity * Math.cos(this.#movementAngle);
-            this.y += this.#velocity * Math.sin(this.#movementAngle);
+
+            for (let i = 0; i < 8; i++) {
+                deltaX = Math.round(this.#velocity * Math.cos(this.#forcedMovementAngle), 4);
+                deltaY = Math.round(this.#velocity * Math.sin(this.#forcedMovementAngle), 4);
+
+                this.x += deltaX;
+                this.y += deltaY;
+
+                if (astrpthfnd.checkObjsObjCollision(objectList, this)) {
+                    this.x -= deltaX;
+                    this.y -= deltaY;
+                } else {
+                    return;
+                }
+            }
+
+            //resolve collision
+            //this.x += deltaX;
+            //this.y += deltaY;
+
         } else if (!this.#idle && !this.#attackMode) {
-            this.x += this.#velocity * Math.cos(this.#enemyAngle);
-            this.y += this.#velocity * Math.sin(this.#enemyAngle);
+
+            for (let i = 0; i < 8; i++) {
+                deltaX = Math.round(this.#velocity * Math.cos(this.#pathAngle), 4);
+                deltaY = Math.round(this.#velocity * Math.sin(this.#pathAngle), 4);
+
+                this.x += deltaX;
+                this.y += deltaY;
+
+                if (astrpthfnd.checkObjsObjCollision(objectList, this)) {
+                    this.x -= deltaX;
+                    this.y -= deltaY;
+
+                    this.#pathAngle += Math.PI / 8;
+
+                } else {
+                    return;
+                }
+            }
+
+            //resolve collision
+            this.x += deltaX;
+            this.y += deltaY;
         }
     }
 
@@ -200,10 +243,16 @@ module.exports = class Soldier extends RoundObject {
             let startNode = astrpthfnd.getTile(this.x, this.y);
             let endNode = astrpthfnd.getTile(closestObj.x, closestObj.y);
 
-            this.#path = astrpthfnd.aStar(startNode, endNode);
+            this.#path = astrpthfnd.aStar(
+                startNode,
+                endNode,
+                [this, closestObj]
+            );
 
-            console.clear();
-            astrpthfnd.printMap();
+            if (CONSTS.DEBUG && CONSTS.SHOW_GRID_SERVER_OUTPUT) {
+                console.clear();
+                astrpthfnd.printMap();
+            }
 
             let nextStepX1 = this.x;
             let nextStepY1 = this.y;
@@ -217,8 +266,13 @@ module.exports = class Soldier extends RoundObject {
                 nextStepY2 = astrpthfnd.trY(this.#path[3].y);
             }
 
-            this.#enemyAngle = Math.atan(
-                (nextStepY2 - nextStepY1) / (nextStepX2 - nextStepX1)
+            this.#pathAngle = Math.atan2(
+                (nextStepY2 - nextStepY1),
+                (nextStepX2 - nextStepX1)
+            );
+
+            this.#enemyAngle = Math.atan2(
+                closestObj.y - this.y, closestObj.x - this.x
             );
         }
     }
@@ -228,7 +282,6 @@ module.exports = class Soldier extends RoundObject {
         let closestObj = null;
 
         objects.foreach((obj) => {
-
             if (obj.owner && obj.owner.name != this.owner.name) {
                 let calculatedD = obj.pos.getDistance(this.pos);
 
@@ -243,24 +296,6 @@ module.exports = class Soldier extends RoundObject {
             Utils.isPointInSquare(this.pos, 0, 0, CONSTS.GFX.ABS_WIDTH, CONSTS.GFX.ABS_HEIGHT) &&
             Utils.isPointInSquare(closestObj.pos, 0, 0, CONSTS.GFX.ABS_WIDTH, CONSTS.GFX.ABS_HEIGHT)
         ) {
-            //let startNode = astrpthfnd.getTile(this.x, this.y);
-            //let endNode = astrpthfnd.getTile(closestObj.x, closestObj.y);
-
-            //this.#path = astrpthfnd.aStar(startNode, endNode);
-
-            //let nextStepX1 = closestObj.x;
-            //let nextStepY1 = closestObj.y;
-            //let nextStepX2 = this.x;
-            //let nextStepY2 = this.y;
-
-            //if (this.#path.length > 1) {
-            //    nextStepX1 = astrpthfnd.trX(this.#path[0].x);
-            //    nextStepY1 = astrpthfnd.trY(this.#path[0].y);
-            //    nextStepX2 = astrpthfnd.trX(this.#path[1].x);
-            //    nextStepY2 = astrpthfnd.trY(this.#path[1].y);
-            // }
-
-
             let enemyDir = new Vector2d(closestObj.x - this.x, closestObj.y - this.y);
             let absDir = enemyDir.add(this.#movement);
 
@@ -268,11 +303,7 @@ module.exports = class Soldier extends RoundObject {
                 absDir.y, absDir.x
             );
 
-            this.#movementAngle = Math.atan2(this.#movement.y, this.#movement.x);
-
-            //this.#enemyAngle = Math.atan(
-            //    (nextStepY2 - nextStepY1) / (nextStepX2 - nextStepX1)
-            //);
+            this.#forcedMovementAngle = Math.atan2(this.#movement.y, this.#movement.x);
 
             this.#attackMode = this.#attackDistance > distance;
         } else {

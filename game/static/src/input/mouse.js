@@ -3,7 +3,8 @@ const MouseEventType = {
     MOUSE_UP: 2,
     MOUSE_MOVE: 3,
     MOUSE_SCROLL_UP: 4,
-    MOUSE_SCROLL_DOWN: 5
+    MOUSE_SCROLL_DOWN: 5,
+    MOUSE_RIGHT_CLICK: 6
 }
 
 class MouseEvent {
@@ -53,6 +54,16 @@ class Mouse extends InputDevice {
 
             this.#eventQueue.enqueue(
                 new MouseEvent(MouseEventType.MOUSE_UP, x, y)
+            );
+        });
+
+        window.addEventListener('contextmenu', e => {
+            e.preventDefault(); // Prevent the default context menu from appearing
+            let x = e.offsetX;
+            let y = e.offsetY;
+
+            this.#eventQueue.enqueue(
+                new MouseEvent(MouseEventType.MOUSE_RIGHT_CLICK, x, y)
             );
         });
     }

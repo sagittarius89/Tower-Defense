@@ -117,9 +117,10 @@ class GameEngine {
     }
 
     update(ctx, objects) {
-        //ctx.clearRect(0, 0, this.WIDTH, this.HEIGHT);
-
+        ctx.fillStyle = "rgb(0, 0, 0, 0)";
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
         CTX.clearCanvas();
+
 
         objects.foreach((obj) => {
             if (obj.x && obj.y
@@ -130,15 +131,17 @@ class GameEngine {
                 objects.delete(obj);
                 return;
             }
-
-            obj.update(ctx, objects);
         });
 
-        objects.foreach((obj) => {
-            obj.logic(objects);
-        });
 
-        this.checkWin(ctx, objects);
+        if (this.continue) {
+            objects.foreach((obj) => {
+                obj.logic(objects);
+            });
+
+            this.checkWin(ctx, objects);
+        }
+
 
         this.#counter++;
 
@@ -151,19 +154,24 @@ class GameEngine {
             this.#counter = 0;
         }
 
-        if (this.continue)
-            window.requestAnimationFrame(function () {
-                this.update(this.#ctx, this.#objects);
-            }.bind(this));
-
-        // Draw mouse position at (0, 0)
-        drawStrokedText(ctx, `Mouse: (${GameContext.inputManager.mousePosX}, ${GameContext.inputManager.mousePosY})`, 150, 150, 15);
-        drawStrokedText(ctx, `Mouse: (${CTX.trAbsX(GameContext.inputManager.mousePosX)}, ${CTX.trAbsY(GameContext.inputManager.mousePosY)})`, 150, 200, 15);
+        setTimeout(function () {
+            this.update(this.#ctx, this.#objects);
+        }.bind(this), CONSTS.FRAME_RATE);
     }
 
     updateSingleFrame() {
+        this.#objects.foreach((obj) => {
+            obj.update(this.#ctx, this.#objects);
+        });
+
+
+        // Draw mouse position at (0, 0)
+        drawStrokedText(this.#ctx, `Mouse: (${GameContext.inputManager.mousePosX}, ${GameContext.inputManager.mousePosY})`, 150, 150, 15);
+        drawStrokedText(this.#ctx, `Mouse: (${CTX.trAbsX(GameContext.inputManager.mousePosX)}, ${CTX.trAbsY(GameContext.inputManager.mousePosY)})`, 150, 200, 15);
+
+
         window.requestAnimationFrame(function () {
-            this.update(this.#ctx, this.#objects);
+            this.updateSingleFrame(this.#ctx, this.#objects);
         }.bind(this));
     }
 
@@ -179,12 +187,13 @@ class GameEngine {
         this.continue = true;
 
         window.requestAnimationFrame(function () {
-            this.update(this.#ctx, this.#objects);
+            this.updateSingleFrame();
         }.bind(this));
+
 
         setTimeout(function () {
             this.update(this.#ctx, this.#objects);
-        }.bind(this), 17);
+        }.bind(this), CONSTS.FRAME_RATE);
 
         setTimeout(function () {
             this.updateAStarMap();
@@ -193,5 +202,9 @@ class GameEngine {
 
     stop() {
         this.continue = false;
+    }
+
+    resume() {
+        this.continue = true;
     }
 }
