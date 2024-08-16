@@ -118,7 +118,7 @@ class GameEngine {
 
     update(ctx, objects) {
         ctx.fillStyle = "rgb(0, 0, 0, 0)";
-        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        ctx.fillRect(0, 0, this.WIDTH, this.HEIGHT);
         CTX.clearCanvas();
 
 

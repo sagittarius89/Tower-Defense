@@ -29,8 +29,8 @@ class CreateTower extends GameAction {
 
         ctx.drawImage(
             image,
-            -CONSTS.TOWER.RADIUS / 2,
-            -CONSTS.TOWER.RADIUS / 2);
+            0,
+            0);
 
         ctx.globalAlpha = 0.1;
 
@@ -41,11 +41,11 @@ class CreateTower extends GameAction {
         }
 
         ctx.beginPath();
-        ctx.arc(0, 0, CONSTS.TOWER.ATTACK_DISTANCE, 0, 2 * Math.PI);
+        ctx.arc(0, 0, CTX.trX(CONSTS.TOWER.ATTACK_DISTANCE), 0, 2 * Math.PI);
         ctx.fill();
         ctx.closePath();
+
         ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.restore();
 
         this.drawBuildingZone(ctx);
 
@@ -148,7 +148,6 @@ class CreateBlackHoleAction extends GameAction {
         ctx.fill();
         ctx.closePath();
         ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.restore();
         this.drawBuildingZone(ctx);
 
         if (this.#mode == CreateBlackHoleAction.MODE_FIRST_BUILDING) {
