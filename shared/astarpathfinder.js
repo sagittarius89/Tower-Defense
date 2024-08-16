@@ -85,6 +85,8 @@ class AStarPathFinder {
     tilifyObject(obj) {
         if (obj instanceof SquareObject) {
             return this.getOccupiedTilesBySquare(obj.x, obj.y, obj.width, obj.height);
+        } else if (obj instanceof Soldier) {
+            return [this.getTile(obj.x, obj.y)];
         } else if (obj instanceof RoundObject) {
             return this.getOccupiedTilesForCircle(obj.x, obj.y, obj.radius);
         }
@@ -118,10 +120,10 @@ class AStarPathFinder {
         let occupiedTiles = [];
 
         //calculate start and end of square
-        let startX = Math.round((x - 0.5 * w) / this.#density);
-        let startY = Math.round((y - 0.5 * h) / this.#density);
-        let endX = Math.round((x + 0.5 * w) / this.#density);
-        let endY = Math.round((y + 0.5 * h) / this.#density);
+        let startX = Math.round((x - 0.8 * w) / this.#density);
+        let startY = Math.round((y - 0.8 * h) / this.#density);
+        let endX = Math.round((x + 0.8 * w) / this.#density);
+        let endY = Math.round((y + 0.8 * h) / this.#density);
 
         // iterate over all tiles in square
         for (let i = startX; i <= endX; i++) {
@@ -191,6 +193,10 @@ class AStarPathFinder {
                         if (tile)
                             tile.walkable = false;
                     });
+                } else if (obj instanceof Soldier) {
+                    let tile = this.getTile(obj.x, obj.y);
+                    if (tile)
+                        tile.walkable = false;
                 } else if (obj instanceof RoundObject) {
                     this.getOccupiedTilesForCircle(obj.x, obj.y, obj.radius).forEach(tile => {
                         if (tile)
@@ -205,9 +211,11 @@ class AStarPathFinder {
         let neighbors = [];
         let directions = [
             { x: -1, y: 0 }, { x: 1, y: 0 },
-            { x: 0, y: -1 }, { x: 0, y: 1 },
-            { x: -1, y: -1 }, { x: 1, y: -1 },
-            { x: -1, y: 1 }, { x: 1, y: 1 }
+            { x: 0, y: -1 }, { x: 0, y: 1 }
+
+            //bias
+            //{ x: -1, y: -1 }, { x: 1, y: -1 },
+            //{ x: -1, y: 1 }, { x: 1, y: 1 }
         ];
 
         for (let dir of directions) {
@@ -294,6 +302,10 @@ class AStarPathFinder {
                                 if (tile == neighbor)
                                     affectedObjs = true;
                             });
+                        } else if (obj instanceof Soldier) {
+                            let tile = this.getTile(obj.x, obj.y);
+                            if (tile == neighbor)
+                                affectedObjs = true;
                         } else if (obj instanceof RoundObject) {
                             this.getOccupiedTilesForCircle(obj.x, obj.y, obj.radius).forEach(tile => {
                                 if (tile == neighbor)

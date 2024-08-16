@@ -180,14 +180,6 @@ class Soldier extends RoundObject {
 
     }
 
-    getPathDirectionY(astrpthfnd) {
-        if (this.#path.length >= 4) {
-            return astrpthfnd.trY(this.#path[0].y + this.#path[1].y + this.#path[2].y + this.#path[3].y) / 4 > this.y;
-        }
-
-        return false;
-    }
-
     move(objectList) {
         if (this.#movement.x != 0 || this.#movement.y != 0) {
 
@@ -222,10 +214,7 @@ class Soldier extends RoundObject {
                     this.y -= deltaY;
 
 
-                    if (!this.getPathDirectionY(astrpthfnd))
-                        this.#forcedMovementAngle += Math.PI / 8;
-                    else
-                        this.#forcedMovementAngle -= Math.PI / 8;
+                    this.#forcedMovementAngle += Math.PI / 8;
                 } else {
                     break;
                 }

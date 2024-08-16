@@ -188,48 +188,62 @@ module.exports = class Soldier extends RoundObject {
 
         if (this.#movement.x != 0 || this.#movement.y != 0) {
 
-            for (let i = 0; i < 8; i++) {
-                deltaX = Math.round(this.#velocity * Math.cos(this.#forcedMovementAngle), 4);
-                deltaY = Math.round(this.#velocity * Math.sin(this.#forcedMovementAngle), 4);
+            deltaX = Math.round(this.#velocity * Math.cos(this.#forcedMovementAngle), 4);
+            deltaY = Math.round(this.#velocity * Math.sin(this.#forcedMovementAngle), 4);
 
-                this.x += deltaX;
-                this.y += deltaY;
+            this.x += deltaX;
+            this.y += deltaY;
 
-                if (astrpthfnd.checkObjsObjCollision(objectList, this)) {
-                    this.x -= deltaX;
-                    this.y -= deltaY;
-                } else {
-                    return;
-                }
+            if (astrpthfnd.checkObjsObjCollision(objectList, this)) {
+                this.x -= deltaX;
+                this.y -= deltaY;
+
+                this.#movement.x = -this.#movement.x;
+                this.#movement.y = -this.#movement.y;
             }
 
-            //resolve collision
-            //this.x += deltaX;
-            //this.y += deltaY;
+            if (this.x < 0 || this.x > CONSTS.GFX.ABS_WIDTH) {
+                this.#movement.x = -this.#movement.x;
+                this.x -= deltaX;
+            }
+
+            if (this.y < 0 || this.y > CONSTS.GFX.ABS_HEIGHT) {
+                this.#movement.y = -this.#movement.y;
+                this.y -= deltaY;
+            }
 
         } else if (!this.#idle && !this.#attackMode) {
+
+            let flagX = false;
+            let flagY = false;
 
             for (let i = 0; i < 8; i++) {
                 deltaX = Math.round(this.#velocity * Math.cos(this.#pathAngle), 4);
                 deltaY = Math.round(this.#velocity * Math.sin(this.#pathAngle), 4);
 
                 this.x += deltaX;
-                this.y += deltaY;
 
                 if (astrpthfnd.checkObjsObjCollision(objectList, this)) {
                     this.x -= deltaX;
+
+                    //this.#pathAngle += Math.PI / 8;
+                } else
+                    flagX = true;
+
+
+                this.y += deltaY;
+
+                if (astrpthfnd.checkObjsObjCollision(objectList, this)) {
                     this.y -= deltaY;
 
-                    this.#pathAngle += Math.PI / 8;
+                    //this.#pathAngle += Math.PI / 8;
+                } else
+                    flagY = true;
 
-                } else {
-                    return;
-                }
+
+                if (flagX && flagY)
+                    break;
             }
-
-            //resolve collision
-            this.x += deltaX;
-            this.y += deltaY;
         }
     }
 

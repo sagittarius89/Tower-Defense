@@ -1,13 +1,13 @@
 var CONSTS = {
     BLOCKOUT: true,
-    DEBUG: true,
+    DEBUG: false,
     SHOW_GRID_SERVER_OUTPUT: false,
     SHOW_GRID_CLIENT: true,
     GFX: {
         ASPECT_RATIO: 16 / 9,
         ABS_WIDTH: 3840,
         ABS_HEIGHT: 2160,
-        TILE_SIZE: 100,
+        TILE_SIZE: 60,
     },
     BULLET: {
         VELOCITY: 7,
