@@ -36,12 +36,12 @@ module.exports = class GameEngine {
 
     endGame(hasPlayer1Objects, hasPlayer2Objects) {
         console.log("end game");
-        //setTimeout(function () {
-        //this.continue = false;
+        setTimeout(function () {
+            this.continue = false;
 
-        //@todo
+            //@todo
 
-        //}.bind(this), 1000);
+        }.bind(this), 1000);
     }
 
     sync(dtoList) {
@@ -85,27 +85,43 @@ module.exports = class GameEngine {
     }
 
     update(objects) {
-        objects.foreach((obj) => {
-            if (obj.x && obj.y
-                && (obj.x > this.background.width ||
-                    obj.y > this.background.height ||
-                    obj.x < 0 || obj.y < 0)
-            ) {
-                objects.delete(obj);
-                return;
-            }
-        });
 
-        objects.foreach((obj) => {
-            obj.logic(objects, this.#conn);
-        });
+        if (this.continue)
+            objects.foreach((obj) => {
+                if (obj.x && obj.y
+                    && (obj.x > this.background.width ||
+                        obj.y > this.background.height ||
+                        obj.x < 0 || obj.y < 0)
+                ) {
+                    objects.delete(obj);
+                    return;
+                }
+            });
+
+
+        if (this.continue)
+            objects.foreach((obj) => {
+                obj.logic(objects, this.#conn, this.aStrPthFnd, this.continue);
+            });
 
         this.checkWin(objects);
 
-        if (this.continue)
-            setTimeout(function () {
-                this.update(this.#objects);
-            }.bind(this), CONSTS.FRAME_RATE);
+        setTimeout(function () {
+            this.update(this.#objects);
+        }.bind(this), CONSTS.FRAME_RATE);
+    }
+
+    updateAStarMap(objects) {
+        this.aStrPthFnd.refreshMap(objects);
+        objects.foreach((obj) => {
+            if (obj instanceof Soldier) {
+                obj.solveAngle(objects, this.aStrPthFnd);
+            }
+        });
+
+        setTimeout(function () {
+            this.updateAStarMap(this.#objects);
+        }.bind(this), 50);
     }
 
     start() {
@@ -114,9 +130,17 @@ module.exports = class GameEngine {
         setTimeout(function () {
             this.update(this.#objects);
         }.bind(this), 17);
+
+        setTimeout(function () {
+            this.updateAStarMap(this.#objects);
+        }.bind(this), 10);
     }
 
     stop() {
         this.continue = false;
+    }
+
+    resume() {
+        this.continue = true;
     }
 }

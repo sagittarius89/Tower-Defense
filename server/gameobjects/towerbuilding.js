@@ -102,7 +102,7 @@ module.exports = class Tower extends Building {
             (now.getTime() - this.#shotTimestamp
                 > this.#shotFrequency)
         ) {
-            this.doShot(objects);
+            //this.doShot(objects);
 
             this.#shotTimestamp = new Date().getTime();
         }

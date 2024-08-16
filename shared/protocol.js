@@ -13,7 +13,9 @@ const MessageType = {
     INC_SPAWN_SPEED: 'inc_spawn_speed',
     UPDATE_POSITION: 'update_position',
     SYNC_SCORE: 'sync_score',
-    MOVE_SOLDIER: 'move_soldier'
+    MOVE_SOLDIER: 'move_soldier',
+    STOP_GAME: 'stop_game',
+    RESUME_GAME: 'resume_game'
 }
 
 class Message {
@@ -153,6 +155,18 @@ class Message {
     static error(text) {
         let msg = new Message(MessageType.ERROR);
         msg.set('message', text);
+
+        return msg;
+    }
+
+    static stopGame() {
+        let msg = new Message(MessageType.STOP_GAME);
+
+        return msg;
+    }
+
+    static resumeGame() {
+        let msg = new Message(MessageType.RESUME_GAME);
 
         return msg;
     }

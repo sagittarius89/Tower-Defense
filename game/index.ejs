@@ -2,7 +2,13 @@
     const wsSocket = "<%= wsSocket %>";
     const wsPort = "<%= wsPort %>";
     const wsProtocol = "<%= wsProtocol %>";
-    function require(str) { }
+    function require(str) {
+        return {
+            a: 1,
+            b: 2,
+            c: 3
+        }
+    }
 </script>
 
 <script src="src/math/vector.js"></script>

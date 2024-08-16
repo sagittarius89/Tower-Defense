@@ -63,19 +63,24 @@ module.exports = class CommandCenterBuilding extends Building {
         return count;
     }
 
-    logic(objects, conn) {
+    logic(objects, conn, astrpthfnd, cont) {
         let now = new Date();
 
         this.#spawnFrequency = conn
             .playerProp(this.owner)
             .get('COMMAND_CENTER.SPAWN_FREQUENCY');
 
-        if (now.getTime() - this.#productionTimestamp
-            > this.#spawnFrequency &&
-            this.#soldierLimit > this.soldierCount(objects)) {
+        if (cont) {
+            if (now.getTime() - this.#productionTimestamp
+                > this.#spawnFrequency &&
+                this.#soldierLimit > this.soldierCount(objects)) {
 
-            this.produceNewSoldier(objects);
+                this.produceNewSoldier(objects);
 
+                this.#productionTimestamp = new Date().getTime();
+            }
+        }
+        else {
             this.#productionTimestamp = new Date().getTime();
         }
     }

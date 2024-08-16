@@ -4,3 +4,24 @@ function UUID() {
         return v.toString(16);
     });
 }
+
+function isPointInSquare(point, x, y, width, height) {
+    const withinX = point.x >= x && point.x <= x + width;
+    const withinY = point.y >= y && point.y <= y + height;
+    return withinX && withinY;
+}
+
+function serializePath(path) {
+    return path.map(node => ({ x: node.x, y: node.y }));
+}
+
+
+
+
+try {
+    module.exports = {
+        serializePath,
+        isPointInSquare,
+        UUID
+    }
+} catch (e) { }
