@@ -245,7 +245,9 @@ class CommandCenterBuilding extends Building {
                 CONSTS.TOWER.COST, true, player
             );
 
-            let incSpawnSpeed = new Button(
+
+            //examples how to define actions
+            /*let incSpawnSpeed = new Button(
                 "increase spawn speed", SpawnSpeedAction,
                 [this.owner, function (owner) {
                     Network.instance.incSpawnSpeed(owner);
@@ -268,7 +270,9 @@ class CommandCenterBuilding extends Building {
                 CONSTS.BLACK_HOLE_COST, true, player
             );
 
-            actionsList.push(towerAction, incSpawnSpeed, holeAction);
+            actionsList.push(towerAction, incSpawnSpeed, holeAction);*/
+
+            actionsList.push(towerAction);
 
             Selection.instance.currentSelection = this;
         }
