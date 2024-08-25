@@ -81,6 +81,79 @@ class CreateTower extends GameAction {
     }
 }
 
+class CreateWall extends GameAction {
+    #pushFunc;
+    #orientation;
+
+    constructor(callback, player, pushFunc, orientation) {
+        super(callback);
+
+        this.#orientation = orientation;
+        this.player = player;
+        this.#pushFunc = pushFunc;
+        this.lock = true;
+    }
+
+    update(ctx, objects) {
+        this.findClostestBuilding(objects);
+
+        ctx.globalAlpha = 0.3;
+
+        Wall.blockout(ctx,
+            CTX.trAbsX(GameContext.inputManager.mousePosX),
+            CTX.trAbsY(GameContext.inputManager.mousePosY),
+            CONSTS.WALL[this.#orientation].WIDTH,
+            CONSTS.WALL[this.#orientation].HEIGHT);
+
+        ctx.setTransform(1, 0, 0, 1,
+            GameContext.inputManager.mousePosX,
+            GameContext.inputManager.mousePosY);
+
+        ctx.globalAlpha = 0.1;
+
+        if (!this.lock) {
+            ctx.fillStyle = 'green';
+        } else {
+            ctx.fillStyle = 'red';
+        }
+
+        ctx.beginPath();
+        ctx.arc(0, 0, CTX.trX(CONSTS.TOWER.ATTACK_DISTANCE), 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.closePath();
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+        this.drawBuildingZone(ctx);
+
+        ctx.globalAlpha = 1;
+    }
+
+    mouseUp() {
+        super.stop();
+
+        if (!this.lock) {
+            let wall = new Wall(
+                new Vector2d(
+                    CTX.trAbsX(GameContext.inputManager.mousePosX),
+                    CTX.trAbsY(GameContext.inputManager.mousePosY)),
+                this.#orientation
+            );
+
+            wall.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
+                this.player);
+
+            wall.owner = this.player;
+
+
+            this.#pushFunc(wall);
+
+            this.callback();
+        }
+    }
+}
+
+
 
 class SpawnSpeedAction extends GameAction {
     #incFunc
@@ -233,7 +306,7 @@ class CommandCenterBuilding extends Building {
         let actionsList = [];
 
         if (player.self) {
-            let towerAction = new Button(
+            /*let towerAction = new Button(
                 "build tower", CreateTower,
                 [towerImage, towerImageSelected, bulletImage, this.owner, function (obj) {
                     let dto = obj.toDTO();
@@ -242,7 +315,31 @@ class CommandCenterBuilding extends Building {
                 }],
                 1570, 1900, 200, 200, "turret_violet_01", CONSTS.TOWER.COOLDOWN,
                 CONSTS.TOWER.COST, true, player
+            );*/
+
+            let wallActionH = new Button(
+                "build wall", CreateWall,
+                [this.owner, function (obj) {
+                    let dto = obj.toDTO();
+                    Network.instance.addBuilding(dto);
+                    console.log('addBuilding');
+                }, Orientation.HORIZONTAL],
+                1570, 1900, 200, 200, "wall_orange_01_horizontal", CONSTS.WALL.COOLDOWN,
+                CONSTS.WALL.COST, true, player
             );
+
+            let wallActionW = new Button(
+                "build wall", CreateWall,
+                [this.owner, function (obj) {
+                    let dto = obj.toDTO();
+                    Network.instance.addBuilding(dto);
+                    console.log('addBuilding');
+                }, Orientation.VERTICAL],
+                1790, 1900, 200, 200, "wall_orange_01", CONSTS.WALL.COOLDOWN,
+                CONSTS.WALL.COST, true, player
+            );
+
+
 
 
             //examples how to define actions
@@ -271,7 +368,7 @@ class CommandCenterBuilding extends Building {
 
             actionsList.push(towerAction, incSpawnSpeed, holeAction);*/
 
-            actionsList.push(towerAction);
+            actionsList.push(wallActionW, wallActionH);
 
             Selection.instance.currentSelection = this;
         }

@@ -6,8 +6,3 @@ const Physics = {
     force: 0.40,
     framerate: 10
 }
-
-const Orientation = {
-    VERTICAL: "vertical",
-    HORIZONTAL: "horizontal"
-}

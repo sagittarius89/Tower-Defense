@@ -47,6 +47,19 @@ var CONSTS = {
         B_SPAWN_X: 3579,
         B_SPAWN_Y: 1079,
     },
+    WALL: {
+        HORIZONTAL: {
+            WIDTH: 300,
+            HEIGHT: 60,
+        },
+        VERTICAL: {
+            WIDTH: 60,
+            HEIGHT: 300,
+        },
+        COST: 1,
+        BUILDING_DISTANCE: 800,
+        SALVAGE: 30
+    },
     SYNC_TIMEOUT: 50,
     FRAME_RATE: 16.7,
     //SYNC_TIMEOUT: 50,

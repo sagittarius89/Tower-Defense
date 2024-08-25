@@ -4,6 +4,7 @@ const Player = require('../shared/player').Player;
 const GameContext = require('./servercontext');
 const Tower = require('./gameobjects/towerbuilding');
 const BlackHole = require('./gameobjects/blackholebuilding');
+const Wall = require('./gameobjects/wallbuilding');
 const CONSTS = require('../shared/consts').CONSTS;
 const PlayerProperties = require('../shared/playerproperties');
 const Vector2d = require('../game/static/src/math/vector').Vector2d;
@@ -82,6 +83,11 @@ class GameServer {
             case BlackHole.name: {
                 obj = BlackHole.fromDTO(dto);
                 this.addScore(obj.owner, -CONSTS.BLACK_HOLE_COST);
+                break;
+            }
+            case Wall.name: {
+                obj = Wall.fromDTO(dto);
+                this.addScore(obj.owner, -CONSTS.WALL_COST);
                 break;
             }
         }

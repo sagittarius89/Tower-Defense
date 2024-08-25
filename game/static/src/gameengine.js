@@ -50,6 +50,13 @@ class GameEngine {
                 this.addObject(obj);
                 break;
             }
+            case 'Wall': {
+                let obj = Wall.fromDTO(dto);
+                obj.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
+                    obj.owner);
+                this.addObject(obj);
+                break;
+            }
             case 'Bullet': {
                 let obj = Bullet.fromDTO(dto);
                 this.addObject(obj);

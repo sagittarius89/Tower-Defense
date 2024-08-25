@@ -15,6 +15,10 @@ function serializePath(path) {
     return path.map(node => ({ x: node.x, y: node.y }));
 }
 
+const Orientation = {
+    VERTICAL: "VERTICAL",
+    HORIZONTAL: "HORIZONTAL"
+}
 
 
 
@@ -22,6 +26,7 @@ try {
     module.exports = {
         serializePath,
         isPointInSquare,
-        UUID
+        UUID,
+        Orientation
     }
 } catch (e) { }

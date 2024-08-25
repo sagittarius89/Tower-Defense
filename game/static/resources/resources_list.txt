@@ -18,3 +18,6 @@ black_holeorangeselected.png
 black_holeorangew.png
 black_holeoviolet.png
 black_holeovioletselected.png
+wall_orange_01.png
+wall_orange_01_horizontal.png
+wall_violet_01.png
