@@ -28,13 +28,26 @@ class GameAction extends GameObject {
         return this.#lock;
     }
 
-    findClostestBuilding(objects) {
+    findClostestBuilding(objects, w, h) {
         this.#buildingList = [];
 
         //if (GameContext.inputManager.mousePosY + 65 > GameContext.hud.Y) {
         //    this.#lock = true;
         //    return;
         //}
+
+
+
+        this.#lock = GameContext.engine.aStrPthFnd.checkObjsObjCollision(objects,
+            new SquareObject(
+                w,
+                h,
+                CTX.trAbsX(GameContext.inputManager.mousePosX),
+                CTX.trAbsY(GameContext.inputManager.mousePosY)
+            )
+        );
+
+        if (this.#lock) return;
 
         let hasBuilding = false;
         objects.foreach((obj) => {

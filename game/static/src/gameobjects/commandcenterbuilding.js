@@ -95,7 +95,9 @@ class CreateWall extends GameAction {
     }
 
     update(ctx, objects) {
-        this.findClostestBuilding(objects);
+        this.findClostestBuilding(objects,
+            CONSTS.WALL[this.#orientation].WIDTH,
+            CONSTS.WALL[this.#orientation].HEIGHT);
 
         ctx.globalAlpha = 0.3;
 
