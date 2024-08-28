@@ -98,7 +98,8 @@ module.exports = class Soldier extends RoundObject {
         let now = new Date();
         if (this.#attackMode &&
             (now.getTime() - this.#shotTimestamp
-                > this.#shotFrequency)
+                > this.#shotFrequency) &&
+            !this.checkLineOfFire(objects, enemy)
         ) {
 
             this.doShot(objects);
@@ -115,6 +116,68 @@ module.exports = class Soldier extends RoundObject {
 
         this.move(objects, astrpthfnd);
     }
+
+    checkLineOfFire(objects, enemy) {
+        const soldierPos = new Vector2d(this.x, this.y);
+        const enemyPos = new Vector2d(enemy.x, enemy.y);
+
+        const direction = enemyPos.subtract(soldierPos);
+        const lineLength = direction.getLength();
+
+        let obscurificator = false;
+
+
+        objects.foreach((obj) => {
+            if (obj instanceof Bullet) {
+                return false;
+            }
+
+            if (obj !== this && obj !== enemy) {
+                const objPos = new Vector2d(obj.x, obj.y);
+
+                if (obj instanceof RoundObject) {
+                    // Handle round objects
+                    const soldierToObj = objPos.subtract(soldierPos);
+                    const projection = soldierToObj.dot(direction) / lineLength;
+
+                    if (projection > 0 && projection < lineLength) {
+                        const closestPointOnLine = soldierPos.add(direction.multiplyByFloat(projection / lineLength));
+                        const distanceToLine = objPos.subtract(closestPointOnLine).getLength();
+
+                        if (distanceToLine < obj.radius) {
+                            obscurificator = true;
+                            return true; // Exit loop early, we found an obstruction
+                        }
+                    }
+                } else if (obj instanceof SquareObject) {
+                    // Handle square objects
+                    const halfWidth = obj.width / 2;
+                    const halfHeight = obj.height / 2;
+
+                    // Find the corners of the square
+                    const corners = [
+                        new Vector2d(obj.x - halfWidth, obj.y - halfHeight), // Top-left
+                        new Vector2d(obj.x + halfWidth, obj.y - halfHeight), // Top-right
+                        new Vector2d(obj.x - halfWidth, obj.y + halfHeight), // Bottom-left
+                        new Vector2d(obj.x + halfWidth, obj.y + halfHeight)  // Bottom-right
+                    ];
+
+                    // Check if any of the square's edges intersect with the line of fire
+                    for (let i = 0; i < corners.length; i++) {
+                        const start = corners[i];
+                        const end = corners[(i + 1) % corners.length];
+                        if (Utils.lineIntersects(soldierPos, enemyPos, start, end)) {
+                            obscurificator = true;
+                            return true; // Exit loop early, we found an obstruction
+                        }
+                    }
+                }
+            }
+        });
+
+        return obscurificator; // No object is obscuring the line of fire
+    }
+
 
     doShot(objects) {
         let bullet = new Bullet(
@@ -324,7 +387,7 @@ module.exports = class Soldier extends RoundObject {
 
             this.#forcedMovementAngle = Math.atan2(this.#movement.y, this.#movement.x);
 
-            this.#attackMode = this.#attackDistance > distance;
+            this.#attackMode = this.#attackDistance > distance && !this.checkLineOfFire(objects, closestObj);
         } else {
             this.#idle = true;
         }

@@ -61,7 +61,9 @@ class GameObjectList {
      */
     foreach(func) {
         for (var i = 0; i < this.#list.length; ++i) {
-            func(this.#list[i]);
+            if (func(this.#list[i])) {
+                break;
+            }
         }
     }
 

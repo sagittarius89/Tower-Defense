@@ -1,6 +1,6 @@
-const GameObject = require('../gameobject');
+const ShapeObject = require('./shapeobject');
 const Vector2d = require('../../game/static/src/math/vector').Vector2d;
-module.exports = class RoundObject extends GameObject {
+module.exports = class RoundObject extends ShapeObject {
     #pos;
     #radius;
 
