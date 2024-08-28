@@ -65,7 +65,7 @@ class Collider {
         var ball1Pos = ball1.pos;
         var ball2Pos = ball2.pos;
 
-        var n = ball1Pos.substract(ball2Pos);
+        var n = ball1Pos.subtract(ball2Pos);
 
         // How much the distance between centers is less than the radii's sum.
         var offset = (ball1.radius + ball2.radius) - (n.getLength());
@@ -77,7 +77,7 @@ class Collider {
 
         // Bring back the two ball according to their mass.
         ball1Pos = ball1Pos.add(n = n.multiplyByFloat(0.5));
-        ball2Pos = ball2Pos.substract(n = n.multiplyByFloat(0.5));
+        ball2Pos = ball2Pos.subtract(n = n.multiplyByFloat(0.5));
 
         ball1.pos = ball1Pos;
         ball2.pos = ball2Pos;

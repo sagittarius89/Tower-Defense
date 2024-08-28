@@ -43,6 +43,16 @@ module.exports = class Bullet extends RoundObject {
 
     checkCollisions(objects, conn) {
         objects.foreach(obj => {
+
+            //separate handler for walls
+            if (obj.constructor.name == 'Wall') {
+                let myPos = new Vector2d(this.x, this.y);
+
+                if (Collider.checkCollisionPointWithSquare(myPos, obj.toSquare())) {
+                    objects.delete(this);
+                }
+            }
+
             if (obj.id != this.#parent) {
                 if ((obj.hp > 0) && //prevent shoting to destroyed objects
                     (obj.owner && this.parentOwner && obj.owner.name != this.parentOwner.name) &&

@@ -91,7 +91,7 @@ class Bullet extends RoundObject {
 
     checkCollisions(objects) {
         objects.foreach(obj => {
-            if (obj.id != this.#parent &&
+            if (obj.id != this.#parent && obj.constructor.name != 'Wall' &&
                 (obj instanceof Soldier || obj instanceof Building)) {
 
                 let player = obj.owner;

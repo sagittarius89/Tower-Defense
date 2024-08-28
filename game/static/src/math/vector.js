@@ -26,7 +26,7 @@ class Vector2d {
     }
 
     /** @param {Vector2d} vector - vector2d */
-    substract(vector) {
+    subtract(vector) {
         return new Vector2d(this.x - vector.x, this.y - vector.y);
     }
 

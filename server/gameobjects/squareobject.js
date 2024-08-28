@@ -1,7 +1,7 @@
-const GameObject = require('../gameobject');
+const ShapeObject = require('./shapeobject');
 const Square = require('./square');
 
-module.exports = class SquareObject extends GameObject {
+module.exports = class SquareObject extends ShapeObject {
     #square;
 
     constructor(width, height, x, y) {
