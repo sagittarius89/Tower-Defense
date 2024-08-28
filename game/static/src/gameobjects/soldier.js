@@ -390,7 +390,9 @@ class Soldier extends RoundObject {
 
         objects.foreach(((obj) => {
 
-            if (obj.owner && obj.owner.name != this.owner.name) {
+            if (obj.owner &&
+                obj.owner.name != this.owner.name &&
+                !(obj instanceof Wall)) {
                 let calculatedD = obj.pos.getDistance(this.pos);
 
                 if (calculatedD < distance) {

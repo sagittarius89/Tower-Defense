@@ -7,6 +7,7 @@ const Collider = require('../../game/static/src/physics/collider').Collider;
 const ColliderShape = require('../../game/static/src/physics/collider').ColliderShape;
 const CONSTS = require('../../shared/consts').CONSTS;
 const Utils = require('../../shared/utils.js');
+const Wall = require('./wallbuilding');
 
 module.exports = class Soldier extends RoundObject {
     #image;
@@ -296,7 +297,11 @@ module.exports = class Soldier extends RoundObject {
         let closestObj = null;
 
         objects.foreach((obj) => {
-            if (obj.owner && obj.owner.name != this.owner.name) {
+            if (
+                obj.owner &&
+                obj.owner.name != this.owner.name &&
+                !(obj instanceof Wall)
+            ) {
                 let calculatedD = obj.pos.getDistance(this.pos);
 
                 if (calculatedD < distance) {
