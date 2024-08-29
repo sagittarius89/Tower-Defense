@@ -30,7 +30,8 @@ class MoveSoldier extends GameAction {
 
         Network.instance.moveSoldier(this.#soldier.id, pos);
 
-        console.log("Move soldier to: " + this.#soldier.movement.x + " " + this.#soldier.movement.y);
+        if (CONSTS.DEBUG)
+            console.log("Move soldier to: " + this.#soldier.movement.x + " " + this.#soldier.movement.y);
     }
 }
 
@@ -319,8 +320,9 @@ class Soldier extends RoundObject {
 
     blockout(ctx) {
         CTX.setTransform(1, 0, 0, 1, this.x, this.y);
-        drawStrokedText(ctx, `${Math.floor(CTX.trX(this.x))} ${Math.floor(CTX.trY(this.y))} ${this.#angle}`,
-            -this.radius / 2, -this.radius * 1.5, 10);
+        if (CONSTS.DEBUG)
+            drawStrokedText(ctx, `${Math.floor(CTX.trX(this.x))} ${Math.floor(CTX.trY(this.y))} ${this.#angle}`,
+                -this.radius / 2, -this.radius * 1.5, 10);
 
         ctx.fillStyle = "red";
         CTX.drawRect(-5, -5, 10, 10);

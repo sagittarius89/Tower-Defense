@@ -173,9 +173,10 @@ class GameEngine {
 
 
         // Draw mouse position at (0, 0)
-        drawStrokedText(this.#ctx, `Mouse: (${GameContext.inputManager.mousePosX}, ${GameContext.inputManager.mousePosY})`, 150, 150, 15);
-        drawStrokedText(this.#ctx, `Mouse: (${CTX.trAbsX(GameContext.inputManager.mousePosX)}, ${CTX.trAbsY(GameContext.inputManager.mousePosY)})`, 150, 200, 15);
-
+        if (CONSTS.DEBUG) {
+            drawStrokedText(this.#ctx, `Mouse: (${GameContext.inputManager.mousePosX}, ${GameContext.inputManager.mousePosY})`, 150, 150, 15);
+            drawStrokedText(this.#ctx, `Mouse: (${CTX.trAbsX(GameContext.inputManager.mousePosX)}, ${CTX.trAbsY(GameContext.inputManager.mousePosY)})`, 150, 200, 15);
+        }
 
         window.requestAnimationFrame(function () {
             this.updateSingleFrame(this.#ctx, this.#objects);
