@@ -22,7 +22,8 @@ module.exports = class CommandCenterBuilding extends Building {
         towerImage, towerImageSelected,
         blackHoleImage, blackHoleImageSelected) {
 
-        super(image, imageSelected, pos.x, pos.y);
+        super(image, imageSelected, pos.x, pos.y, CONSTS.COMMAND_CENTER.WIDTH,
+            CONSTS.COMMAND_CENTER.HEIGHT);
 
         this.#productionTimestamp = new Date().getTime();
         this.#spawnFrequency = CONSTS.COMMAND_CENTER.SPAWN_FREQUENCY;
