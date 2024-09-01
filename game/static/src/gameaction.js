@@ -36,14 +36,16 @@ class GameAction extends GameObject {
         //    return;
         //}
 
+        let x = Math.floor(CTX.trAbsX(GameContext.inputManager.mousePosX) / 60) * 60;
+        let y = Math.floor(CTX.trAbsY(GameContext.inputManager.mousePosY) / 60) * 60;
 
 
         this.#lock = GameContext.engine.aStrPthFnd.checkObjsObjCollision(objects,
             new SquareObject(
                 w,
                 h,
-                CTX.trAbsX(GameContext.inputManager.mousePosX),
-                CTX.trAbsY(GameContext.inputManager.mousePosY)
+                x,
+                y
             )
         );
 

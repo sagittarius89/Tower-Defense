@@ -120,10 +120,10 @@ class AStarPathFinder {
         let occupiedTiles = [];
 
         //calculate start and end of square
-        let startX = Math.round((x - 0.8 * w) / this.#density);
-        let startY = Math.round((y - 0.8 * h) / this.#density);
-        let endX = Math.round((x + 0.8 * w) / this.#density);
-        let endY = Math.round((y + 0.8 * h) / this.#density);
+        let startX = Math.round((x - 0.49 * w) / this.#density);
+        let startY = Math.round((y - 0.49 * h) / this.#density);
+        let endX = Math.round((x + 0.49 * w) / this.#density);
+        let endY = Math.round((y + 0.49 * h) / this.#density);
 
         // iterate over all tiles in square
         for (let i = startX; i <= endX; i++) {

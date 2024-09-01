@@ -23,9 +23,12 @@ class CreateTower extends GameAction {
 
         ctx.globalAlpha = 0.3;
 
-        ctx.setTransform(1, 0, 0, 1,
-            GameContext.inputManager.mousePosX,
-            GameContext.inputManager.mousePosY);
+        let x = CTX.trAbsX(GameContext.inputManager.mousePosX) / 60;
+        let y = CTX.trAbsY(GameContext.inputManager.mousePosY) / 60;
+
+        CTX.setTransform(1, 0, 0, 1,
+            x,
+            y);
 
         ctx.drawImage(
             image,
@@ -56,13 +59,13 @@ class CreateTower extends GameAction {
         super.stop();
 
         if (!this.lock) {
+
+            let x = CTX.trAbsX(GameContext.inputManager.mousePosX) / 60;
+            let y = CTX.trAbsY(GameContext.inputManager.mousePosY) / 60;
+
             let tower = new Tower(
-                new Vector2d(
-                    CTX.trAbsX(GameContext.inputManager.mousePosX),
-                    CTX.trAbsY(GameContext.inputManager.mousePosY)),
-                new Vector2d(
-                    CTX.trAbsX(GameContext.inputManager.mousePosX),
-                    CTX.trAbsY(GameContext.inputManager.mousePosY)),
+                new Vector2d(x, y),
+                new Vector2d(x, y),
                 this.#towerImage,
                 this.#towerImageSelected,
                 this.#bulletImage
@@ -101,15 +104,16 @@ class CreateWall extends GameAction {
 
         ctx.globalAlpha = 0.3;
 
+
+        let x = Math.floor(CTX.trAbsX(GameContext.inputManager.mousePosX) / 60) * 60;
+        let y = Math.floor(CTX.trAbsY(GameContext.inputManager.mousePosY) / 60) * 60;
+
         Wall.blockout(ctx,
-            CTX.trAbsX(GameContext.inputManager.mousePosX),
-            CTX.trAbsY(GameContext.inputManager.mousePosY),
+            x, y,
             CONSTS.WALL[this.#orientation].WIDTH,
             CONSTS.WALL[this.#orientation].HEIGHT);
 
-        ctx.setTransform(1, 0, 0, 1,
-            GameContext.inputManager.mousePosX,
-            GameContext.inputManager.mousePosY);
+        ctx.setTransform(1, 0, 0, 1, x, y);
 
         ctx.globalAlpha = 0.1;
 
@@ -135,10 +139,11 @@ class CreateWall extends GameAction {
         super.stop();
 
         if (!this.lock) {
+            let x = Math.floor(CTX.trAbsX(GameContext.inputManager.mousePosX) / 60) * 60;
+            let y = Math.floor(CTX.trAbsY(GameContext.inputManager.mousePosY) / 60) * 60;
+
             let wall = new Wall(
-                new Vector2d(
-                    CTX.trAbsX(GameContext.inputManager.mousePosX),
-                    CTX.trAbsY(GameContext.inputManager.mousePosY)),
+                new Vector2d(x, y),
                 this.#orientation
             );
 
