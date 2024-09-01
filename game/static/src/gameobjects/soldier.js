@@ -324,12 +324,16 @@ class Soldier extends RoundObject {
             drawStrokedText(ctx, `${Math.floor(CTX.trX(this.x))} ${Math.floor(CTX.trY(this.y))} ${this.#angle}`,
                 -this.radius / 2, -this.radius * 1.5, 10);
 
-        ctx.fillStyle = "red";
+
+
         CTX.drawRect(-5, -5, 10, 10);
 
-        if (this.hp > 0)
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-
+        if (this.hp == 0)
+            ctx.fillStyle = "red";
+        else if (this.owner.name == "Player 2")
+            ctx.fillStyle = "#fff44f";
+        else
+            ctx.fillStyle = "#19647e";
 
         let angle = this.#forcedMovementAngle != 0 ? this.#forcedMovementAngle : this.#pathAngle;
 
@@ -445,7 +449,8 @@ class Soldier extends RoundObject {
     }
 
     notify(inputEvent) {
-        if (inputEvent.type == MouseEventType.MOUSE_DOWN &&
+        if (GameContext.getCurrentPlayer().name === this.owner.name &&
+            inputEvent.type == MouseEventType.MOUSE_DOWN &&
             Collider.checkCollisionPointWithSquare(
                 new Vector2d(inputEvent.x, inputEvent.y),
                 new Square(
