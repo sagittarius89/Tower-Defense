@@ -92,6 +92,11 @@ module.exports = class Soldier extends RoundObject {
 
         let enemy = this.findClostestEnemy(objects, astrpthfnd);
 
+        if (!enemy) {
+            this.#idle = true;
+            return;
+        }
+
         if (!this.#attackMode && !this.#idle)
             this.checkCollisions(objects, enemy);
 

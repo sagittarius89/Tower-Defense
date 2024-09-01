@@ -34,12 +34,9 @@ module.exports = class GameEngine {
     get WIDTH() { return this.ctx.canvas.width }
     get HEIGHT() { return this.ctx.canvas.height; }
 
-    endGame(hasPlayer1Objects, hasPlayer2Objects) {
-        console.log("end game");
+    endGame(hasPlayer1Objects, hasPlayer2Objects, network) {
         setTimeout(function () {
             this.continue = false;
-
-            //@todo
 
         }.bind(this), 1000);
     }
@@ -106,9 +103,10 @@ module.exports = class GameEngine {
 
         this.checkWin(objects);
 
-        setTimeout(function () {
-            this.update(this.#objects);
-        }.bind(this), CONSTS.FRAME_RATE);
+        if (this.continue)
+            setTimeout(function () {
+                this.update(this.#objects);
+            }.bind(this), CONSTS.FRAME_RATE);
     }
 
     updateAStarMap(objects) {
