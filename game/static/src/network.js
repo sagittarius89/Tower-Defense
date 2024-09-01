@@ -262,12 +262,39 @@ class Network {
                     this.resumeGame();
                     break;
                 }
+                case MessageType.COUNTDOWN: {
+                    let time = msg.get('time_left');
+
+                    let ctx = canvas.getContext("2d");
+
+                    ctx.fillStyle = "white";
+                    ctx.fillRect(0, 0, GraphicsContextWrapper.WIDTH, GraphicsContextWrapper.HEIGHT);
+
+                    drawStrokedText(ctx, `Game soon starts.`,
+                        GraphicsContextWrapper.WIDTH / 2, GraphicsContextWrapper.HEIGHT / 2, 40);
+                    drawStrokedText(ctx, `${time}s left`,
+                        GraphicsContextWrapper.WIDTH / 2, GraphicsContextWrapper.HEIGHT / 2 + 100, 40);
+                    drawStrokedText(ctx, `Prepare your defenses!`,
+                        GraphicsContextWrapper.WIDTH / 2, GraphicsContextWrapper.HEIGHT / 2 + 200, 40);
+
+                    break;
+                }
+                case MessageType.END_GAME: {
+                    let player = msg.get('player');
+
+                    GameContext.engine.endGame(player);
+                    break;
+                }
             }
         }
     }
 
     send(msg) {
         this.#client.send(msg.serialize());
+    }
+
+    closeConnection() {
+        this.#client.close();
     }
 };
 

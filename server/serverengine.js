@@ -10,6 +10,7 @@ module.exports = class GameEngine {
     #player1;
     #player2;
     #conn;
+    #end;
 
     constructor(p1, p2, conn) {
 
@@ -19,6 +20,7 @@ module.exports = class GameEngine {
         this.#player2 = p2;
         this.continue = false;
         this.#conn = conn;
+        this.#end = false;
     }
 
     /**
@@ -31,14 +33,17 @@ module.exports = class GameEngine {
 
     get objects() { return this.#objects; }
 
+    get end() { return this.#end; }
+
     get WIDTH() { return this.ctx.canvas.width }
     get HEIGHT() { return this.ctx.canvas.height; }
 
-    endGame(hasPlayer1Objects, hasPlayer2Objects, network) {
-        setTimeout(function () {
-            this.continue = false;
+    endGame(playerName, network) {
+        this.continue = false;
+        this.#end = true;
 
-        }.bind(this), 1000);
+        if (network)
+            network.endGame(playerName);
     }
 
     sync(dtoList) {
@@ -59,7 +64,7 @@ module.exports = class GameEngine {
         });
     }
 
-    checkWin(objects) {
+    checkWin(objects, network) {
         let hasPlayer1Objects = false;
         let hasPlayer2Objects = false;
 
@@ -76,8 +81,10 @@ module.exports = class GameEngine {
             }
         });
 
-        if (!hasPlayer1Objects || !hasPlayer2Objects) {
-            this.endGame(hasPlayer1Objects, hasPlayer2Objects);
+        if (!hasPlayer1Objects) {
+            this.endGame(this.#player2.name, network);
+        } else if (!hasPlayer2Objects) {
+            this.endGame(this.#player1.name, network);
         }
     }
 
@@ -101,7 +108,7 @@ module.exports = class GameEngine {
                 obj.logic(objects, this.#conn, this.aStrPthFnd, this.continue);
             });
 
-        this.checkWin(objects);
+        this.checkWin(objects, this.#conn);
 
         if (this.continue)
             setTimeout(function () {

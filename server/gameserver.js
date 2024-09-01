@@ -140,15 +140,29 @@ class GameServer {
     }
 
     playerDisconnected(conn) {
+        console.log('player disconnected');
 
-
-        if (conn == this.#p1Conn) {
-            this.#gameContext.engine.endGame(true, false);
-        } else if (conn == this.#p2Conn) {
-            this.#gameContext.engine.endGame(false, true);
+        if (!this.#gameContext.engine.end) {
+            if (conn == this.#p1Conn) {
+                this.#gameContext.engine.endGame(this.#player2.name);
+            } else if (conn == this.#p2Conn) {
+                this.#gameContext.engine.endGame(this.#player1.name);
+            }
+            this.#gameContext.engine.stop();
+            this.#gameContext = null;
         }
 
-        this.#gameContext.engine.stop();
+        try {
+            this.#p1Conn.close();
+        } catch (e) {
+            console.log(e);
+        }
+
+        try {
+            this.#p2Conn.close();
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     playerProp(player) {
@@ -228,7 +242,17 @@ class GameServer {
     }
 
     countDown() {
-        //@todo
+        let msg = Message.countdown(this.countDownNumber);
+        this.broadcast(msg);
+
+        if (this.countDownNumber > 0) {
+            setTimeout(function () {
+                this.countDownNumber--;
+                this.countDown();
+            }.bind(this), 1000);
+        } else {
+            this.postCountDown();
+        }
     }
 
 
@@ -248,9 +272,12 @@ class GameServer {
     }*/
 
     startGame() {
-        this.countDown();
         this.#gameContext = new GameContext(this.#player1, this.#player2, this);
 
+        this.countDown();
+    }
+
+    postCountDown() {
         let objectList = [];
         this.#gameContext.engine.objects.foreach(element => {
             objectList.push(element.toDTO());
@@ -271,6 +298,11 @@ class GameServer {
 
     full() {
         return this.#player1 && this.#player2;
+    }
+
+    endGame(player_name) {
+        let msg = Message.endGame(player_name);
+        this.broadcast(msg);
     }
 
     send(connection, msg) {

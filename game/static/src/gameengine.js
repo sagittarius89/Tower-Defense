@@ -6,6 +6,7 @@ class GameEngine {
     #fps;
     #lastLoop;
     #counter;
+    #end;
 
     /** @param {CanvasRenderingContext2D} ctx */
     constructor(ctx) {
@@ -84,43 +85,12 @@ class GameEngine {
         addObject(this.#camera);
     }
 
-    endGame(ctx, hasPlayer1Objects, hasPlayer2Objects) {
+    endGame(playerName) {
+        this.continue = false;
+        this.#end = true;
 
-        setTimeout(function () {
-            this.continue = false;
-            let text = '';
-            if (hasPlayer1Objects && !hasPlayer2Objects) {
-                text = `${GameContext.player1.name} wins`;
-            } else if (!hasPlayer1Objects && hasPlayer2Objects) {
-                text = `${GameContext.player2.name} wins`;
-            } else {
-                text = `Draw!`;
-            }
-
-            drawStrokedText(ctx, text, this.background.width / 2, this.background.height / 2, 40);
-        }.bind(this), 1000);
-    }
-
-    checkWin(ctx, objects) {
-        let hasPlayer1Objects = false;
-        let hasPlayer2Objects = false;
-
-        objects.foreach(element => {
-            if (element instanceof Building || element instanceof Soldier) {
-                let player = element.owner;
-                if (player) {
-                    if (player.name == GameContext.player1.name) {
-                        hasPlayer1Objects = true;
-                    } else if (player.name == GameContext.player2.name) {
-                        hasPlayer2Objects = true;
-                    }
-                }
-            }
-        });
-
-        if (!hasPlayer1Objects || !hasPlayer2Objects) {
-            //this.endGame(ctx, hasPlayer1Objects, hasPlayer2Objects);
-        }
+        this.playerWon = playerName;
+        Network.instance.closeConnection();
     }
 
     update(ctx, objects) {
@@ -145,10 +115,11 @@ class GameEngine {
             objects.foreach((obj) => {
                 obj.logic(objects);
             });
-
-            this.checkWin(ctx, objects);
         }
 
+        if (this.#end) {
+            return;
+        }
 
         this.#counter++;
 
@@ -170,6 +141,15 @@ class GameEngine {
         this.#objects.foreach((obj) => {
             obj.update(this.#ctx, this.#objects);
         });
+
+        if (this.#end) {
+            drawStrokedText(this.ctx, `Player ${this.playerWon} wins!`,
+                GraphicsContextWrapper.WIDTH / 2, GraphicsContextWrapper.HEIGHT / 2, 40);
+            drawStrokedText(this.ctx, `Press F5 to play again.`,
+                GraphicsContextWrapper.WIDTH / 2, GraphicsContextWrapper.HEIGHT / 2 + 150, 40);
+
+            return;
+        }
 
 
         // Draw mouse position at (0, 0)

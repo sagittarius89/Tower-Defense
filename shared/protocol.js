@@ -15,7 +15,9 @@ const MessageType = {
     SYNC_SCORE: 'sync_score',
     MOVE_SOLDIER: 'move_soldier',
     STOP_GAME: 'stop_game',
-    RESUME_GAME: 'resume_game'
+    RESUME_GAME: 'resume_game',
+    COUNTDOWN: 'countdown',
+    END_GAME: 'end_game'
 }
 
 class Message {
@@ -167,6 +169,20 @@ class Message {
 
     static resumeGame() {
         let msg = new Message(MessageType.RESUME_GAME);
+
+        return msg;
+    }
+
+    static countdown(timeLeft) {
+        let msg = new Message(MessageType.COUNTDOWN);
+        msg.set('time_left', timeLeft);
+
+        return msg;
+    }
+
+    static endGame(player_name) {
+        let msg = new Message(MessageType.END_GAME);
+        msg.set('player', player_name);
 
         return msg;
     }

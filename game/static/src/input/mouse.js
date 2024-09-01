@@ -4,7 +4,8 @@ const MouseEventType = {
     MOUSE_MOVE: 3,
     MOUSE_SCROLL_UP: 4,
     MOUSE_SCROLL_DOWN: 5,
-    MOUSE_RIGHT_CLICK: 6
+    MOUSE_RIGHT_CLICK: 6,
+    MOUSE_DBCLICK: 7
 }
 
 class MouseEvent {
@@ -55,6 +56,21 @@ class Mouse extends InputDevice {
             this.#eventQueue.enqueue(
                 new MouseEvent(MouseEventType.MOUSE_UP, x, y)
             );
+        });
+
+        window.addEventListener("dblclick", (event) => {
+            let x = e.offsetX;
+            let y = e.offsetY;
+
+            if (e.deltaY < 0) {
+                this.#eventQueue.enqueue(
+                    new MouseEvent(MouseEventType.MOUSE_DBCLICK, x, y)
+                );
+            } else {
+                this.#eventQueue.enqueue(
+                    new MouseEvent(MouseEventType.MOUSE_DBCLICK, x, y)
+                );
+            }
         });
 
         window.addEventListener('contextmenu', e => {
