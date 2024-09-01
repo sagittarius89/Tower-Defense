@@ -8,6 +8,7 @@ const Wall = require('./gameobjects/wallbuilding');
 const CONSTS = require('../shared/consts').CONSTS;
 const PlayerProperties = require('../shared/playerproperties');
 const Vector2d = require('../game/static/src/math/vector').Vector2d;
+const UUID = require('../shared/utils').UUID;
 
 
 class GameServer {
@@ -18,10 +19,14 @@ class GameServer {
     #p1prop;
     #p2prop;
     #gameContext;
+    #id;
 
     constructor() {
         this.countDownNumber = 3;
+        this.#id = UUID();
     }
+
+    get id() { return this.#id; }
 
     processMsg(msg, connection) {
         switch (msg.type) {
@@ -142,27 +147,18 @@ class GameServer {
     playerDisconnected(conn) {
         console.log('player disconnected');
 
-        if (!this.#gameContext.engine.end) {
-            if (conn == this.#p1Conn) {
-                this.#gameContext.engine.endGame(this.#player2.name);
-            } else if (conn == this.#p2Conn) {
-                this.#gameContext.engine.endGame(this.#player1.name);
+        if (this.#gameContext && this.#gameContext.engine) {
+            if (!this.#gameContext.engine.end) {
+                if (conn == this.#p1Conn) {
+                    this.#gameContext.engine.endGame(this.#player2.name);
+                } else if (conn == this.#p2Conn) {
+                    this.#gameContext.engine.endGame(this.#player1.name);
+                }
+                this.#gameContext.engine.stop();
             }
-            this.#gameContext.engine.stop();
-            this.#gameContext = null;
         }
 
-        try {
-            this.#p1Conn.close();
-        } catch (e) {
-            console.log(e);
-        }
-
-        try {
-            this.#p2Conn.close();
-        } catch (e) {
-            console.log(e);
-        }
+        this.dispose();
     }
 
     playerProp(player) {
@@ -279,13 +275,42 @@ class GameServer {
 
     postCountDown() {
         let objectList = [];
-        this.#gameContext.engine.objects.foreach(element => {
-            objectList.push(element.toDTO());
-        });
 
-        let msg = Message.initGame(objectList);
+        if (this.#gameContext && this.#gameContext.engine) {
 
-        this.broadcast(msg);
+            this.#gameContext.engine.objects.foreach(element => {
+                objectList.push(element.toDTO());
+            });
+
+            let msg = Message.initGame(objectList);
+
+            this.broadcast(msg);
+        } else {
+            this.dispose();
+        }
+    }
+
+    dispose() {
+        try {
+            this.#p1Conn.close();
+        } catch (e) {
+            console.log(e);
+        }
+
+        try {
+            this.#p2Conn.close();
+        } catch (e) {
+            console.log(e);
+        }
+
+        this.#player1 = null;
+        this.#player2 = null;
+        this.#p1Conn = null;
+        this.#p2Conn = null;
+        this.#p1prop = null;
+        this.#p2prop = null;
+        this.#gameContext = null;
+        this.countDownNumber = 3;
     }
 
     broadcast(msg) {

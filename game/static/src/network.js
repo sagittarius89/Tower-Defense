@@ -86,7 +86,9 @@ class Network {
             }
         }).bind(this));
 
-        this.send(Message.syncPack(dtoList));
+        if (!this.send(Message.syncPack(dtoList))) {
+            GameContext.engine.endGame(GameContext.getCurrentPlayer().name);
+        }
 
         setTimeout(this.sync.bind(this), CONSTS.SYNC_TIMEOUT);
     }
@@ -290,7 +292,14 @@ class Network {
     }
 
     send(msg) {
-        this.#client.send(msg.serialize());
+        try {
+            this.#client.send(msg.serialize());
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+
+        return true;
     }
 
     closeConnection() {
