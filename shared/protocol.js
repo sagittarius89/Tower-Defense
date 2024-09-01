@@ -14,6 +14,7 @@ const MessageType = {
     UPDATE_POSITION: 'update_position',
     SYNC_SCORE: 'sync_score',
     MOVE_SOLDIER: 'move_soldier',
+    HOLD_SOLDIER: 'hold_soldier',
     STOP_GAME: 'stop_game',
     RESUME_GAME: 'resume_game',
     COUNTDOWN: 'countdown',
@@ -127,6 +128,13 @@ class Message {
         let msg = new Message(MessageType.MOVE_SOLDIER)
         msg.set('id', id);
         msg.set('movement', pos);
+
+        return msg;
+    }
+
+    static holdSoldier(id) {
+        let msg = new Message(MessageType.HOLD_SOLDIER)
+        msg.set('id', id);
 
         return msg;
     }

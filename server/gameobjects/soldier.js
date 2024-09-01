@@ -29,6 +29,7 @@ module.exports = class Soldier extends RoundObject {
     #forcedMovementAngle;
     #lastActonCooldown;
     #path;
+    #hold;
 
     constructor(x, y, dronImage, bulletImage, owner) {
         let tmpImg = ResourceManager.instance.getImageResource(dronImage);
@@ -63,6 +64,7 @@ module.exports = class Soldier extends RoundObject {
         this.zIndex = 20;
         this.selectable = true;
         this.syncable = true;
+        this.#hold = false;
     }
 
     get angle() { return this.#angle; }
@@ -74,6 +76,8 @@ module.exports = class Soldier extends RoundObject {
         this.x = value.x;
         this.y = value.y;
     }
+    get hold() { return this.#hold; }
+    set hold(value) { this.#hold = value; }
 
     get movement() { return this.#movement; }
     set movement(value) { this.#movement.x = value.x; this.#movement.y = value.y; }
@@ -119,7 +123,8 @@ module.exports = class Soldier extends RoundObject {
             this.#movement = new Vector2d(0, 0);
         }
 
-        this.move(objects, astrpthfnd);
+        if (!this.#hold)
+            this.move(objects, astrpthfnd);
     }
 
     checkLineOfFire(objects, enemy) {
@@ -436,6 +441,7 @@ module.exports = class Soldier extends RoundObject {
         dto.type = this.constructor.name;
         dto.movement = this.#movement.toDTO();
         dto.path = Utils.serializePath(this.#path);
+        dto.hold = this.#hold;
 
         return dto;
     }

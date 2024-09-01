@@ -58,7 +58,7 @@ class Mouse extends InputDevice {
             );
         });
 
-        window.addEventListener("dblclick", (event) => {
+        window.addEventListener("dblclick", e => {
             let x = e.offsetX;
             let y = e.offsetY;
 

@@ -51,6 +51,9 @@ class GameServer {
             case MessageType.MOVE_SOLDIER:
                 this.processMoveSoldier(msg);
                 break;
+            case MessageType.HOLD_SOLDIER:
+                this.processHoldSoldier(msg);
+                break;
             case MessageType.STOP_GAME:
                 this.#gameContext.engine.stop();
                 this.broadcast(Message.stopGame());
@@ -73,6 +76,18 @@ class GameServer {
             soldier.movement = new Vector2d(pos.x, pos.y);
             soldier.lastActonCooldownRestart();
             soldier.idle = false;
+            soldier.hold = false;
+        }
+    }
+
+
+    processHoldSoldier(msg) {
+        let id = msg.get('id');
+        let soldier = this.#gameContext.engine.objects.byId(id);
+
+        if (soldier) {
+            soldier.lastActonCooldownRestart();
+            soldier.hold = !soldier.hold;
         }
     }
 

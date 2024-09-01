@@ -43,6 +43,7 @@ class Soldier extends RoundObject {
     #angle;
     #attackMode;
     #idle;
+    #hold;
     #imgWidth;
     #imgHeight;
     #currFrame;
@@ -77,6 +78,7 @@ class Soldier extends RoundObject {
         this.#currFrame = 0;
         this.#kills = 0;
         this.#bulletImage = bulletImage;
+        this.#hold = false;
 
         this.owner = owner;
         this.name = "Drone";
@@ -126,7 +128,8 @@ class Soldier extends RoundObject {
             return true;
         }
 
-        this.move(objects);
+        if (!this.#hold)
+            this.move(objects);
     }
 
     checkCollisions(objects, clostestEnemy) {
@@ -488,6 +491,20 @@ class Soldier extends RoundObject {
             GameContext.hud.currentAction = action;
 
             //Selection.instance.currentSelection = this;
+        } else if (
+            GameContext.getCurrentPlayer().name === this.owner.name &&
+            inputEvent.type == MouseEventType.MOUSE_RIGHT_CLICK &&
+            Collider.checkCollisionPointWithSquare(
+                new Vector2d(inputEvent.x, inputEvent.y),
+                new Square(
+                    CTX.trX(this.x - this.radius),
+                    CTX.trY(this.y - this.radius),
+                    CTX.trX(this.radius * 5),
+                    CTX.trHeight(this.radius * 5)))) {
+
+            console.log("uuid: " + this.id + " double clicked");
+
+            Network.instance.holdSoldier(this.id);
         }
     }
 
@@ -529,6 +546,7 @@ class Soldier extends RoundObject {
         obj.#bulletImage = dto.bulletImage;
         obj.#movement = Vector2d.fromDTO(dto.movement);
         obj.#path = dto.path;
+        obj.#hold = dto.hold;
 
         return obj;
     }
@@ -540,12 +558,13 @@ class Soldier extends RoundObject {
         this.#attackDistance = dto.attackDistance;
         this.#angle = dto.angle;
         this.#attackMode = dto.attackMode;
-        //this.#idle = dto.idle;
+        this.#idle = dto.idle;
         this.#kills = dto.kills;
         this.#image = dto.image;
         this.#bulletImage = dto.bulletImage;
         this.#movement = Vector2d.fromDTO(dto.movement);
         this.#path = dto.path;
+        this.#hold = dto.hold;
 
     }
 }

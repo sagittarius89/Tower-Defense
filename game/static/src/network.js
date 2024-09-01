@@ -119,6 +119,12 @@ class Network {
         this.send(msg);
     }
 
+    holdSoldier(id) {
+        let msg = Message.holdSoldier(id);
+
+        this.send(msg);
+    }
+
     stopGame() {
         GameContext.engine.continue = false;
     }
