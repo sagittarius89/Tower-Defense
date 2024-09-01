@@ -119,9 +119,9 @@ class Soldier extends RoundObject {
             this.addProperty(InputManager.INPUT_LISTENER_PROPERTY,
                 null);
 
-            if (Selection.instance.currentSelection == this) {
-                Selection.instance.currentSelection = null;
-            }
+            //if (Selection.instance.currentSelection == this) {
+            //    Selection.instance.currentSelection = null;
+            //}
 
             return true;
         }

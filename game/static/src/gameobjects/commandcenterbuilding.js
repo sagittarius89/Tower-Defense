@@ -113,7 +113,7 @@ class CreateWall extends GameAction {
             CONSTS.WALL[this.#orientation].WIDTH,
             CONSTS.WALL[this.#orientation].HEIGHT);
 
-        ctx.setTransform(1, 0, 0, 1, x, y);
+        ctx.setTransform(1, 0, 0, 1, GameContext.inputManager.mousePosX, GameContext.inputManager.mousePosY);
 
         ctx.globalAlpha = 0.1;
 

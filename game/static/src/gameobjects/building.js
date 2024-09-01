@@ -121,7 +121,7 @@ class Building extends SquareObject {
         ) {
             console.log("uuid: " + this.id + " clicked");
 
-            Selection.instance.currentSelection = this;
+            //Selection.instance.currentSelection = this;
         }
     }
 
