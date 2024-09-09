@@ -69,6 +69,10 @@ class GameEngine {
                     obj.owner);
                 this.addObject(obj);
             }
+            case 'Spawn': {
+                let obj = Spawn.fromDTO(dto);
+                this.addObject(obj);
+            }
         }
     }
 

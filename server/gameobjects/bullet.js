@@ -3,6 +3,7 @@ const ResourceManager = require('../resourcemanager').ResourceManager;
 const Vector2d = require('../../game/static/src/math/vector').Vector2d;
 //const Soldier = require('./soldier');
 const Building = require('./building');
+const Spawn = require('./spawnbuilding');
 const SquareObject = require('./squareobject');
 const Collider = require('../../game/static/src/physics/collider').Collider;
 const ColliderShape = require('../../game/static/src/physics/collider').ColliderShape;
@@ -57,7 +58,7 @@ module.exports = class Bullet extends RoundObject {
                 if ((obj.hp > 0) && //prevent shoting to destroyed objects
                     (obj.owner && this.parentOwner && obj.owner.name != this.parentOwner.name) &&
                     //turn off friendly fire
-                    (obj.constructor.name == 'Soldier' || obj instanceof Building)) {
+                    (obj.constructor.name == 'Soldier' || obj instanceof Building || obj instanceof Spawn)) {
 
                     let player = obj.owner;
 
@@ -74,7 +75,7 @@ module.exports = class Bullet extends RoundObject {
                                     let parent = objects.byId(this.#parent);
                                     if (parent) {
                                         parent.kills++;
-                                        conn.addScore(parent.owner, CONSTS.SOLDIER.SALVAGE);
+                                        conn.addScore(parent.owner, CONSTS.SOLDIER[obj.soldierType].SALVAGE);
                                     }
                                 }
 

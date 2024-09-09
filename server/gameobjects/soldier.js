@@ -9,7 +9,13 @@ const CONSTS = require('../../shared/consts').CONSTS;
 const Utils = require('../../shared/utils.js');
 const Wall = require('./wallbuilding');
 
-module.exports = class Soldier extends RoundObject {
+
+const Type = {
+    FIGHTER: "FIGHTER",
+    TANK: "TANK",
+};
+
+class Soldier extends RoundObject {
     #image;
     #velocity;
     #attackDistance;
@@ -30,11 +36,13 @@ module.exports = class Soldier extends RoundObject {
     #lastActonCooldown;
     #path;
     #hold;
+    #soldierType;
 
-    constructor(x, y, dronImage, bulletImage, owner) {
+    constructor(x, y, dronImage, bulletImage, owner, type = Type.FIGHTER) {
         let tmpImg = ResourceManager.instance.getImageResource(dronImage);
         super(CONSTS.SOLDIER.RADIUS, x, y);
 
+        this.#soldierType = type;
         this.#image = dronImage;
         this.#angle = 0;
         this.#pathAngle = 0;
@@ -43,11 +51,11 @@ module.exports = class Soldier extends RoundObject {
         this.#lastActonCooldown = 0;
         this.#path = [];
 
-        this.#velocity = CONSTS.SOLDIER_VELOCITY;
-        this.#attackDistance = CONSTS.SOLDIER.ATTACK_DISTANCE;
-        this.hp = CONSTS.SOLDIER.HP;
-        this.maxHp = CONSTS.SOLDIER.HP;
-        this.#shotFrequency = CONSTS.SOLDIER.SHOT_FREQUENCY;
+        this.#velocity = CONSTS.SOLDIER[this.#soldierType].VELOCITY;
+        this.#attackDistance = CONSTS.SOLDIER[this.#soldierType].ATTACK_DISTANCE;
+        this.hp = CONSTS.SOLDIER[this.#soldierType].HP;
+        this.maxHp = CONSTS.SOLDIER[this.#soldierType].HP;
+        this.#shotFrequency = CONSTS.SOLDIER[this.#soldierType].SHOT_FREQUENCY;
         this.#attackMode = false;
         this.#idle = false;
         this.#shotTimestamp = new Date().getTime();
@@ -84,6 +92,8 @@ module.exports = class Soldier extends RoundObject {
 
     get kills() { return this.#kills; }
     set kills(value) { this.#kills = Number.parseInt(value); }
+
+    get soldierType() { return this.#soldierType; }
 
     lastActonCooldownRestart() { this.#lastActonCooldown = 150; }
 
@@ -442,6 +452,7 @@ module.exports = class Soldier extends RoundObject {
         dto.movement = this.#movement.toDTO();
         dto.path = Utils.serializePath(this.#path);
         dto.hold = this.#hold;
+        dto.soldierType = this.#soldierType;
 
         return dto;
     }
@@ -467,4 +478,9 @@ module.exports = class Soldier extends RoundObject {
     sync(dto) {
         super.sync(dto);
     }
+}
+
+module.exports = {
+    Type,
+    Soldier
 }

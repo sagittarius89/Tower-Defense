@@ -1,6 +1,6 @@
 var SquareObjectR = require('../server/gameobjects/squareobject');
 var RoundObjectR = require('../server/gameobjects/roundobject');
-var SoldierR = require('../server/gameobjects/soldier');
+var SoldierR = require('../server/gameobjects/soldier').Soldier;
 var BuildingR = require('../server/gameobjects/building');
 const { PerformanceObserver, performance } = require('perf_hooks');
 

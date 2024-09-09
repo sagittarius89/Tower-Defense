@@ -1,6 +1,6 @@
 const GameObjectList = require('../game/static/src/gameobjectlist').GameObjectList;
 const Bullet = require('./gameobjects/bullet');
-const Soldier = require('./gameobjects/soldier');
+const Soldier = require('./gameobjects/soldier').Soldier;
 const Building = require('./gameobjects/building');
 const Tower = require('./gameobjects/towerbuilding');
 const CONSTS = require('../shared/consts').CONSTS;
@@ -93,8 +93,8 @@ module.exports = class GameEngine {
         if (this.continue)
             objects.foreach((obj) => {
                 if (obj.x && obj.y
-                    && (obj.x > this.background.width ||
-                        obj.y > this.background.height ||
+                    && (obj.x > CONSTS.GFX.ABS_WIDTH ||
+                        obj.y > CONSTS.GFX.ABS_HEIGHT ||
                         obj.x < 0 || obj.y < 0)
                 ) {
                     objects.delete(obj);

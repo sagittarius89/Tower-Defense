@@ -1,6 +1,7 @@
 const Building = require('./building');
 const Player = require("../../shared/player");
-const Soldier = require("./soldier");
+const Soldier = require("./soldier").Soldier;
+const Type = require("./soldier").Type;
 const Vector2d = require('../../game/static/src/math/vector').Vector2d;
 const CONSTS = require('../../shared/consts').CONSTS;
 
@@ -48,7 +49,7 @@ module.exports = class CommandCenterBuilding extends Building {
 
     produceNewSoldier(objects) {
         let soldier = new Soldier(this.#spawnPoint.x, this.#spawnPoint.y,
-            this.#dronImage, this.#bulletImage, this.owner);
+            this.#dronImage, this.#bulletImage, this.owner, Math.random() > 0.5 ? Type.FIGHTER : Type.TANK);
 
         objects.push(soldier);
     }

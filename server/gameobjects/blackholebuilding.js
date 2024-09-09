@@ -1,6 +1,6 @@
 const Building = require('./building');
 const Vector2d = require('../../game/static/src/math/vector').Vector2d;
-const Soldier = require('./soldier');
+const Soldier = require('./soldier').Soldier;
 const CONSTS = require('../../shared/consts').CONSTS;
 
 module.exports = class BlackHole extends Building {

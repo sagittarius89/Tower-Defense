@@ -36,6 +36,11 @@ class MoveSoldier extends GameAction {
 }
 
 
+const Type = {
+    FIGHTER: "FIGHTER",
+    TANK: "TANK",
+}
+
 class Soldier extends RoundObject {
     #image;
     #velocity;
@@ -54,11 +59,13 @@ class Soldier extends RoundObject {
     #enemyAngle;
     #forcedMovementAngle;
     #path;
+    #soldierType;
 
-    constructor(x, y, dronImage, bulletImage, owner) {
+    constructor(x, y, dronImage, bulletImage, owner, type = Type.FIGHTER) {
         let tmpImg = ResourceManager.instance.getImageResource(dronImage);
         super(CONSTS.SOLDIER.RADIUS, x, y);
 
+        this.#soldierType = type;
         this.#image = dronImage;
         this.#angle = 0;
         this.#pathAngle = 0;
@@ -66,10 +73,10 @@ class Soldier extends RoundObject {
         this.#forcedMovementAngle = 0;
         this.#path = [];
 
-        this.#velocity = CONSTS.SOLDIER_VELOCITY;
-        this.#attackDistance = CONSTS.SOLDIER.ATTACK_DISTANCE;
-        this.hp = CONSTS.SOLDIER.HP;
-        this.maxHp = CONSTS.SOLDIER.HP;
+        this.#velocity = CONSTS.SOLDIER[this.#soldierType].VELOCITY;
+        this.#attackDistance = CONSTS.SOLDIER[this.#soldierType].ATTACK_DISTANCE;
+        this.hp = CONSTS.SOLDIER[this.#soldierType].HP;
+        this.maxHp = CONSTS.SOLDIER[this.#soldierType].HP;
         this.#movement = new Vector2d(0, 0);
         this.#attackMode = false;
         this.#idle = false;
@@ -103,6 +110,8 @@ class Soldier extends RoundObject {
 
     get kills() { return this.#kills; }
     set kills(value) { this.#kills = Number.parseInt(value); }
+
+    get soldierType() { return this.#soldierType; }
 
     update(ctx, objects) {
         let enemy = this.findClostestEnemy(objects);
@@ -356,15 +365,31 @@ class Soldier extends RoundObject {
 
         let angle = this.#forcedMovementAngle != 0 ? this.#forcedMovementAngle : this.#pathAngle;
 
-        ctx.beginPath();
-        CTX.moveTo(0, 0, angle);
-        CTX.lineTo(-this.radius / 2, -this.radius / 2, angle);
-        CTX.lineTo(this.radius, 0, angle);
-        CTX.lineTo(-this.radius / 2, this.radius / 2, angle);
-        CTX.lineTo(0, 0, angle);
-        ctx.stroke();
-        ctx.fill();
-        ctx.closePath();
+        if (this.#soldierType == Type.FIGHTER) {
+            ctx.beginPath();
+            CTX.moveTo(0, 0, angle);
+            CTX.lineTo(-this.radius / 2, -this.radius / 2, angle);
+            CTX.lineTo(this.radius, 0, angle);
+            CTX.lineTo(-this.radius / 2, this.radius / 2, angle);
+            CTX.lineTo(0, 0, angle);
+            ctx.stroke();
+            ctx.fill();
+            ctx.closePath();
+        } else if (this.#soldierType == Type.TANK) {
+            ctx.beginPath();
+            CTX.moveTo(0, 0, angle);
+            let r7 = this.radius * 0.7;
+
+            CTX.lineTo(-r7, r7, angle);
+            CTX.lineTo(r7, r7, angle);
+            CTX.lineTo(r7, -r7, angle);
+            CTX.lineTo(-r7, -r7, angle);
+            CTX.lineTo(-r7, r7, angle);
+
+            ctx.stroke();
+            ctx.fill();
+            ctx.closePath();
+        }
 
 
         ctx.strokeStyle = 'rgba(0, 0, 1)';
@@ -520,6 +545,7 @@ class Soldier extends RoundObject {
         dto.movement = this.#movement.toDTO();
 
         dto.type = this.constructor.name;
+        dto.soldierType = this.#soldierType;
         return dto;
     }
 
@@ -532,7 +558,8 @@ class Soldier extends RoundObject {
         dto.y,
         dto.image,
         dto.bulletImage,
-        Player.fromDTO(dto.owner))) {
+        Player.fromDTO(dto.owner),
+        dto.soldierType)) {
 
         super.fromDTO(dto, obj);
 
@@ -565,6 +592,5 @@ class Soldier extends RoundObject {
         this.#movement = Vector2d.fromDTO(dto.movement);
         this.#path = dto.path;
         this.#hold = dto.hold;
-
     }
 }
