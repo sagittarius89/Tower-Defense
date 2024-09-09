@@ -121,8 +121,11 @@ class Building extends SquareObject {
         ) {
             console.log("uuid: " + this.id + " clicked");
 
+
             //Selection.instance.currentSelection = this;
         }
+
+        return true;
     }
 
     lumbago() {

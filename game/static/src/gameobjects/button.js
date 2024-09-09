@@ -107,7 +107,11 @@ class Button extends SquareObject {
 
             GameContext.hud.currentAction = action;
             GameContext.engine.addObject(action);
+
+            return false;
         }
+
+        return true;
     }
 
     update(ctx, objects) {

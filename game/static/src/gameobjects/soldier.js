@@ -515,6 +515,7 @@ class Soldier extends RoundObject {
             GameContext.engine.addObject(action);
             GameContext.hud.currentAction = action;
 
+            return false;
             //Selection.instance.currentSelection = this;
         } else if (
             GameContext.getCurrentPlayer().name === this.owner.name &&
@@ -530,7 +531,11 @@ class Soldier extends RoundObject {
             console.log("uuid: " + this.id + " double clicked");
 
             Network.instance.holdSoldier(this.id);
+
+            return false;
         }
+
+        return true;
     }
 
     toDTO() {

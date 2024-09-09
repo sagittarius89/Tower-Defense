@@ -180,6 +180,7 @@ class Hud extends GameObject {
                     actionsList.forEach(element => {
                         if (element.notify) {
                             element.notify(inputEvent);
+                            return false;
                         }
                     });
                 }
@@ -197,6 +198,8 @@ class Hud extends GameObject {
                 }
             }
         }
+
+        return true;
     }
 
     get Y() {

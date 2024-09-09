@@ -39,7 +39,9 @@ class InputManager extends GameObject {
                 let player = obj.getProperty(InputManager.INPUT_LISTENER_PROPERTY);
 
                 if (player && device) {
-                    obj.notify(event);
+                    if (!obj.notify(event)) {
+                        return true;
+                    }
                 }
             });
         }

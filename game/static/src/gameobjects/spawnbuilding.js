@@ -52,7 +52,7 @@ class Spawn extends Building {
         if (this.hp > 0) {
             drawHpStripe(ctx, this.maxHp, this.hp,
                 -this.width / 2,
-                -this.height * 1.2,
+                -this.height * 0.4,
                 this.width * 1.5, 10);
         }
 
