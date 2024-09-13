@@ -1,3 +1,36 @@
+class SelectAction extends GameAction {
+    #x;
+    #y;
+
+    constructor(x, y) {
+        super();
+
+        this.#x = x;
+        this.#y = y;
+    }
+
+
+    update(ctx, objects) {
+        let mouseX = GameContext.inputManager.mousePosX;
+        let mouseY = GameContext.inputManager.mousePosY;
+
+        let width = mouseX - this.#x;
+        let height = mouseY - this.#y;
+
+        ctx.fillStyle = 'rgba(0, 255, 0, 0.25)'; // Green with 50% transparency
+        ctx.strokeStyle = 'rgba(0, 255, 0, 0.25)'; // Green with 50% transparency
+        ctx.fillRect(this.#x, this.#y, width, height);
+        ctx.strokeRect(this.#x, this.#y, width, height);
+    }
+
+    mouseUp(x, y) {
+        Selection.instance.selectSoliderAction = null;
+    }
+}
+
+
+
+
 class Hud extends GameObject {
     #grd;
     #currentAction;
@@ -24,7 +57,6 @@ class Hud extends GameObject {
         this.#grd.addColorStop(0, 'rgba(0,0,0,0)');
 
         this.syncable = false;
-
     }
 
     drawSection(ctx, name, x, y, width, height) {
@@ -162,6 +194,12 @@ class Hud extends GameObject {
 
         drawStrokedText(ctx, "Your Salvage: " + GameContext.getCurrentPlayer().score, 2348, 2016, 20);
 
+
+        if (Selection.instance.selectSoliderAction) {
+            Selection.instance.selectSoliderAction.update(ctx, objects);
+        }
+
+
         if (CONSTS.DEBUG) {
             this.renderAStarMap(ctx, GameContext.engine.aStrPthFnd.map);
         }
@@ -185,9 +223,18 @@ class Hud extends GameObject {
                     });
                 }
             }
+
+            if (!Selection.instance.selectSoliderAction) {
+                Selection.instance.selectSoliderAction = new SelectAction(inputEvent.x, inputEvent.y);
+            }
+
         } else if (inputEvent.type == MouseEventType.MOUSE_UP) {
             if (this.currentAction) {
                 this.currentAction.mouseUp();
+            }
+
+            if (Selection.instance.selectSoliderAction) {
+                Selection.instance.selectSoliderAction.mouseUp();
             }
         } else if (inputEvent.type == MouseEventType.MOUSE_RIGHT_CLICK) {
             if (CONSTS.DEBUG) {
