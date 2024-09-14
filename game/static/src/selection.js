@@ -5,7 +5,7 @@ class Selection {
 
     constructor() {
         this.#selectedObj = null;
-        this.#selectedSoldiers = null;
+        this.#selectedSoldiers = [];
     }
 
     get currentSelection() { return this.#selectedObj; }
@@ -21,20 +21,28 @@ class Selection {
         }
     }
 
-    get soldierSelection() { return this.#selectedSoldiers; }
+    get soldierSelection() {
+        if (this.#selectedSoldiers == null) {
+            this.#selectedSoldiers = [];
+        };
+
+        return this.#selectedSoldiers;
+    }
     set soldierSelection(value) {
-        if (value == null) {
-            this.#selectedSoldiers = null;
-        }
-        else if (value instanceof Soldier)
-            this.#selectedSoldiers = value;
-        else {
-            this.#selectedSoldiers = null;
-            console.error("Passed value: " + value + " is not selected soldier");
+        this.#selectedSoldiers = [];
+
+        if (value instanceof Array) {
+            value.forEach((obj) => {
+                if (obj instanceof Soldier)
+                    this.#selectedSoldiers.push(obj);
+            });
+        } else {
+            console.error("Passed value: " + value + " is not an array");
         }
     }
 
     get selectSoliderAction() { return this.#selectSoliderAction; }
+
     set selectSoliderAction(value) {
         if (value == null) {
             this.#selectSoliderAction = null;
@@ -45,6 +53,13 @@ class Selection {
             this.#selectSoliderAction = null;
             console.error("Passed value: " + value + " is not select solider action");
         }
+    }
+
+    isSoldierSelected(obj) {
+        if (this.#selectedSoldiers == null)
+            return false;
+
+        return this.#selectedSoldiers.includes(obj);
     }
 }
 

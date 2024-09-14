@@ -1,12 +1,15 @@
 class SelectAction extends GameAction {
     #x;
     #y;
+    #objects;
 
     constructor(x, y) {
         super();
 
         this.#x = x;
         this.#y = y;
+
+        Selection.instance.soldierSelection = [];
     }
 
 
@@ -21,10 +24,27 @@ class SelectAction extends GameAction {
         ctx.strokeStyle = 'rgba(0, 255, 0, 0.25)'; // Green with 50% transparency
         ctx.fillRect(this.#x, this.#y, width, height);
         ctx.strokeRect(this.#x, this.#y, width, height);
+
+        this.#objects = objects;
     }
 
     mouseUp(x, y) {
         Selection.instance.selectSoliderAction = null;
+
+        this.#objects.foreach((obj) => {
+            if (obj instanceof Soldier && obj.owner.name == GameContext.getCurrentPlayer().name) {
+                let absx = CTX.trAbsX(this.#x);
+                let absy = CTX.trAbsY(this.#y);
+
+                if (obj.x > absx &&
+                    obj.x < absx + (CTX.trAbsX(GameContext.inputManager.mousePosX) - absx) &&
+                    obj.y > absy &&
+                    obj.y < absy + (CTX.trAbsY(GameContext.inputManager.mousePosY) - absy)) {
+
+                    Selection.instance.soldierSelection.push(obj);
+                }
+            }
+        });
     }
 }
 

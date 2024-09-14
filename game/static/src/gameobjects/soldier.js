@@ -346,13 +346,25 @@ class Soldier extends RoundObject {
             ctx.closePath();
         }
 
+        if (Selection.instance.isSoldierSelected(this)) {
+            ctx.fillStyle = "#A1D6B2";
+            ctx.beginPath();
+            CTX.ellipse(
+                this.x,
+                this.y,
+                this.radius * 1.1,
+                this.radius * 1.1,
+                0,
+                0,
+                2 * Math.PI);
+            ctx.stroke();
+            ctx.closePath();
+        }
 
         CTX.setTransform(1, 0, 0, 1, this.x, this.y);
         if (CONSTS.DEBUG)
             drawStrokedText(ctx, `${Math.floor(CTX.trX(this.x))} ${Math.floor(CTX.trY(this.y))} ${this.#angle}`,
                 -this.radius / 2, -this.radius * 1.5, 10);
-
-
 
         CTX.drawRect(-5, -5, 10, 10);
 
@@ -409,6 +421,9 @@ class Soldier extends RoundObject {
         }
 
         CTX.setTransform(1, 0, 0, 1, 0, 0);
+
+
+
 
 
         if (CONSTS.DEBUG && this.#path[0] && this.owner.name == "Player 2") {
